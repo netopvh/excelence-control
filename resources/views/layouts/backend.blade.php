@@ -91,7 +91,7 @@
 
                 <!-- User Info -->
                 <a class="link-fx text-body-color-dark fw-semibold fs-sm" href="javascript:void(0)">
-                    John Smith
+                    {{ Auth::user()->name }}
                 </a>
                 <!-- END User Info -->
 
@@ -173,7 +173,7 @@
                             <ul class="list-inline mt-3 mb-0">
                                 <li class="list-inline-item">
                                     <a class="link-fx text-dual fs-sm fw-semibold text-uppercase"
-                                        href="javascript:void(0)">Administrador</a>
+                                        href="javascript:void(0)">{{ Auth::user()->name }}</a>
                                 </li>
                                 <li class="list-inline-item">
                                     <!-- Layout API, functionality initialized in Template._uiApiLayout() -->
@@ -289,14 +289,14 @@
                         <button type="button" class="btn btn-sm btn-alt-secondary" id="page-header-user-dropdown"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fa fa-user d-sm-none"></i>
-                            <span class="d-none d-sm-inline-block fw-semibold">Administrador</span>
+                            <span class="d-none d-sm-inline-block fw-semibold">{{ Auth::user()->name }}</span>
                             <i class="fa fa-angle-down opacity-50 ms-1"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-md dropdown-menu-end p-0"
                             aria-labelledby="page-header-user-dropdown">
                             <div class="px-2 py-3 bg-body-light rounded-top">
                                 <h5 class="h6 text-center mb-0">
-                                    Administrador
+                                    {{ Auth::user()->name }}
                                 </h5>
                             </div>
                             <div class="p-2">
@@ -328,10 +328,15 @@
 
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item d-flex align-items-center justify-content-between space-x-1"
-                                    href="javascript:void(0)">
+                                    href="javascript:void(0)"
+                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <span>Sair</span>
                                     <i class="fa fa-fw fa-sign-out-alt opacity-25"></i>
                                 </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    style="display: none;">
+                                    @csrf
+                                </form>
                             </div>
                         </div>
                     </div>

@@ -2,40 +2,40 @@
 <html lang="{{ config('app.locale') }}">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-  <title>Codebase - Bootstrap 5 Admin Template &amp; UI Framework</title>
+    <title>Login de Acesso</title>
 
-  <meta name="description" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework created by pixelcave">
-  <meta name="author" content="pixelcave">
-  <meta name="robots" content="index, follow">
+    <meta name="description" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework created by pixelcave">
+    <meta name="author" content="pixelcave">
+    <meta name="robots" content="index, follow">
 
-  <!-- Open Graph Meta -->
-  <meta property="og:title" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework">
-  <meta property="og:site_name" content="Codebase">
-  <meta property="og:description" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework created by pixelcave">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="">
-  <meta property="og:image" content="">
+    <!-- Open Graph Meta -->
+    <meta property="og:title" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework">
+    <meta property="og:site_name" content="Codebase">
+    <meta property="og:description"
+        content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework created by pixelcave">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
 
-  <!-- Icons -->
-  <link rel="shortcut icon" href="{{ asset('media/favicons/favicon.png') }}">
-  <link rel="icon" sizes="192x192" type="image/png" href="{{ asset('media/favicons/favicon-192x192.png') }}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('media/favicons/apple-touch-icon-180x180.png') }}">
+    <!-- Icons -->
+    <link rel="shortcut icon" href="{{ asset('media/favicons/favicon.png') }}">
+    <link rel="icon" sizes="192x192" type="image/png" href="{{ asset('media/favicons/favicon-192x192.png') }}">
 
-  <!-- Modules -->
-  @yield('css')
-  @vite(['resources/sass/main.scss', 'resources/js/codebase/app.js'])
+    <!-- Modules -->
+    @yield('css')
+    @vite(['resources/sass/main.scss', 'resources/js/codebase/app.js'])
 
-  <!-- Alternatively, you can also include a specific color theme after the main stylesheet to alter the default color theme of the template -->
-  {{-- @vite(['resources/sass/main.scss', 'resources/sass/codebase/themes/corporate.scss', 'resources/js/codebase/app.js']) --}}
-  @yield('js')
+    <!-- Alternatively, you can also include a specific color theme after the main stylesheet to alter the default color theme of the template -->
+    {{-- @vite(['resources/sass/main.scss', 'resources/sass/codebase/themes/corporate.scss', 'resources/js/codebase/app.js']) --}}
+    @yield('js')
 </head>
 
 <body>
-  <!-- Page Container -->
-  <!--
+    <!-- Page Container -->
+    <!--
     Available classes for #page-container:
 
     SIDEBAR & SIDE OVERLAY
@@ -78,14 +78,14 @@
 
       'sidebar-dark page-header-dark dark-mode'   Enable dark mode (light sidebar/header is not supported with dark mode)
   -->
-  <div id="page-container" class="main-content-boxed">
-    <!-- Main Container -->
-    <main id="main-container">
-      @yield('content')
-    </main>
-    <!-- END Main Container -->
-  </div>
-  <!-- END Page Container -->
+    <div id="page-container" class="main-content-boxed">
+        <!-- Main Container -->
+        <main id="main-container">
+            @yield('content')
+        </main>
+        <!-- END Main Container -->
+    </div>
+    <!-- END Page Container -->
 </body>
 
 </html>

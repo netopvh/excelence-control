@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\OrderController;
@@ -22,7 +23,11 @@ Route::get('/', function () {
     return redirect()->route('dashboard.index');
 });
 
-Route::prefix('/dashboard')->name('dashboard.')->group(function () {
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/list', [DashboardController::class, 'list'])->name('list');
     Route::prefix('import')->name('import.')->group(function () {
