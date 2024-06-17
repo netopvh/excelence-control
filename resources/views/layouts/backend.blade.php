@@ -7,14 +7,14 @@
 
     <title>Sistema de Controle</title>
 
-    <meta name="description" content="Sistema para controle de produtos de produção">
-    <meta name="author" content="Creative Mobile">
+    <meta name="description" content="Sistema para controle de produção">
+    <meta name="author" content="Rubens Coelho">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph Meta -->
-    <meta property="og:title" content="Sistema para controle de produtos de produção">
-    <meta property="og:site_name" content="Creative Mobile">
-    <meta property="og:description" content="Sistema para controle de produtos de produção">
+    <meta property="og:title" content="Sistema para controle de produção">
+    <meta property="og:site_name" content="Excelence brindes">
+    <meta property="og:description" content="Sistema para controle de produção">
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:image" content="">

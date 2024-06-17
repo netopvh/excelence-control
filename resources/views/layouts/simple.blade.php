@@ -7,15 +7,14 @@
 
     <title>Login de Acesso</title>
 
-    <meta name="description" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework created by pixelcave">
-    <meta name="author" content="pixelcave">
+    <meta name="description" content="Sistema de Controle de Produção">
+    <meta name="author" content="rubens coelho">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph Meta -->
-    <meta property="og:title" content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework">
-    <meta property="og:site_name" content="Codebase">
-    <meta property="og:description"
-        content="Codebase - Bootstrap 5 Admin Template &amp; UI Framework created by pixelcave">
+    <meta property="og:title" content="Sistema de Controle de Produção">
+    <meta property="og:site_name" content="Excelence brindes">
+    <meta property="og:description" content="Sistema de Controle de Produção">
     <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:image" content="">
