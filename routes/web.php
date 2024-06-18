@@ -29,17 +29,24 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
+    Route::get('/chart', [DashboardController::class, 'chartJson'])->name('chart');
     Route::prefix('import')->name('import.')->group(function () {
         Route::get('/', [ImportController::class, 'index'])->name('index');
         Route::post('/', [ImportController::class, 'import'])->name('store');
     });
     Route::prefix('order')->name('order.')->group(function () {
+        //Order Lists
         Route::get('/list', [OrderController::class, 'json'])->name('list');
         Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/list-kanban', [OrderController::class, 'jsonKanban'])->name('list.kanban');
+        Route::patch('/list-kanban/{id}', [OrderController::class, 'updateKanban']);
         Route::get('/kanban', [OrderController::class, 'kanban'])->name('kanban');
+
+        // Order Manipularion
         Route::get('/create', [OrderController::class, 'create'])->name('create');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::post('/', [OrderController::class, 'store'])->name('store');
+        //Status Routes
         Route::post('/{id}/update/status', [OrderController::class, 'updateStatus'])->name('update.status');
         Route::post('/{id}/update/employee', [OrderController::class, 'updateEmployee'])->name('update.employee');
         Route::post('/{id}/update/arrived', [OrderController::class, 'updateArrived'])->name('update.arrived');

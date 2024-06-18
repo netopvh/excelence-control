@@ -2,7 +2,36 @@
 
 @section('js')
     <script src="{{ asset('js/lib/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.canvasjs.com/jquery.canvasjs.min.js"></script>
     @vite(['resources/js/pages/dashboard.js'])
+    <script>
+        window.onload = function() {
+            // Fazer requisição GET para o endpoint /dashboard/data
+            fetch('/dashboard/chart')
+                .then(response => response.json())
+                .then(data => {
+                    // Construir options do gráfico com os dados recebidos
+                    var options = {
+                        title: {
+                            text: "Pedidos no mês atual"
+                        },
+                        data: [{
+                            type: "column",
+                            dataPoints: data.map(item => ({
+                                label: item.order_date_formatted,
+                                y: item.total_orders
+                            }))
+                        }]
+                    };
+
+                    // Renderizar o gráfico usando CanvasJS
+                    $("#chartContainer").CanvasJSChart(options);
+                })
+                .catch(error => {
+                    console.error('Erro ao obter dados do endpoint:', error);
+                });
+        }
+    </script>
 @endsection
 
 @section('content')
@@ -48,6 +77,9 @@
                     </div>
                 </a>
             </div>
+        </div>
+        <div class="row">
+            <div id="chartContainer" style="height: 370px; width: 100%;"></div>
         </div>
     </div>
     <!-- END Page Content -->

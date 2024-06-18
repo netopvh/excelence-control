@@ -65,7 +65,7 @@ class OrderController extends Controller
                 return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
             })
             ->addColumn('action', function ($model) {
-                return '<a href="' . route('dashboard.order.show', $model->id) . '" class="btn btn-sm btn-primary"><i class="fa fa-eye" /></a>';
+                return '<a href="' . route('dashboard.order.show', $model->id) . '" class="btn btn-sm btn-primary text-white"><i class="fa fa-eye" /></a>';
             })
             ->with('totalApproved', Order::query()->where('status', 'aprovado')->count())
             ->with('totalWaitingApproval', Order::query()->where('status', 'aguard. aprov')->count())
@@ -79,9 +79,38 @@ class OrderController extends Controller
         return view('pages.order.list');
     }
 
+    public function jsonKanban()
+    {
+        $model = Order::query()->with(['customer', 'orderProducts']);
+
+        return response()->json($model->get());
+    }
+
     public function kanban()
     {
         return view('pages.order.kanban');
+    }
+
+    public function updateKanban(Request $request, $id)
+    {
+        // $request->validate([
+        //     'status' => 'required|in:aprovado,aguard. aprov,aguard. arte',
+        // ], [
+        //     'status.required' => 'O campo status é obrigatório.',
+        //     'status.in' => 'O campo status deve ser um dos seguintes valores: Aprovado, Aguard. Aprov, Aguard. Arte.',
+        // ]);
+
+        $order = Order::query()->findOrFail($id);
+
+        $order->update([
+            'status' => $request->get('status'),
+        ]);
+
+        session()->flash('success', 'Status atualizado com sucesso!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Status atualizado com sucesso!',
+        ]);
     }
 
     public function create()

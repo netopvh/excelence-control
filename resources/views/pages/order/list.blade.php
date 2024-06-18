@@ -50,17 +50,19 @@
                         </div>
                         <div class="d-flex flex-row gap-2">
                             <div>
-                                <button class="btn btn-primary" disabled>Listagem</button>
+                                <button class="btn btn-primary text-white" disabled>Listagem</button>
                             </div>
                             <div>
-                                <a href="{{ route('dashboard.order.kanban') }}" class="btn btn-primary">Kanban</a>
+                                <a href="{{ route('dashboard.order.kanban') }}"
+                                    class="btn btn-primary text-white">Kanban</a>
                             </div>
                         </div>
                     </div>
                     <div class="block-content block-content-full">
                         <div class="row mb-3">
                             <div class="col-md-2">
-                                <a href="{{ route('dashboard.order.create') }}" class="btn btn-primary">Novo Pedido</a>
+                                <a href="{{ route('dashboard.order.create') }}" class="btn btn-primary text-white">Novo
+                                    Pedido</a>
                             </div>
                         </div>
                         <fieldset class="border px-2 pb-2 mb-2">
@@ -115,7 +117,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4 col-xl-2">
-                                    <button type="button" class="btn btn-primary btn-block" id="btnCleanFilters">
+                                    <button type="button" class="btn btn-primary btn-block text-white"
+                                        id="btnCleanFilters">
                                         <i class="fa fa-fw fa-broom mr-1"></i> Limpar Filtros
                                     </button>
                                 </div>

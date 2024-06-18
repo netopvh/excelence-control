@@ -19,6 +19,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base_url" content="{{ url('/') }}">
     <!-- Icons -->
     <link rel="shortcut icon" href="{{ asset('media/favicons/favicon.png') }}">
     <link rel="icon" sizes="192x192" type="image/png" href="{{ asset('media/favicons/favicon-192x192.png') }}">
@@ -194,7 +195,7 @@
                     <div class="content-side content-side-full">
                         <ul class="nav-main">
                             <li class="nav-main-item">
-                                <a class="nav-main-link{{ request()->is('dashboard') ? ' active' : '' }}"
+                                <a class="nav-main-link{{ active(['dashboard'], ' active') }}"
                                     href="{{ route('dashboard.index') }}">
                                     <i class="nav-main-link-icon fa fa-house-user"></i>
                                     <span class="nav-main-link-name">Painel</span>
@@ -230,7 +231,7 @@
                             </li> --}}
                             <li class="nav-main-heading">Produção</li>
                             <li class="nav-main-item">
-                                <a class="nav-main-link{{ request()->is('dashboard.order.*') ? ' active' : '' }}"
+                                <a class="nav-main-link{{ active(['dashboard.order.*'], ' active') }}"
                                     href="{{ route('dashboard.order.index') }}">
                                     <i class="nav-main-link-icon fa fa-envelope-open"></i>
                                     <span class="nav-main-link-name">Pedidos</span>
@@ -238,7 +239,8 @@
                             </li>
                             <li class="nav-main-heading">Administração</li>
                             <li class="nav-main-item">
-                                <a class="nav-main-link" href="{{ route('dashboard.import.index') }}">
+                                <a class="nav-main-link{{ active(['dashboard.import.index'], ' active') }}"
+                                    href="{{ route('dashboard.import.index') }}">
                                     <i class="nav-main-link-icon fa fa-object-group"></i>
                                     <span class="nav-main-link-name">Importar Dados</span>
                                 </a>

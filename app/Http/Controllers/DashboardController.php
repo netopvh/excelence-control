@@ -19,67 +19,17 @@ class DashboardController extends Controller
         return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt'));
     }
 
-    public function list(Request $request)
+    public function chartJson(Request $request)
     {
-        $model = Order::query()->with(['customer', 'orderProducts']);
+        $startDate = now()->startOfMonth();
+        $endDate = now()->endOfMonth();
 
-        return DataTables::of($model)
-            ->filter(function ($query) use ($request) {
+        $orders = Order::selectRaw("DATE_FORMAT(date, '%d/%m/%Y') as order_date_formatted, COUNT(*) as total_orders")
+            ->whereBetween('date', [$startDate, $endDate])
+            ->groupBy('order_date_formatted')
+            ->orderBy('order_date_formatted', 'asc') // Ordena pela data formatada
+            ->get();
 
-                if (trim($request->get('search')['value']) !== '') {
-                    $query->whereHas('customer', function ($query) use ($request) {
-                        $query->where('name', 'like', '%' . $request->get('search')['value'] . '%');
-                    })
-                        ->orWhere('number', 'like', '%' . $request->get('search')['value'] . '%')
-                        ->orWhere('employee', 'like', '%' . $request->get('search')['value'] . '%');
-                }
-
-                if ($request->get('status') !== 'all') {
-                    $query->where('status', $request->get('status'));
-                }
-
-                if ($request->get('month') !== 'all') {
-                    $query->whereMonth('date', $request->get('month'));
-                }
-
-                if (trim($request->get('from')) !== '' && trim($request->get('to')) !== '') {
-                    $query->whereDate('date', '>=', Carbon::createFromFormat('d/m/Y', $request->get('from')))
-                        ->whereDate('date', '<=', Carbon::createFromFormat('d/m/Y', $request->get('to')));
-                }
-            })
-            ->editColumn('date', function ($model) {
-                return $model->date->format('d/m/Y');
-            })
-            ->editColumn('delivery_date', function ($model) {
-                return $model->delivery_date->format('d/m/Y');
-            })
-            ->editColumn('customer.name', function ($model) {
-                return strtoupper($model->customer->name);
-            })
-            ->editColumn('status', function ($model) {
-                if ($model->status === 'aprovado') {
-                    return '<span class="badge bg-success">Aprovado</span>';
-                } else if ($model->status === 'aguard. aprov') {
-                    return '<span class="badge bg-warning">Aguardando Aprov.</span>';
-                } else if ($model->status === 'aguard. arte') {
-                    return '<span class="badge bg-info">Aguardando Arte</span>';
-                } else {
-                    return '<span class="badge bg-black-50">Não definido</span>';
-                }
-            })
-            ->editColumn('employee', function ($model) {
-                return $model->employee ? strtoupper($model->employee) : 'Não definido';
-            })
-            ->editColumn('arrived', function ($model) {
-                return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
-            })
-            ->addColumn('action', function ($model) {
-                return '<a href="' . route('dashboard.order.show', $model->id) . '" class="btn btn-sm btn-primary"><i class="fa fa-eye" /></a>';
-            })
-            ->with('totalApproved', Order::query()->where('status', 'aprovado')->count())
-            ->with('totalWaitingApproval', Order::query()->where('status', 'aguard. aprov')->count())
-            ->with('totalWaitingArt', Order::query()->where('status', 'aguard. arte')->count())
-            ->rawColumns(['status', 'arrived', 'action'])
-            ->make(true);
+        return response()->json($orders);
     }
 }
