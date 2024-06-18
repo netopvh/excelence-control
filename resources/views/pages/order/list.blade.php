@@ -131,7 +131,7 @@
                                         <th style="width: 100px;">Pedido</th>
                                         <th>Cliente</th>
                                         <th class="text-center" style="width: 110px">Status</th>
-                                        <th class="text-center" style="width: 20%;">Arte Finalista</th>
+                                        <th class="text-center" style="width: 20%;">Vendedor</th>
                                         <th class="text-center" style="width: 100px;">Mercadoria</th>
                                         <th style="width: 120px;">Entrega</th>
                                         <th class="text-center" style="width: 10%;">Ação</th>

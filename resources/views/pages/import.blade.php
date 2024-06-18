@@ -31,6 +31,16 @@
                         );
                         $('#import')[0].reset();
                         $('#import').attr('disabled', false);
+                    },
+                    error: function(data) {
+                        $('#loading').hide();
+                        $('#message').html(
+                            '<div class="alert alert-danger mx-4 alert-dismissible fade show" role="alert">' +
+                            '<strong>' + data.responseJSON.message + '</strong>' +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                            '</div>'
+                        );
+                        $('#import').attr('disabled', false);
                     }
                 })
             });
