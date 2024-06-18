@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fbcfca682642485e5920e3b0be69ffce",
+    "content-hash": "b91f753aa0f419825fc63dba4b8d1824",
     "packages": [
         {
             "name": "brick/math",
@@ -6321,28 +6321,28 @@
         },
         {
             "name": "watson/active",
-            "version": "7.1.0",
+            "version": "7.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dwightwatson/active.git",
-                "reference": "861be09a8d2ce225701f442899812506cbe5674e"
+                "reference": "ae143167005e1fae6f8a2d92c592d294b49f95d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dwightwatson/active/zipball/861be09a8d2ce225701f442899812506cbe5674e",
-                "reference": "861be09a8d2ce225701f442899812506cbe5674e",
+                "url": "https://api.github.com/repos/dwightwatson/active/zipball/ae143167005e1fae6f8a2d92c592d294b49f95d5",
+                "reference": "ae143167005e1fae6f8a2d92c592d294b49f95d5",
                 "shasum": ""
             },
             "require": {
-                "illuminate/config": "^10.0|^11.0",
-                "illuminate/http": "^10.0|^11.0",
-                "illuminate/routing": "^10.0|^11.0",
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.2"
+                "illuminate/config": "^9.0|^10.0",
+                "illuminate/http": "^9.0|^10.0",
+                "illuminate/routing": "^9.0|^10.0",
+                "illuminate/support": "^9.0|^10.0",
+                "php": "^8.1"
             },
             "require-dev": {
                 "mockery/mockery": "^1.5.1",
-                "phpunit/phpunit": "^9.0|^10.5|^11.0"
+                "phpunit/phpunit": "^9.0"
             },
             "type": "library",
             "extra": {
@@ -6381,9 +6381,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dwightwatson/active/issues",
-                "source": "https://github.com/dwightwatson/active/tree/7.1.0"
+                "source": "https://github.com/dwightwatson/active/tree/7.0.0"
             },
-            "time": "2024-02-28T21:52:01+00:00"
+            "time": "2023-02-15T02:30:02+00:00"
         },
         {
             "name": "webmozart/assert",
