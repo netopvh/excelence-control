@@ -29,7 +29,7 @@
 @section('js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const apiEndpoint = 'http://localhost'; // Replace with your API endpoint
+            const apiEndpoint = '{{ url('/') }}'; // Replace with your API endpoint
 
             // Fetch and render cards from the API
             fetch(`${apiEndpoint}/dashboard/order/list-kanban`)
