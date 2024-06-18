@@ -25,62 +25,44 @@
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.print.min.js') }}"></script>
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-    @vite(['resources/js/pages/dashboard.js'])
+    @vite(['resources/js/pages/order.js'])
 @endsection
 
 @section('content')
-    <!-- Page Content -->
     <div class="content">
-        <div class="row">
-            <div class="col-6 col-xl-3">
-                <a class="block block-rounded block-link-rotate text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
-                            <i class="fa fa-thumbs-up fa-2x text-success"></i>
-                        </div>
-                        <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $approved }}</div>
-                            <div class="fs-sm fw-semibold text-uppercase text-muted">Aprovados</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-xl-3">
-                <a class="block block-rounded block-link-rotate text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
-                            <i class="fa fa-hourglass-half fa-2x text-warning"></i>
-                        </div>
-                        <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $waitingApproval }}</div>
-                            <div class="fs-sm fw-semibold text-uppercase text-muted">Aguard. Aprov.</div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-6 col-xl-3">
-                <a class="block block-rounded block-link-rotate text-end" href="javascript:void(0)">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
-                        <div class="d-none d-sm-block">
-                            <i class="fa fa-id-badge fa-2x text-info"></i>
-                        </div>
-                        <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $waitingArt }}</div>
-                            <div class="fs-sm fw-semibold text-uppercase text-muted">Aguard. Arte</div>
-                        </div>
-                    </div>
-                </a>
+        <div class="bg-body-light border-bottom mb-4">
+            <div class="content py-1 text-center">
+                <nav class="breadcrumb bg-body-light py-2 mb-0">
+                    <a class="breadcrumb-item" href="{{ route('dashboard.index') }}">Painel</a>
+                    <a class="breadcrumb-item" href="#">Pedidos</a>
+                    <span class="breadcrumb-item active">Listagem</span>
+                </nav>
             </div>
         </div>
         <div class="row items-push">
             <div class="col-md-12 col-xl-12">
                 <div class="block block-rounded">
-                    <div class="block-header block-header-default">
-                        <h3 class="block-title">
-                            Último lançamentos para produção
-                        </h3>
+                    <div class="block-header block-header-default d-flex justify-content-between flex-row">
+                        <div>
+                            <h3 class="block-title">
+                                Listagem de Pedidos
+                            </h3>
+                        </div>
+                        <div class="d-flex flex-row gap-2">
+                            <div>
+                                <button class="btn btn-primary" disabled>Listagem</button>
+                            </div>
+                            <div>
+                                <a href="{{ route('dashboard.order.kanban') }}" class="btn btn-primary">Kanban</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="block-content block-content-full">
+                        <div class="row mb-3">
+                            <div class="col-md-2">
+                                <a href="{{ route('dashboard.order.create') }}" class="btn btn-primary">Novo Pedido</a>
+                            </div>
+                        </div>
                         <fieldset class="border px-2 pb-2 mb-2">
                             <legend class="float-none w-auto px-4 h5">Filtros</legend>
                             <div class="row">
@@ -164,5 +146,4 @@
             </div>
         </div>
     </div>
-    <!-- END Page Content -->
 @endsection

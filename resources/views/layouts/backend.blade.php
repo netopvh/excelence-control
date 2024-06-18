@@ -230,7 +230,8 @@
                             </li> --}}
                             <li class="nav-main-heading">Produção</li>
                             <li class="nav-main-item">
-                                <a class="nav-main-link" href="{{ route('dashboard.order.create') }}">
+                                <a class="nav-main-link{{ request()->is('dashboard.order.*') ? ' active' : '' }}"
+                                    href="{{ route('dashboard.order.index') }}">
                                     <i class="nav-main-link-icon fa fa-envelope-open"></i>
                                     <span class="nav-main-link-name">Pedidos</span>
                                 </a>

@@ -29,12 +29,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
-    Route::get('/list', [DashboardController::class, 'list'])->name('list');
     Route::prefix('import')->name('import.')->group(function () {
         Route::get('/', [ImportController::class, 'index'])->name('index');
         Route::post('/', [ImportController::class, 'import'])->name('store');
     });
     Route::prefix('order')->name('order.')->group(function () {
+        Route::get('/list', [OrderController::class, 'json'])->name('list');
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/kanban', [OrderController::class, 'kanban'])->name('kanban');
         Route::get('/create', [OrderController::class, 'create'])->name('create');
         Route::get('/{id}', [OrderController::class, 'show'])->name('show');
         Route::post('/', [OrderController::class, 'store'])->name('store');

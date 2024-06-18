@@ -10,13 +10,13 @@ use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
 {
-    public function index() : \Illuminate\View\View
+    public function index(): \Illuminate\View\View
     {
         $approved = Order::query()->where('status', 'aprovado')->count();
         $waitingApproval = Order::query()->where('status', 'aguard. aprov')->count();
         $waitingArt = Order::query()->where('status', 'aguard. arte')->count();
 
-        return view('dashboard', compact('approved', 'waitingApproval', 'waitingArt'));
+        return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt'));
     }
 
     public function list(Request $request)

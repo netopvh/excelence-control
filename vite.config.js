@@ -14,6 +14,7 @@ export default defineConfig({
                 'resources/js/codebase/app.js',
                 'resources/js/app.js',
                 'resources/js/pages/dashboard.js',
+                'resources/js/pages/order.js',
             ],
             refresh: true,
         }),

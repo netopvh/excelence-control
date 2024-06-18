@@ -232,7 +232,7 @@
                     </div>
                     <div class="d-flex flex-row justify-content-end gap-1 my-4">
                         <div>
-                            <a class="btn btn-warning" href="{{ route('dashboard.index') }}">
+                            <a class="btn btn-warning" href="{{ route('dashboard.order.index') }}">
                                 <i class="fa fa-arrow-left opacity-50 me-1"></i>Voltar
                             </a>
                         </div>
