@@ -52,7 +52,7 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
             $order->fill([
                 'employee' => $row['vendedor'],
                 'date' => $this->parseDate($row['data']),
-                'status' => $row['arte'],
+                'status' => 'new-orders', //$row['arte'],
                 'delivery_date' => $this->parseDate($row['entrega']),
             ])->save();
         }
