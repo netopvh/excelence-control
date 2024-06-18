@@ -217,7 +217,7 @@
 
         <div class="d-flex flex-row">
             <div class="me-2">
-                <a href="{{ route('dashboard.index') }}" class="btn bg-flat">
+                <a href="{{ route('dashboard.order.index') }}" class="btn bg-flat">
                     <i class="fa fa-fw fa-chevron-left text-white me-1"></i>
                     <span class="d-none d-sm-inline text-white">Voltar</span>
                 </a>
