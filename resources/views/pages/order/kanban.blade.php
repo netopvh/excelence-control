@@ -19,7 +19,7 @@
             background-color: #ffffff;
             border: 1px solid #ddd;
             border-radius: 5px;
-            padding: 10px;
+            padding: 14px 10px;
             margin-bottom: 10px;
             cursor: pointer;
         }
@@ -54,7 +54,7 @@
                 cardDiv.id = `card-${card.id}`;
                 cardDiv.draggable = true;
                 cardDiv.innerHTML =
-                    `<strong>N. do Pedido:</strong> #${card.number} <br> <strong>Cliente:</strong> ${card.customer.name}`;
+                    `<strong>N. do Pedido:</strong> #${card.number} <br> <strong>Data de Venda:</strong> ${card.date} <br> <strong>Cliente:</strong> ${card.customer}`;
                 cardDiv.addEventListener('dragstart', handleDragStart);
                 return cardDiv;
             }
@@ -108,6 +108,46 @@
                 column.addEventListener('drop', handleDrop);
                 column.addEventListener('dragover', handleDragOver);
             });
+
+            const filters = document.querySelectorAll('.kanban-filter');
+            filters.forEach(filter => {
+                filter.addEventListener('input', function() {
+                    const columnId = this.dataset.column;
+                    const filterType = this.dataset.filter;
+                    const filterText = this.value.trim().toLowerCase();
+                    const cards = document.querySelectorAll(`#${columnId}-cards .kanban-card`);
+
+                    cards.forEach(card => {
+                        const cardInfo = card.textContent.toLowerCase();
+                        let shouldShow = true;
+
+                        if (filterType === 'number') {
+                            const cardNumberMatch = cardInfo.match(
+                                /N\. do Pedido:\s*#(\d+)/i);
+                            if (cardNumberMatch && cardNumberMatch.length > 1) {
+                                const cardNumber = cardNumberMatch[1];
+                                shouldShow = cardNumber.includes(filterText);
+                            } else {
+                                shouldShow = false;
+                            }
+                        } else if (filterType === 'customer') {
+                            const customerInfoMatch = cardInfo.match(/Cliente:\s*(.*)/i);
+                            if (customerInfoMatch && customerInfoMatch.length > 1) {
+                                const customerName = customerInfoMatch[1];
+                                shouldShow = customerName.includes(filterText);
+                            } else {
+                                shouldShow = false;
+                            }
+                        }
+
+                        if (shouldShow) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
         });
     </script>
 @endsection
@@ -151,19 +191,51 @@
                         </div>
                         <div class="kanban-board" id="kanban-board">
                             <div class="kanban-column" id="new-orders">
-                                <h5 class="text-center">Novos Pedidos</h5>
+                                <h5 class="text-center text-white bg-info py-4 mb-2 rounded-1">Arte Finalista</h5>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="new-orders"
+                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="new-orders"
+                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                </div>
                                 <div class="kanban-cards" id="new-orders-cards"></div>
                             </div>
                             <div class="kanban-column" id="in-production">
-                                <h5 class="text-center">Em Produção</h5>
+                                <h5 class="text-center text-white bg-elegance py-4 mb-2 rounded-1">Em Produção</h5>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="in-production"
+                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="in-production"
+                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                </div>
                                 <div class="kanban-cards" id="in-production-cards"></div>
                             </div>
                             <div class="kanban-column" id="finished">
-                                <h5 class="text-center">Finalizados</h5>
+                                <h5 class="text-center text-white bg-success py-4 mb-2 rounded-1">Concluídos</h5>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="finished"
+                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="finished"
+                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                </div>
                                 <div class="kanban-cards" id="finished-cards"></div>
                             </div>
                             <div class="kanban-column" id="shipped">
-                                <h5 class="text-center">Enviados</h5>
+                                <h5 class="text-center text-white bg-earth py-4 mb-2 rounded-1">Enviados</h5>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="shipped"
+                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control kanban-filter" data-column="shipped"
+                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                </div>
                                 <div class="kanban-cards" id="shipped-cards"></div>
                             </div>
                         </div>

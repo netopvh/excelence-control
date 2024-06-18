@@ -83,7 +83,15 @@ class OrderController extends Controller
     {
         $model = Order::query()->with(['customer', 'orderProducts']);
 
-        return response()->json($model->get());
+        return response()->json($model->get()->map(function ($model) {
+            return [
+                'id' => $model->id,
+                'number' => $model->number,
+                'customer' => $model->customer->name,
+                'date' => $model->date->format('d/m/Y'),
+                'status' => $model->status,
+            ];
+        }));
     }
 
     public function kanban()
