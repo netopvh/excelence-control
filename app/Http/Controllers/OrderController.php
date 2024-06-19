@@ -16,7 +16,9 @@ class OrderController extends Controller
 {
     public function json(Request $request)
     {
-        $model = Order::query()->with(['customer', 'orderProducts', 'employee']);
+        $model = Order::query()
+            ->with(['customer', 'orderProducts', 'employee'])
+            ->orderBy('date', 'desc');
 
         return DataTables::of($model)
             ->filter(function ($query) use ($request) {
