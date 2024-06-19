@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementType;
+use App\Events\OrderStepUpdated;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\User;
@@ -150,7 +151,17 @@ class OrderController extends Controller
             'waiting_design'    => 'Aguard. Arte',
         ];
 
-        return view('pages.order.show', compact('order', 'users', 'status'));
+        $step = [
+            'created'           => 'Novo',
+            'in_design'         => 'Design e Arte',
+            'in_production'     => 'Produção',
+            'finished'          => 'Concluído',
+            'shipping'          => 'Para Entrega',
+            'pickup'            => 'Para Retirada',
+            'cancelled'         => 'Cancelado',
+        ];
+
+        return view('pages.order.show', compact('order', 'users', 'status', 'step'));
     }
 
     public function store(Request $request)
@@ -343,6 +354,30 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Chegou atualizado com sucesso!',
+        ]);
+    }
+
+    public function updateStep(Request $request, $id)
+    {
+        $request->validate([
+            'step' => 'required|in:created,in_design,in_production,finished,shipping,pickup,cancelled',
+        ], [
+            'step.required' => 'O campo chegou é obrigatório.',
+            'step.in' => 'O campo não possui o valor esperado.',
+        ]);
+
+        $order = Order::query()->findOrFail($id);
+
+        $order->update([
+            'step' => $request->get('step'),
+        ]);
+
+        broadcast(new OrderStepUpdated($order));
+
+        return response()->json([
+            'success' => true,
+            'step' => get_step($order->step),
+            'message' => 'Etapa atualizada com sucesso!',
         ]);
     }
 }

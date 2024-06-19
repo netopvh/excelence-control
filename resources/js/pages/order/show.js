@@ -1,3 +1,5 @@
+import { post } from "../../codebase/api";
+
 class pageShowOrder {
 
   static initPage() {
@@ -8,33 +10,25 @@ class pageShowOrder {
       jQuery('#upload-preview').submit(function(e) {
           e.preventDefault();
 
-          $.ajax({
-              url: url + '/dashboard/order/' + orderId + '/upload/preview',
-              method: "POST",
-              data: new FormData(this),
-              dataType: 'JSON',
-              contentType: false,
-              cache: false,
-              processData: false,
-              beforeSend: function() {
-                  $('#loading-preview').show();
-                  $('#upload-preview').attr('disabled', 'disabled');
-              },
-              success: function(data) {
-                  location.reload();
-              },
-              error: function(data) {
-                  $('#loading-preview').hide();
-                  $('#error-msg').html(
-                      '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                      '<strong>' + data.responseJSON.message + '</strong>' +
-                      '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
-                      '</div>'
-                  );
-                  // $('#upload-preview')[0].reset();
-                  // $('#upload-preview').attr('disabled', false);
+          $('#loading-preview').show();
+          $('#upload-preview').attr('disabled', 'disabled');
+
+          post('/dashboard/order/' + orderId + '/upload/preview', new FormData(this), {
+              headers: {
+                  'Content-Type': 'multipart/form-data'
               }
-          })
+          }).then(response => {
+            location.reload();
+          }).catch(error => {
+              console.log(error);
+              $('#loading-preview').hide();
+              $('#error-msg').html(
+                  '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                  '<strong>' + data.responseJSON.message + '</strong>' +
+                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                  '</div>'
+              );
+          });
       });
 
       $('#upload-design').submit(function(e) {
@@ -171,6 +165,37 @@ class pageShowOrder {
               }
           })
       });
+
+      $('.dropdown-item.step').click(function() {
+        var step = $(this).data('value');
+
+        $('#arrived-dropdown').html(
+          '<div class="spinner-border spinner-border-sm text-white" role="status">' +
+          '<span class="visually-hidden">Loading...</span>' +
+          '</div>'
+        );
+
+        post('/dashboard/order/' + orderId + '/update/step', {
+          step: step
+        }).then(response => {
+          $('#step-dropdown').html('');
+          $('#step-dropdown').html(
+              '<i class="fa fa-fw fa-chevron-down text-white me-1"></i>' +
+              '<span class="d-none d-sm-inline">' + response.step +
+              '</span>'
+          );
+          Codebase.helpers('jq-notify', {
+            align: 'right',
+            from: 'top',
+            type: 'success',
+            icon: 'fa fa-info me-5',
+            message: response.message
+          });
+        }).catch(error => {
+            console.log(error);
+        });
+
+    });
   }
 
   static init() {

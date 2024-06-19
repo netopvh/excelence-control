@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="me-2">
+                        <div class="me-2" style="display: none">
                             <span class="fw-bold">Etapa:</span>
                             <div class="dropdown">
                                 <button type="button" class="btn btn-success dropdown-toggle text-white"
@@ -76,6 +76,22 @@
                                     <a class="dropdown-item arrived" data-value="1" href="javascript:void(0)">Chegou</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item arrived" data-value="0" href="javascript:void(0)">Não Chegou</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="me-2">
+                            <span class="fw-bold">Etapa:</span>
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-success dropdown-toggle text-white" id="step-dropdown"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ get_step($order->step) }}
+                                </button>
+                                <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-primary">
+                                    @foreach ($step as $key => $value)
+                                        <a class="dropdown-item step" data-value="{{ $key }}"
+                                            href="javascript:void(0)">{{ $value }}</a>
+                                        <div class="dropdown-divider"></div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

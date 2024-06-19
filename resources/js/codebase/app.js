@@ -7,6 +7,8 @@
 
 // Import required modules
 import Template from './modules/template';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
 // App extends Template
 export default class App extends Template {
@@ -43,12 +45,40 @@ export default class App extends Template {
    *
    */
 
-  //  _uiInit() {
-  //      // Call original function
-  //      super._uiInit();
-  //
-  //      // Your extra JS code afterwards
-  //  }
+   _uiInit() {
+       super._uiInit();
+
+       this._initLaravelEcho();
+   }
+
+   _initLaravelEcho() {
+      window.Pusher = Pusher;
+      window.Echo = new Echo({
+          broadcaster: 'pusher',
+          key: import.meta.env.VITE_PUSHER_APP_KEY,
+          cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+          encrypted: true
+      });
+
+      window.Echo.join(`orders`)
+      .here((users) => {
+          console.log(users);
+      })
+      .joining((user) => {
+          console.log(user.name);
+      })
+      .leaving((user) => {
+          console.log(user.name);
+      })
+      .listen('YourEventName', (e) => {
+          console.log(e);
+      });
+
+      window.Echo.channel('orders')
+        .listen('OrderStepUpdated', (e) => {
+            console.log(e);
+        });
+   }
 
   /*
    * EXAMPLE #3 - Replacing default functionality by writing your own code
@@ -56,7 +86,7 @@ export default class App extends Template {
    */
 
   //  _uiInit() {
-  //      // Your own JS code without ever calling the original function's code
+       // Your own JS code without ever calling the original function's code
   //  }
 }
 
