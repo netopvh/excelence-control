@@ -56,18 +56,6 @@
             Codebase.helpersOnLoad(['jq-datepicker']);
         });
 
-        let route = "{{ route('dashboard.product.autocomplete') }}";
-
-        jQuery('input.autocomplete').typeahead({
-            source: function(query, process) {
-                return jQuery.get(route, {
-                    query: query
-                }, function(data) {
-                    return process(data);
-                });
-            }
-        });
-
         @if (session('success'))
             jQuery.notify({
                 icon: 'fa fa-fw fa-check',
@@ -109,6 +97,55 @@
             });
         @endif
     </script>
+    <script>
+        let productIndex = 2;
+        let route = "{{ route('dashboard.product.autocomplete') }}";
+
+        jQuery('input.autocomplete-1').typeahead({
+            source: function(query, process) {
+                return jQuery.get(route, {
+                    query: query
+                }, function(data) {
+                    return process(data);
+                });
+            }
+        });
+
+        function adicionarLinha() {
+            const tabela = document.getElementById('tabelaProdutos').getElementsByTagName('tbody')[0];
+            const novaLinha = tabela.insertRow();
+
+            novaLinha.innerHTML = `
+                <td><input type="text" class="form-control autocomplete-${productIndex}" name="product[${productIndex}][name]" placeholder="Informe o Produto" /></td>
+                <td><input type="number" class="form-control" name="product[${productIndex}][qtd]" placeholder="Quantidade" /></td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="removerLinha(this)">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </td>
+            `;
+
+            tabela.appendChild(novaLinha);
+
+            jQuery('input.autocomplete-' + productIndex).typeahead({
+                source: function(query, process) {
+                    return jQuery.get(route, {
+                        query: query
+                    }, function(data) {
+                        return process(data);
+                    });
+                }
+            });
+
+            productIndex++;
+        }
+
+        function removerLinha(botao) {
+            const linha = botao.parentNode.parentNode;
+            linha.parentNode.removeChild(linha);
+        }
+    </script>
+
     {{-- <script type="module">
         import Autocomplete from "https://cdn.jsdelivr.net/gh/lekoala/bootstrap5-autocomplete@master/autocomplete.js";
         Autocomplete.init("input.autocomplete", {
@@ -138,108 +175,104 @@
                 <h3 class="block-title">Cadastro de Pedido em Produção</h3>
             </div>
             <div class="block-content">
+                <!-- Seletor de cliente -->
                 <form action="{{ route('dashboard.order.store') }}" method="POST">
                     @csrf
-                    <div class="row push">
-                        <div class="col-lg-3">
-                            <p class="fw-bold">
-                                Informações Gerais
-                            </p>
+                    <div class="row mb-3">
+                        <div class="col-md-9">
+                            <label for="selectCliente" class="form-label">Selecionar Cliente</label>
+                            <select class="customer-select form-select" id="selectCliente" name="customer_id"
+                                data-placeholder="Selecione um cliente..">
+                                <option></option>
+                                <!-- Required for data-placeholder attribute to work with Select2 plugin -->
+                                @foreach ($customers as $customer)
+                                    <option value="{{ $customer->id }}">{{ strtoupper($customer->name) }}</option>
+                                @endforeach
+                            </select>
+                            @error('customer_id')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-lg-9">
-                            <!-- Form Grid -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <select class="customer-select form-select" id="customer_id" name="customer_id"
-                                        style="width: 80%;" data-placeholder="Selecione um cliente..">
-                                        <option></option>
-                                        <!-- Required for data-placeholder attribute to work with Select2 plugin -->
-                                        @foreach ($customers as $customer)
-                                            <option value="{{ $customer->id }}">{{ strtoupper($customer->name) }}</option>
-                                        @endforeach
-                                    </select>
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#modal-normal"
-                                        class="btn btn-md btn-alt-primary">Novo
-                                        Cliente</button>
-                                    @error('customer_id')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-
-                                </div>
-                            </div>
-                            <div class="row mb-4">
-                                <div class="col-4">
-                                    <input type="text" class="js-datepicker form-control" id="date" name="date"
-                                        data-week-start="1" data-autoclose="true" data-today-highlight="true"
-                                        data-date-format="dd/mm/yyyy" placeholder="Data de Emissão">
-                                    @error('date')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-4">
-                                    <input type="number" name="number" placeholder="N. do Pedido" class="form-control">
-                                    @error('number')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-4">
-                                    <input type="text" class="js-datepicker form-control" id="delivery_date"
-                                        name="delivery_date" data-week-start="1" data-autoclose="true"
-                                        data-today-highlight="true" data-date-format="dd/mm/yyyy"
-                                        placeholder="Data de Entrega">
-                                    @error('delivery_date')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#modal-normal"
+                                class="btn btn-md btn-primary">Novo
+                                Cliente</button>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-3">
-                            <p class="fw-bold">
-                                Produtos
-                            </p>
+
+                    <!-- Campos de texto -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="dataEmissao" class="form-label">Data da Emissão</label>
+                            <input type="text" class="js-datepicker form-control" id="dataEmissao" name="date"
+                                data-week-start="1" data-autoclose="true" data-today-highlight="true"
+                                data-date-format="dd/mm/yyyy" placeholder="Data de Emissão">
+                            @error('date')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="col-lg-9">
-                            <table class="table table-bordered" id="productTable">
+                        <div class="col-md-4">
+                            <label for="numeroPedido" class="form-label">Número do Pedido</label>
+                            <input type="text" class="form-control" id="numeroPedido" name="number">
+                            @error('number')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dataEntrega" class="form-label">Data da Entrega</label>
+                            <input type="text" class="js-datepicker form-control" id="dataEntrega" name="delivery_date"
+                                data-week-start="1" data-autoclose="true" data-today-highlight="true"
+                                data-date-format="dd/mm/yyyy" placeholder="Data de Entrega">
+                            @error('delivery_date')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <!-- Tabela de produtos -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered" id="tabelaProdutos">
                                 <thead>
                                     <tr>
                                         <th>Produto</th>
-                                        <th style="width: 150px">Quantidade</th>
+                                        <th>Quantidade</th>
                                         <th>Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><input type="text" class="form-control autocomplete"
-                                                name="product[0][name]" />
+                                        <td>
+                                            <input type="text" class="form-control autocomplete-1"
+                                                name="product[1][name]" placeholder="Informe o Produto">
                                         </td>
-                                        <td><input type="number" class="form-control" name="product[0][qtd]" /></td>
-                                        <td><button type="button" class="btn btn-danger"
-                                                onclick="removeRow(this)">Remover</button></td>
+                                        <td>
+                                            <input type="number" class="form-control" name="product[1][qtd]"
+                                                placeholder="Quantidade">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success" onclick="adicionarLinha()">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="4" class="text-end">
-                                            <button type="button" class="btn btn-success" onclick="addRow()">Adicionar
-                                                Produto</button>
-                                        </td>
-                                    </tr>
-                                </tfoot>
                             </table>
                         </div>
                     </div>
-                    <div class="d-flex flex-row justify-content-end gap-1 my-4">
-                        <div>
-                            <a class="btn btn-warning" href="{{ route('dashboard.order.index') }}">
-                                <i class="fa fa-arrow-left opacity-50 me-1"></i>Voltar
-                            </a>
-                        </div>
-                        <div>
-                            <button type="submit" class="btn btn-primary me-1 mb-1">
-                                <i class="fa fa-check opacity-50 me-1"></i> Salvar
-                            </button>
+
+                    <div class="row">
+                        <div class="d-flex flex-row justify-content-end gap-1 my-4">
+                            <div>
+                                <a class="btn btn-warning" href="{{ route('dashboard.order.index') }}">
+                                    <i class="fa fa-arrow-left opacity-50 me-1"></i>Voltar
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary me-1 mb-1">
+                                    <i class="fa fa-check opacity-50 me-1"></i> Salvar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>

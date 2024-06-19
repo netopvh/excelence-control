@@ -47,4 +47,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderProduct::class);
     }
+
+    public function movements()
+    {
+        return $this->hasMany(OrderMovement::class, 'order_id');
+    }
 }

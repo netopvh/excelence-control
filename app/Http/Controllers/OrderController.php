@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\MovementType;
+use App\Enums\StatusType;
 use App\Events\OrderStepUpdated;
 use App\Models\Customer;
 use App\Models\Order;
@@ -28,7 +29,11 @@ class OrderController extends Controller
                         $query->where('name', 'like', '%' . $request->get('search')['value'] . '%');
                     })
                         ->orWhere('number', 'like', '%' . $request->get('search')['value'] . '%')
-                        ->orWhere('employee', 'like', '%' . $request->get('search')['value'] . '%');
+                        ->orWhere(function ($query) use ($request) {
+                            $query->whereHas('employee', function ($query) use ($request) {
+                                $query->where('name', 'like', '%' . $request->get('search')['value'] . '%');
+                            });
+                        });
                 }
 
                 if ($request->get('status') !== 'all') {
@@ -166,6 +171,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'date' => 'required',
@@ -194,13 +200,22 @@ class OrderController extends Controller
         ]);
 
 
+
         $customer = Customer::query()->findOrFail($request->get('customer_id'));
 
         $order = $customer->orders()->create([
+            'employee_id' => auth()->user()->id,
             'date' => Carbon::createFromFormat('d/m/Y', $request->get('date'))->format('Y-m-d'),
             'number' => $request->get('number'),
             'delivery_date' => Carbon::createFromFormat('d/m/Y', $request->get('delivery_date'))->format('Y-m-d'),
-            'status' => 'aguard. arte',
+            'status' => StatusType::WaitingDesign(),
+            'step' => MovementType::InDesign(),
+        ]);
+
+        $order->movements()->create([
+            'action_date' => now(),
+            'responsable_id' => auth()->user()->id,
+            'movement_type' => MovementType::InDesign(),
         ]);
 
         foreach ($request->get('product') as $product) {
