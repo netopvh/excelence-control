@@ -17,7 +17,6 @@ export default class App extends Template {
   constructor() {
     super();
   }
-
   /*
    *  Here you can override or extend any function you want from Template class
    *  if you would like to change/extend/remove the default functionality.

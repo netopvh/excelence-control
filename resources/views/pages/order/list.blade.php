@@ -25,7 +25,7 @@
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.print.min.js') }}"></script>
     <script src="{{ asset('js/plugins/datatables-buttons/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-    @vite(['resources/js/pages/order.js'])
+    @vite(['resources/js/pages/order/index.js'])
 @endsection
 
 @section('content')
@@ -133,9 +133,9 @@
                                         <th style="width: 120px;">Data</th>
                                         <th style="width: 100px;">Pedido</th>
                                         <th>Cliente</th>
-                                        <th class="text-center" style="width: 110px">Status</th>
+                                        <th class="text-center" style="width: 110px">Etapa</th>
                                         <th class="text-center" style="width: 20%;">Vendedor</th>
-                                        <th class="text-center" style="width: 100px;">Mercadoria</th>
+                                        <th class="text-center" style="width: 100px;">Status</th>
                                         <th style="width: 120px;">Entrega</th>
                                         <th class="text-center" style="width: 10%;">Ação</th>
                                     </tr>

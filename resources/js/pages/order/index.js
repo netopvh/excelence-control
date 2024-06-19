@@ -65,8 +65,8 @@ class pageOrder {
       serverSide: true,
       processing: true,
       paging: true,
-      pageLength: 10,
-      lengthMenu: [[5, 10, 20, 40, 60, 80, 100], [5, 10, 20, 40, 60, 80, 100]],
+      pageLength: 50,
+      lengthMenu: [[5, 10, 20, 40, 50, 80, 100], [5, 10, 20, 40, 50, 80, 100]],
       autoWidth: false,
       // buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
       //"<'row'<'col-sm-12'<'text-center bg-body-light py-2 mb-2'B>>>" +
@@ -82,7 +82,6 @@ class pageOrder {
         },
       },
       drawCallback: function (settings) {
-        console.log(settings.json);
       },
       columns: [
         {
@@ -94,8 +93,10 @@ class pageOrder {
         { data: 'date', name: 'date' },
         { data: 'number', name: 'number' },
         { data: 'customer.name', name: 'customer.name' },
-        { data: 'status', name: 'status' },
-        { data: 'employee', name: 'employee' },
+        { data: 'step', name: 'step' },
+        { data: 'employee.name', name: 'employee.name', render: function (data, type, row) {
+          return data ? data : '-';
+        }},
         { data: 'arrived', name: 'arrived' },
         { data: 'delivery_date', name: 'delivery_date' },
         { data: 'action', name: 'action', orderable: false, searchable: false}

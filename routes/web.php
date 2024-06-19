@@ -51,6 +51,7 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         //Status Routes
         Route::post('/{id}/update/status', [OrderController::class, 'updateStatus'])->name('update.status');
         Route::post('/{id}/update/employee', [OrderController::class, 'updateEmployee'])->name('update.employee');
+        Route::post('/{id}/update/designer', [OrderController::class, 'updateDesigner'])->name('update.designer');
         Route::post('/{id}/update/arrived', [OrderController::class, 'updateArrived'])->name('update.arrived');
         Route::post('/{id}/upload/preview', [OrderController::class, 'uploadPreview'])->name('upload.preview');
         Route::post('/{id}/upload/design', [OrderController::class, 'uploadDesign'])->name('upload.design');

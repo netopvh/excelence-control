@@ -38,11 +38,11 @@
                 .then(data => {
                     data.forEach(card => {
                         const cardElement = createCardElement(card);
-                        const columnCards = document.getElementById(`${card.status}-cards`);
+                        const columnCards = document.getElementById(`${card.step}-cards`);
                         if (columnCards) {
                             columnCards.appendChild(cardElement);
                         } else {
-                            console.error(`Column with ID ${card.status}-cards not found.`);
+                            console.error(`Column with ID ${card.step}-cards not found.`);
                         }
                     });
                 })
@@ -190,78 +190,80 @@
                                     Pedido</a>
                             </div>
                         </div>
-                        <div class="kanban-board" id="kanban-board">
-                            <div class="kanban-column" id="created">
-                                <h5 class="text-center text-white bg-default py-4 mb-2 rounded-1">Novos</h5>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="created"
-                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                        <div class="table-responsive">
+                            <div class="kanban-board" id="kanban-board">
+                                <div class="kanban-column" id="created">
+                                    <h5 class="text-center text-white bg-default py-4 mb-2 rounded-1">Novos</h5>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="created"
+                                            data-filter="number" placeholder="Filtrar por número do pedido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="created"
+                                            data-filter="customer" placeholder="Filtrar por cliente">
+                                    </div>
+                                    <div class="kanban-cards" id="created-cards"></div>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="created"
-                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                <div class="kanban-column" id="in_design">
+                                    <h5 class="text-center text-white bg-info py-4 mb-2 rounded-1">Design</h5>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="in_design"
+                                            data-filter="number" placeholder="Filtrar por número do pedido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="in_design"
+                                            data-filter="customer" placeholder="Filtrar por cliente">
+                                    </div>
+                                    <div class="kanban-cards" id="in_design-cards"></div>
                                 </div>
-                                <div class="kanban-cards" id="created-cards"></div>
-                            </div>
-                            <div class="kanban-column" id="in_design">
-                                <h5 class="text-center text-white bg-info py-4 mb-2 rounded-1">Design</h5>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="in_design"
-                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                                <div class="kanban-column" id="in_production">
+                                    <h5 class="text-center text-white bg-elegance py-4 mb-2 rounded-1">Produção</h5>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="in_production"
+                                            data-filter="number" placeholder="Filtrar por número do pedido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="in_production"
+                                            data-filter="customer" placeholder="Filtrar por cliente">
+                                    </div>
+                                    <div class="kanban-cards" id="in_production-cards"></div>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="in_design"
-                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                <div class="kanban-column" id="finished">
+                                    <h5 class="text-center text-white bg-success py-4 mb-2 rounded-1">Concluídos</h5>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="finished"
+                                            data-filter="number" placeholder="Filtrar por número do pedido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="finished"
+                                            data-filter="customer" placeholder="Filtrar por cliente">
+                                    </div>
+                                    <div class="kanban-cards" id="finished-cards"></div>
                                 </div>
-                                <div class="kanban-cards" id="in_design-cards"></div>
-                            </div>
-                            <div class="kanban-column" id="in_production">
-                                <h5 class="text-center text-white bg-elegance py-4 mb-2 rounded-1">Produção</h5>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="in_production"
-                                        data-filter="number" placeholder="Filtrar por número do pedido">
+                                <div class="kanban-column" id="shipping">
+                                    <h5 class="text-center text-white bg-earth py-4 mb-2 rounded-1">Enviados</h5>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="shipping"
+                                            data-filter="number" placeholder="Filtrar por número do pedido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="shipping"
+                                            data-filter="customer" placeholder="Filtrar por cliente">
+                                    </div>
+                                    <div class="kanban-cards" id="shipping-cards"></div>
                                 </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="in_production"
-                                        data-filter="customer" placeholder="Filtrar por cliente">
+                                <div class="kanban-column" id="pickup">
+                                    <h5 class="text-center text-white bg-gd-cherry py-4 mb-2 rounded-1">Retirada</h5>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="pickup"
+                                            data-filter="number" placeholder="Filtrar por número do pedido">
+                                    </div>
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control kanban-filter" data-column="pickup"
+                                            data-filter="customer" placeholder="Filtrar por cliente">
+                                    </div>
+                                    <div class="kanban-cards" id="pickup-cards"></div>
                                 </div>
-                                <div class="kanban-cards" id="in_production-cards"></div>
-                            </div>
-                            <div class="kanban-column" id="finished">
-                                <h5 class="text-center text-white bg-success py-4 mb-2 rounded-1">Concluídos</h5>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="finished"
-                                        data-filter="number" placeholder="Filtrar por número do pedido">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="finished"
-                                        data-filter="customer" placeholder="Filtrar por cliente">
-                                </div>
-                                <div class="kanban-cards" id="finished-cards"></div>
-                            </div>
-                            <div class="kanban-column" id="shipping">
-                                <h5 class="text-center text-white bg-earth py-4 mb-2 rounded-1">Enviados</h5>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="shipping"
-                                        data-filter="number" placeholder="Filtrar por número do pedido">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="shipping"
-                                        data-filter="customer" placeholder="Filtrar por cliente">
-                                </div>
-                                <div class="kanban-cards" id="shipping-cards"></div>
-                            </div>
-                            <div class="kanban-column" id="pickup">
-                                <h5 class="text-center text-white bg-gd-cherry py-4 mb-2 rounded-1">Retirada</h5>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="pickup"
-                                        data-filter="number" placeholder="Filtrar por número do pedido">
-                                </div>
-                                <div class="mb-3">
-                                    <input type="text" class="form-control kanban-filter" data-column="pickup"
-                                        data-filter="customer" placeholder="Filtrar por cliente">
-                                </div>
-                                <div class="kanban-cards" id="pickup-cards"></div>
                             </div>
                         </div>
                     </div>

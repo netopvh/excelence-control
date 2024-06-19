@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Enums\MovementType;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\User;
 use App\Rules\IsValidDate;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -51,9 +52,9 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
 
         if (!$order->exists) {
             $order->fill([
-                'employee' => $row['vendedor'],
+                'employee_id' => $this->findUser($row['vendedor']),
                 'date' => $this->parseDate($row['data']),
-                'status' => $this->validateStatus($row['arte']),
+                'step' => $this->validateStep($row['arte']),
                 'delivery_date' => $this->parseDate($row['entrega']),
             ])->save();
         }
@@ -99,7 +100,7 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
         return date('Y') . '-' . $dateParts[1] . '-' . $dateParts[0];
     }
 
-    private function validateStatus($status)
+    private function validateStep($status)
     {
         $status = trim($status);
 
@@ -114,6 +115,17 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
         }
 
         return MovementType::Created;
+    }
+
+    private function findUser($name)
+    {
+        $user = User::query()->where('name', 'like', '%' . $name . '%')->first();
+
+        if (is_null($user)) {
+            return null;
+        }
+
+        return $user->id;
     }
 
     public function batchSize(): int

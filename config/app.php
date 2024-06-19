@@ -188,6 +188,7 @@ return [
         Yajra\DataTables\DataTablesServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Watson\Active\ActiveServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
         /*
              * Application Service Providers...
              */

@@ -11,11 +11,13 @@ class Order extends Model
 
     protected $fillable = [
         'customer_id',
-        'employee',
+        'employee_id',
+        'designer_id',
         'date',
         'delivery_date',
         'number',
         'status',
+        'step',
         'preview',
         'design_file',
         'arrived',
@@ -29,6 +31,16 @@ class Order extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function  employee()
+    {
+        return $this->belongsTo(User::class, 'employee_id');
+    }
+
+    public function designer()
+    {
+        return $this->belongsTo(User::class, 'designer_id');
     }
 
     public function orderProducts()

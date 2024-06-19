@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\MovementType;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -13,7 +14,7 @@ class OrderController extends Controller
 {
     public function json(Request $request)
     {
-        $model = Order::query()->with(['customer', 'orderProducts']);
+        $model = Order::query()->with(['customer', 'orderProducts', 'employee']);
 
         return DataTables::of($model)
             ->filter(function ($query) use ($request) {
@@ -48,25 +49,22 @@ class OrderController extends Controller
             ->editColumn('customer.name', function ($model) {
                 return strtoupper($model->customer->name);
             })
-            ->editColumn('status', function ($model) {
-                if ($model->status === MovementType::InDesign) {
+            ->editColumn('step', function ($model) {
+                if ($model->step === MovementType::InDesign) {
                     return '<span class="badge bg-success">Design e Arte</span>';
-                } else if ($model->status === MovementType::Created) {
+                } else if ($model->step === MovementType::Created) {
                     return '<span class="badge bg-warning">Não Definido</span>';
-                } else if ($model->status === MovementType::InProduction) {
+                } else if ($model->step === MovementType::InProduction) {
                     return '<span class="badge bg-info">Produção</span>';
-                } else if ($model->status === MovementType::Finished) {
+                } else if ($model->step === MovementType::Finished) {
                     return '<span class="badge bg-info">Concluído</span>';
-                } else if ($model->status === MovementType::Shipping) {
+                } else if ($model->step === MovementType::Shipping) {
                     return '<span class="badge bg-info">Para Entrega</span>';
-                } else if ($model->status === MovementType::Pickup) {
+                } else if ($model->step === MovementType::Pickup) {
                     return '<span class="badge bg-info">Para Retirada</span>';
                 } else {
                     return '<span class="badge bg-black-50">Não definido</span>';
                 }
-            })
-            ->editColumn('employee', function ($model) {
-                return $model->employee ? strtoupper($model->employee) : 'Não definido';
             })
             ->editColumn('arrived', function ($model) {
                 return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
@@ -77,7 +75,7 @@ class OrderController extends Controller
             ->with('totalApproved', Order::query()->where('status', 'aprovado')->count())
             ->with('totalWaitingApproval', Order::query()->where('status', 'aguard. aprov')->count())
             ->with('totalWaitingArt', Order::query()->where('status', 'aguard. arte')->count())
-            ->rawColumns(['status', 'arrived', 'action'])
+            ->rawColumns(['step', 'arrived', 'action'])
             ->make(true);
     }
 
@@ -97,6 +95,7 @@ class OrderController extends Controller
                 'customer' => $model->customer->name,
                 'date' => $model->date->format('d/m/Y'),
                 'status' => $model->status,
+                'step' => $model->step,
             ];
         }));
     }
@@ -139,7 +138,19 @@ class OrderController extends Controller
     {
         $order = Order::query()->with(['customer', 'orderProducts'])->findOrFail($id);
 
-        return view('pages.order.show', compact('order'));
+        $users = User::query()->whereHas('roles', function ($query) {
+            $query->where('name', 'design');
+        })
+            ->where('name', '!=', 'Dayane Azevedo')
+            ->get();
+
+        $status = [
+            'approved'          => 'Aprovado',
+            'waiting_approval'  => 'Aguard. Aprov',
+            'waiting_design'    => 'Aguard. Arte',
+        ];
+
+        return view('pages.order.show', compact('order', 'users', 'status'));
     }
 
     public function store(Request $request)
@@ -248,7 +259,7 @@ class OrderController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|in:aprovado,aguard. aprov,aguard. arte',
+            'status' => 'required|in:approved,waiting_approval,waiting_design',
         ], [
             'status.required' => 'O campo status é obrigatório.',
             'status.in' => 'O campo status deve ser um dos seguintes valores: Aprovado, Aguard. Aprov, Aguard. Arte.',
@@ -260,9 +271,9 @@ class OrderController extends Controller
             'status' => $request->get('status'),
         ]);
 
-        session()->flash('success', 'Status atualizado com sucesso!');
         return response()->json([
             'success' => true,
+            'status' => status_type($request->get('status')),
             'message' => 'Status atualizado com sucesso!',
         ]);
     }
@@ -270,21 +281,45 @@ class OrderController extends Controller
     public function updateEmployee(Request $request, $id)
     {
         $request->validate([
-            'employee' => 'required|string|max:255',
+            'employee' => 'required|exists:users,name',
         ], [
-            'employee.string' => 'O campo funcionário deve ser uma string.',
-            'employee.max' => 'O campo funcionário deve ter no máximo 255 caracteres.',
+            'employee.required' => 'O campo funcionário é obrigatório.',
+            'employee.exists' => 'O campo funcionário deve existir.',
         ]);
 
         $order = Order::query()->findOrFail($id);
+        $employee = User::query()->where('name', $request->get('employee'))->firstOrFail();
 
         $order->update([
-            'employee' => $request->get('employee'),
+            'employee_id' => $employee->id,
         ]);
 
         session()->flash('success', 'Arte Finalista atualizado com sucesso!');
         return response()->json([
             'success' => true,
+            'message' => 'Arte Finalista atualizado com sucesso!',
+        ]);
+    }
+
+    public function updateDesigner(Request $request, $id)
+    {
+        $request->validate([
+            'designer' => 'required|exists:users,name',
+        ], [
+            'designer.required' => 'O campo funcionário é obrigatório.',
+            'designer.exists' => 'O campo funcionário deve existir.',
+        ]);
+
+        $order = Order::query()->findOrFail($id);
+        $employee = User::query()->where('name', $request->get('designer'))->firstOrFail();
+
+        $order->update([
+            'designer_id' => $employee->id,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'employee' => $employee,
             'message' => 'Arte Finalista atualizado com sucesso!',
         ]);
     }
