@@ -79,7 +79,7 @@
                     // Update card status via API
                     const cardData = {
                         _token: $('meta[name="csrf-token"]').attr('content'),
-                        status: newStatus
+                        step: newStatus
                     };
                     fetch(`${apiEndpoint}/dashboard/order/list-kanban/${cardId.replace('card-', '')}`, {
                             method: 'PATCH',

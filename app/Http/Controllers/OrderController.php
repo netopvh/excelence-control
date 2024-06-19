@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -73,9 +74,6 @@ class OrderController extends Controller
             ->addColumn('action', function ($model) {
                 return '<a href="' . route('dashboard.order.show', $model->id) . '" class="btn btn-sm btn-primary text-white"><i class="fa fa-eye" /></a>';
             })
-            ->with('totalApproved', Order::query()->where('status', 'aprovado')->count())
-            ->with('totalWaitingApproval', Order::query()->where('status', 'aguard. aprov')->count())
-            ->with('totalWaitingArt', Order::query()->where('status', 'aguard. arte')->count())
             ->rawColumns(['step', 'arrived', 'action'])
             ->make(true);
     }
@@ -118,7 +116,7 @@ class OrderController extends Controller
         $order = Order::query()->findOrFail($id);
 
         $order->update([
-            'status' => $request->get('status'),
+            'step' => $request->get('step'),
         ]);
 
         session()->flash('success', 'Status atualizado com sucesso!');
@@ -372,7 +370,7 @@ class OrderController extends Controller
             'step' => $request->get('step'),
         ]);
 
-        broadcast(new OrderStepUpdated($order));
+        event(new OrderStepUpdated($order));
 
         return response()->json([
             'success' => true,

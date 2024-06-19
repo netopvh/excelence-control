@@ -16,6 +16,7 @@ export default defineConfig({
                 'resources/js/pages/dashboard.js',
                 'resources/js/pages/order/index.js',
                 'resources/js/pages/order/show.js',
+                'resources/js/pages/order/kanban.js',
             ],
             refresh: true,
         }),

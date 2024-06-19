@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementType;
+use App\Enums\StatusType;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,11 +14,42 @@ class DashboardController extends Controller
 {
     public function index(): \Illuminate\View\View
     {
-        $approved = Order::query()->where('status', 'aprovado')->count();
-        $waitingApproval = Order::query()->where('status', 'aguard. aprov')->count();
-        $waitingArt = Order::query()->where('status', 'aguard. arte')->count();
+        $notInSteps = ['finished', 'shipping', 'canceled', 'pickup'];
 
-        return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt'));
+        $approved = Order::query()
+            ->where('status', StatusType::Approved())
+            ->whereNotIn('step', $notInSteps)
+            ->count();
+        $waitingApproval = Order::query()
+            ->where('status', StatusType::WaitingApproval())
+            ->whereNotIn('step', $notInSteps)
+            ->count();
+        $waitingArt = Order::query()
+            ->where('status', StatusType::WaitingDesign())
+            ->whereNotIn('step', $notInSteps)
+            ->count();
+
+        $stepInDesign = Order::query()
+            ->where('step', MovementType::InDesign())
+            ->count();
+
+        $stepInProduction = Order::query()
+            ->where('step', MovementType::InProduction())
+            ->count();
+
+        $stepFinished = Order::query()
+            ->where('step', MovementType::Finished())
+            ->count();
+
+        $stepShipped = Order::query()
+            ->where('step', MovementType::Shipping())
+            ->count();
+
+        $stepPickup = Order::query()
+            ->where('step', MovementType::Pickup())
+            ->count();
+
+        return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt', 'stepInDesign', 'stepInProduction', 'stepFinished', 'stepShipped', 'stepPickup'));
     }
 
     public function chartJson(Request $request)

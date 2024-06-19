@@ -73,9 +73,9 @@
                                         <label for="filterByStatus" class="fw-bold mb-1">Filtrar por status</label>
                                         <select class="form-control" id="filterByStatus">
                                             <option value="all">Todos</option>
-                                            <option value="aguard. aprov">Aguardando Aprovação</option>
-                                            <option value="aguard. arte">Aguardando Arte</option>
-                                            <option value="aprovado">Aprovado</option>
+                                            <option value="waiting_approval">Aguardando Aprovação</option>
+                                            <option value="waiting_design">Aguardando Arte</option>
+                                            <option value="approved">Aprovado</option>
                                         </select>
                                     </div>
                                 </div>

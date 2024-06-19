@@ -1,9 +1,10 @@
+import { getParameterByName } from "../../codebase/utils";
+
 class pageOrder {
-  /*
-	 * Init DataTables functionality
-	 *
-	 */
+
 	static initDataTables() {
+
+
 		// Override a few default classes
     jQuery.extend(jQuery.fn.dataTable.ext.classes, {
       sWrapper: "dataTables_wrapper dt-bootstrap5",
@@ -58,7 +59,7 @@ class pageOrder {
           })
         + `</table>`
       );
-  }
+    }
 
     // Init DataTable with Buttons
     const table = jQuery('.list-latest').DataTable({
@@ -158,12 +159,20 @@ class pageOrder {
 
 	}
 
+  static checkStatusOnUrl() {
+    const status = getParameterByName('status');
+    if (status) {
+      jQuery('#filterByStatus').val(status).trigger('change');
+    }
+  }
+
 	/*
 	 * Init functionality
 	 *
 	 */
 	static init() {
 		this.initDataTables();
+    this.checkStatusOnUrl();
 	}
 }
 

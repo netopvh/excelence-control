@@ -185,8 +185,8 @@
                             <li class="nav-main-item">
                                 <a class="nav-main-link{{ active(['dashboard'], ' active') }}"
                                     href="{{ route('dashboard.index') }}">
-                                    <i class="nav-main-link-icon fa fa-house-user"></i>
-                                    <span class="nav-main-link-name">Painel</span>
+                                    <i class="nav-main-link-icon fa-solid fa-chart-simple"></i>
+                                    <span class="nav-main-link-name">Indicadores</span>
                                 </a>
                             </li>
                             <li class="nav-main-heading">Comercial</li>
@@ -407,9 +407,9 @@
         <footer id="page-footer">
             <div class="content py-3">
                 <div class="row fs-sm">
-
                     <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start">
-                        Todos os direitos reservados &copy; Excelence Brindes - <span data-toggle="year-copy"></span>
+                        Todos os direitos reservados &copy; Desenvolvido por Rubens Coelho | Excelence Brindes - <span
+                            data-toggle="year-copy"></span>
                     </div>
                 </div>
             </div>
