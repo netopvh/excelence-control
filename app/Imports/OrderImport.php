@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Enums\MovementType;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Rules\IsValidDate;
@@ -52,12 +53,10 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
             $order->fill([
                 'employee' => $row['vendedor'],
                 'date' => $this->parseDate($row['data']),
-                'status' => 'new-orders', //$row['arte'],
+                'status' => $this->validateStatus($row['arte']),
                 'delivery_date' => $this->parseDate($row['entrega']),
             ])->save();
         }
-
-        Log::info('Criando o Pedido' . $order->number);
         return $order;
     }
 
@@ -98,6 +97,23 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
     {
         $dateParts = explode('-', $date);
         return date('Y') . '-' . $dateParts[1] . '-' . $dateParts[0];
+    }
+
+    private function validateStatus($status)
+    {
+        $status = trim($status);
+
+        if ($status === 'Aprovado(C)' || $status === 'Aprovado(D)' || $status === 'Aprovado(R)') {
+            return MovementType::InDesign;
+        } else if ($status === 'Aguard Aprov') {
+            return MovementType::Created;
+        } else if ($status === 'Cancelado') {
+            return MovementType::Cancelled;
+        } else if ($status === 'Aguard Arte') {
+            return MovementType::Created;
+        }
+
+        return MovementType::Created;
     }
 
     public function batchSize(): int

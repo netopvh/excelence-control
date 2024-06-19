@@ -27,7 +27,8 @@ class ImportController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Ocorreu um erro de formatação de datas, verique os campos de data do seu arquivo excel.'
+                // 'message' => 'Ocorreu um erro de formatação de datas, verique os campos de data do seu arquivo excel.'
+                'message' => $e->getMessage()
             ], 500);
         }
     }

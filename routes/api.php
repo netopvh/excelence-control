@@ -23,12 +23,3 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-
-Route::post('/auth/login', [LoginController::class, 'login']);
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/auth/logout', [LoginController::class, 'logout']);
-
-    Route::get('dashboard', [DashboardController::class, 'index']);
-});

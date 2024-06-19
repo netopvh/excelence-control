@@ -19,7 +19,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="base_url" content="{{ url('/') }}">
+    <meta name="base-url" content="{{ url('/') }}">
     <!-- Icons -->
     <link rel="shortcut icon" href="{{ asset('media/favicons/favicon.png') }}">
     <link rel="icon" sizes="192x192" type="image/png" href="{{ asset('media/favicons/favicon-192x192.png') }}">
@@ -114,20 +114,7 @@
             </div>
             <!-- END Side Content -->
         </aside>
-        <!-- END Side Overlay -->
 
-        <!-- Sidebar -->
-        <!--
-      Helper classes
-
-      Adding .smini-hide to an element will make it invisible (opacity: 0) when the sidebar is in mini mode
-      Adding .smini-show to an element will make it visible (opacity: 1) when the sidebar is in mini mode
-        If you would like to disable the transition, just add the .no-transition along with one of the previous 2 classes
-
-      Adding .smini-hidden to an element will hide it when the sidebar is in mini mode
-      Adding .smini-visible to an element will show it only when the sidebar is in mini mode
-      Adding 'smini-visible-block' to an element will show it (display: block) only when the sidebar is in mini mode
-    -->
         <nav id="sidebar">
             <!-- Sidebar Content -->
             <div class="sidebar-content">
@@ -201,40 +188,19 @@
                                     <span class="nav-main-link-name">Painel</span>
                                 </a>
                             </li>
-                            {{-- <li class="nav-main-heading">Various</li> --}}
-                            {{-- <li class="nav-main-item{{ request()->is('pages/*') ? ' open' : '' }}">
-                                <a class="nav-main-link nav-main-link-submenu" data-toggle="submenu"
-                                    aria-haspopup="true" aria-expanded="true" href="#">
-                                    <i class="nav-main-link-icon fa fa-lightbulb"></i>
-                                    <span class="nav-main-link-name">Examples</span>
-                                </a>
-                                <ul class="nav-main-submenu">
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link{{ request()->is('pages/datatables') ? ' active' : '' }}"
-                                            href="/pages/datatables">
-                                            <span class="nav-main-link-name">DataTables</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link{{ request()->is('pages/slick') ? ' active' : '' }}"
-                                            href="/pages/slick">
-                                            <span class="nav-main-link-name">Slick Slider</span>
-                                        </a>
-                                    </li>
-                                    <li class="nav-main-item">
-                                        <a class="nav-main-link{{ request()->is('pages/blank') ? ' active' : '' }}"
-                                            href="/pages/blank">
-                                            <span class="nav-main-link-name">Blank</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li> --}}
-                            <li class="nav-main-heading">Produção</li>
+                            <li class="nav-main-heading">Comercial</li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link{{ active(['dashboard.order.*'], ' active') }}"
                                     href="{{ route('dashboard.order.index') }}">
                                     <i class="nav-main-link-icon fa fa-envelope-open"></i>
                                     <span class="nav-main-link-name">Pedidos</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link{{ active(['dashboard.customer.*'], ' active') }}"
+                                    href="{{ route('dashboard.customer.index') }}">
+                                    <i class="nav-main-link-icon fa fa-users"></i>
+                                    <span class="nav-main-link-name">Clientes</span>
                                 </a>
                             </li>
                             <li class="nav-main-heading">Administração</li>

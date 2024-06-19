@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\MovementType;
 use App\Models\Customer;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -48,12 +49,18 @@ class OrderController extends Controller
                 return strtoupper($model->customer->name);
             })
             ->editColumn('status', function ($model) {
-                if ($model->status === 'aprovado') {
-                    return '<span class="badge bg-success">Aprovado</span>';
-                } else if ($model->status === 'aguard. aprov') {
-                    return '<span class="badge bg-warning">Aguardando Aprov.</span>';
-                } else if ($model->status === 'aguard. arte') {
-                    return '<span class="badge bg-info">Aguardando Arte</span>';
+                if ($model->status === MovementType::InDesign) {
+                    return '<span class="badge bg-success">Design e Arte</span>';
+                } else if ($model->status === MovementType::Created) {
+                    return '<span class="badge bg-warning">Não Definido</span>';
+                } else if ($model->status === MovementType::InProduction) {
+                    return '<span class="badge bg-info">Produção</span>';
+                } else if ($model->status === MovementType::Finished) {
+                    return '<span class="badge bg-info">Concluído</span>';
+                } else if ($model->status === MovementType::Shipping) {
+                    return '<span class="badge bg-info">Para Entrega</span>';
+                } else if ($model->status === MovementType::Pickup) {
+                    return '<span class="badge bg-info">Para Retirada</span>';
                 } else {
                     return '<span class="badge bg-black-50">Não definido</span>';
                 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\OrderController;
@@ -34,6 +35,7 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::get('/', [ImportController::class, 'index'])->name('index');
         Route::post('/', [ImportController::class, 'import'])->name('store');
     });
+
     Route::prefix('order')->name('order.')->group(function () {
         //Order Lists
         Route::get('/list', [OrderController::class, 'json'])->name('list');
@@ -53,6 +55,16 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::post('/{id}/upload/preview', [OrderController::class, 'uploadPreview'])->name('upload.preview');
         Route::post('/{id}/upload/design', [OrderController::class, 'uploadDesign'])->name('upload.design');
     });
+
+    Route::prefix('customer')->name('customer.')->group(function () {
+        Route::get('/', [CustomerController::class, 'index'])->name('index');
+        Route::get('/create', [CustomerController::class, 'create'])->name('create');
+        Route::post('/create', [CustomerController::class, 'store']);
+        Route::get('/{id}', [CustomerController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [CustomerController::class, 'update']);
+        Route::delete('/{id}', [CustomerController::class, 'destroy'])->name('destroy');
+    });
+
     Route::prefix('product')->name('product.')->group(function () {
         Route::get('/autocomplete', [ProductController::class, 'autocomplete'])->name('autocomplete');
     });
