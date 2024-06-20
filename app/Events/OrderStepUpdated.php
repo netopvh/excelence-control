@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,14 +15,11 @@ class OrderStepUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $order;
-
     /**
      * Create a new event instance.
      */
-    public function __construct($order)
+    public function __construct(public Order $order)
     {
-        $this->order = $order;
     }
 
     /**
@@ -32,7 +30,6 @@ class OrderStepUpdated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            // new PresenceChannel('orders.' . $this->order->id),
             new Channel('orders'),
         ];
     }

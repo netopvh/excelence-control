@@ -60,20 +60,6 @@ export default class App extends Template {
           encrypted: true
       });
 
-      window.Echo.join(`orders`)
-      .here((users) => {
-          console.log(users);
-      })
-      .joining((user) => {
-          console.log(user.name);
-      })
-      .leaving((user) => {
-          console.log(user.name);
-      })
-      .listen('YourEventName', (e) => {
-          console.log(e);
-      });
-
       window.Echo.channel('orders')
         .listen('OrderStepUpdated', (e) => {
             console.log(e);

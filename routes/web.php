@@ -36,7 +36,7 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::post('/', [ImportController::class, 'import'])->name('store');
     });
 
-    Route::prefix('order')->name('order.')->group(function () {
+    Route::prefix('/order')->name('order.')->group(function () {
         //Order Lists
         Route::get('/list', [OrderController::class, 'json'])->name('list');
         Route::get('/', [OrderController::class, 'index'])->name('index');
@@ -58,7 +58,10 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::post('/{id}/upload/design', [OrderController::class, 'uploadDesign'])->name('upload.design');
     });
 
-    Route::prefix('customer')->name('customer.')->group(function () {
+    Route::prefix('/customer')->name('customer.')->group(function () {
+
+        Route::get('/filter', [CustomerController::class, 'filter']);
+
         Route::get('/', [CustomerController::class, 'index'])->name('index');
         Route::get('/create', [CustomerController::class, 'create'])->name('create');
         Route::post('/create', [CustomerController::class, 'store']);

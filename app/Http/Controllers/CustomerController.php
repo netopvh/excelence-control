@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.customer.index');
+        $customers = Customer::query()->paginate(10);
+        return view('pages.customer.index', compact('customers'));
     }
 
     public function create()
@@ -77,5 +79,30 @@ class CustomerController extends Controller
         $customer->delete();
         session()->flash('success', 'Cliente excluído com sucesso!');
         return redirect()->route('customer.index');
+    }
+
+    public function filter(Request $request)
+    {
+        $this->validate($request, [
+            'search' => 'string|max:255',
+        ]);
+
+        $customers = Customer::query()
+            ->where('name', 'like', '%' . $request->get('search') . '%')
+            ->orWhere('email', 'like', '%' . $request->get('search') . '%')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        if ($customers->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'data' => []
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $customers
+        ]);
     }
 }
