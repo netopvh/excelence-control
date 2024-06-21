@@ -12,7 +12,6 @@ export default defineConfig({
         'resources/sass/codebase/themes/flat.scss',
         'resources/sass/codebase/themes/pulse.scss',
         'resources/js/codebase/app.js',
-        'resources/js/app.js',
         'resources/js/pages/dashboard.js',
         'resources/js/pages/order/index.js',
         'resources/js/pages/order/create.js',
