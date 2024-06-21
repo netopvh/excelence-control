@@ -42,14 +42,14 @@
             <div class="block-content block-content-full">
                 <fieldset class="border px-2 pb-2 mb-2">
                     <legend class="float-none w-auto h5">Ações</legend>
-                    <div class="d-flex py-1 px-1">
-                        <div class="me-2">
+                    <div class="row">
+                        <div class="col-12 col-md-3">
                             <span class="fw-bold">Status:</span>
                             <div class="dropdown">
-                                <button type="button" class="btn btn-warning dropdown-toggle" id="status-dropdown"
+                                <button type="button" class="btn btn-warning dropdown-toggle w-100" id="status-dropdown"
                                     data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
-                                    <span class="d-none d-sm-inline">{{ status_type($order->status) }}</span>
+                                    <span class="d-sm-inline">{{ status_type($order->status) }}</span>
                                 </button>
                                 <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-primary">
                                     @foreach ($status as $key => $value)
@@ -60,10 +60,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="me-2" style="display: none">
+                        <div class="col-12 d-none">
                             <span class="fw-bold">Etapa:</span>
                             <div class="dropdown">
-                                <button type="button" class="btn btn-success dropdown-toggle text-white"
+                                <button type="button" class="btn btn-success dropdown-toggle text-white w-100"
                                     id="arrived-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false">
                                     @if ($order->arrived)
@@ -79,11 +79,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="me-2">
+                        <div class="col-12 col-md-3">
                             <span class="fw-bold">Etapa:</span>
                             <div class="dropdown">
-                                <button type="button" class="btn btn-success dropdown-toggle text-white" id="step-dropdown"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button type="button" class="btn btn-success dropdown-toggle text-white w-100"
+                                    id="step-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
                                     {{ get_step($order->step) }}
                                 </button>
                                 <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-primary">
@@ -95,15 +96,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="">
+                        <div class="col-12 col-md-3">
                             <span class="fw-bold">Arte Finalista:</span>
                             <div class="dropdown">
-                                <button type="button" class="btn btn-info dropdown-toggle text-white"
+                                <button type="button" class="btn btn-info dropdown-toggle text-white w-100"
                                     id="designer-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false">
                                     @if ($order->designer)
                                         <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
-                                        <span class="d-none d-sm-inline">{{ $order->designer->name }}</span>
+                                        <span class="d-sm-inline">{{ $order->designer->name }}</span>
                                     @else
                                         Nenhum
                                     @endif
@@ -195,21 +196,21 @@
                         <div class="block block-rounded h-100 mb-0">
                             <div class="block-content fs-md">
                                 <div id="error-msg"></div>
-                                <div class="d-flex flex-row mb-4">
-                                    <div>
+                                <div class="row mb-4">
+                                    <div class="col-12 col-md-6">
                                         <div class="fw-bold">
                                             Pré-visualização
                                         </div>
-                                        <div>
+                                        <div id="preview-container">
                                             @if ($order->preview)
                                                 <img src="{{ asset('preview/' . $order->preview) }}"
-                                                    alt="Pré-visualização" class="img-fluid w-50" />
+                                                    alt="Pré-visualização" class="img-fluid mt-4 gap-5" />
                                             @else
                                                 <img src="{{ asset('media/photos/noimage.jpg') }}" alt="Pré-visualização"
                                                     class="img-fluid" />
                                             @endif
                                         </div>
-                                        <div id="loading-preview" class="mx-4 mt-4" style="display: none">
+                                        <div id="loading-preview" class="mx-4 mt-4 d-none">
                                             <svg width="32" height="32" viewBox="0 0 32 32"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <style>
@@ -301,37 +302,33 @@
                                             </svg>
                                         </div>
                                         @if (!$order->preview)
-                                            <div>
-                                                <form action="{{ route('dashboard.order.upload.preview', $order->id) }}"
-                                                    id="upload-preview" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <div class="row mb-4">
-                                                        <div class="col-md-12 col-xl-12 fw-bold">
-                                                            Nenhum arquivo foi enviado
+                                            <form action="{{ route('dashboard.order.upload.preview', $order->id) }}"
+                                                id="upload-preview" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="row mb-4">
+                                                    <div class="col-md-12 col-xl-12 fw-bold">
+                                                        Nenhum arquivo foi enviado
+                                                    </div>
+                                                </div>
+                                                <div class="row d-block">
+                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
+                                                        <div class="mb-4">
+                                                            <input class="form-control" type="file" name="preview"
+                                                                id="example-file-input">
                                                         </div>
                                                     </div>
-                                                    <div class="row d-block">
-                                                        <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                            <div class="mb-4">
-                                                                <input class="form-control" type="file" name="preview"
-                                                                    id="example-file-input">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                            <button type="submit"
-                                                                class="btn btn-primary">Importar</button>
-                                                        </div>
+                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
+                                                        <button type="submit" class="btn btn-primary">Importar</button>
                                                     </div>
-                                                </form>
-                                            </div>
+                                                </div>
+                                            </form>
                                         @endif
                                     </div>
-
-                                    <div class="">
+                                    <div class="col-12 col-md-6">
                                         <div class="fw-bold">
                                             Arquivo de Design PDF
                                         </div>
-                                        <div>
+                                        <div id="design-container">
                                             @if ($order->design_file)
                                                 <div class="mt-5">
                                                     <a href="{{ asset('design/' . $order->design_file) }}"
@@ -345,7 +342,7 @@
                                                     class="img-fluid" />
                                             @endif
                                         </div>
-                                        <div id="loading-design" class="mx-4 mt-4" style="display: none">
+                                        <div id="loading-design" class="mx-4 mt-4 d-none">
                                             <svg width="32" height="32" viewBox="0 0 32 32"
                                                 xmlns="http://www.w3.org/2000/svg">
                                                 <style>
@@ -437,29 +434,26 @@
                                             </svg>
                                         </div>
                                         @if (!$order->design_file)
-                                            <div>
-                                                <form action="{{ route('dashboard.order.upload.design', $order->id) }}"
-                                                    id="upload-design" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <div class="row mb-4">
-                                                        <div class="col-md-12 col-xl-12 fw-bold">
-                                                            Nenhum arquivo foi enviado
+                                            <form action="{{ route('dashboard.order.upload.design', $order->id) }}"
+                                                id="upload-design" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="row mb-4">
+                                                    <div class="col-md-12 col-xl-12 fw-bold">
+                                                        Nenhum arquivo foi enviado
+                                                    </div>
+                                                </div>
+                                                <div class="row d-block">
+                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
+                                                        <div class="mb-4">
+                                                            <input class="form-control" type="file" name="design"
+                                                                id="example-file-input">
                                                         </div>
                                                     </div>
-                                                    <div class="row d-block">
-                                                        <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                            <div class="mb-4">
-                                                                <input class="form-control" type="file" name="design"
-                                                                    id="example-file-input">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                            <button type="submit"
-                                                                class="btn btn-primary">Importar</button>
-                                                        </div>
+                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
+                                                        <button type="submit" class="btn btn-primary">Importar</button>
                                                     </div>
-                                                </form>
-                                            </div>
+                                                </div>
+                                            </form>
                                         @endif
                                     </div>
                                 </div>

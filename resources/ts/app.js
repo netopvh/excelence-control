@@ -6,11 +6,9 @@
  */
 
 // Import required modules
-import Template from './modules/template'
-import Echo from 'laravel-echo'
-import Pusher from 'pusher-js'
-import 'sweetalert2/src/sweetalert2.scss'
-// import $ from 'jquery';
+import Template from './modules/template';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 
 // App extends Template
 export default class App extends Template {
@@ -18,8 +16,8 @@ export default class App extends Template {
    * Auto called when creating a new instance
    *
    */
-  constructor () {
-    super()
+  constructor() {
+    super();
   }
   /*
    *  Here you can override or extend any function you want from Template class
@@ -41,30 +39,32 @@ export default class App extends Template {
 
   //  _uiInit() {}
 
+
   /*
    * EXAMPLE #2 - Extending default functionality with additional code
    *
    */
 
-  _uiInit () {
-    super._uiInit()
-    this._initLaravelEcho()
-  }
+   _uiInit() {
+       super._uiInit();
 
-  _initLaravelEcho () {
-    window.Pusher = Pusher
-    window.Echo = new Echo({
-      broadcaster: 'pusher',
-      key: import.meta.env.VITE_PUSHER_APP_KEY,
-      cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-      encrypted: true
-    })
+       this._initLaravelEcho();
+   }
 
-    window.Echo.channel('orders')
-      .listen('OrderStepUpdated', (e) => {
-        console.log(e)
-      })
-  }
+   _initLaravelEcho() {
+      window.Pusher = Pusher;
+      window.Echo = new Echo({
+          broadcaster: 'pusher',
+          key: import.meta.env.VITE_PUSHER_APP_KEY,
+          cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+          encrypted: true
+      });
+
+      window.Echo.channel('orders')
+        .listen('OrderStepUpdated', (e) => {
+            console.log(e);
+        });
+   }
 
   /*
    * EXAMPLE #3 - Replacing default functionality by writing your own code
@@ -72,9 +72,9 @@ export default class App extends Template {
    */
 
   //  _uiInit() {
-  // Your own JS code without ever calling the original function's code
+       // Your own JS code without ever calling the original function's code
   //  }
 }
 
 // Create a new instance of App
-window.Codebase = new App()
+window.Codebase = new App();

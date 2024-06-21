@@ -19,6 +19,7 @@
     <meta property="og:url" content="">
     <meta property="og:image" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="api-token" content="{{ Auth::user()->api_token }}">
     <meta name="base-url" content="{{ url('/') }}">
     @yield('meta')
     <!-- Icons -->
@@ -407,7 +408,7 @@
         <footer id="page-footer">
             <div class="content py-3">
                 <div class="row fs-sm">
-                    <div class="col-sm-6 order-sm-1 py-1 text-center text-sm-start">
+                    <div class="col-md-12 order-sm-1 py-1 text-center text-sm-start">
                         Todos os direitos reservados &copy; Desenvolvido por Rubens Coelho | Excelence Brindes - <span
                             data-toggle="year-copy"></span>
                     </div>

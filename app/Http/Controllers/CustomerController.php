@@ -23,20 +23,18 @@ class CustomerController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:255',
         ], [
             'name.required' => 'O campo nome é obrigatório.',
             'name.string' => 'O campo nome deve ser uma string.',
             'name.max' => 'O campo nome deve ter no máximo 255 caracteres.',
-            'email.required' => 'O campo email é obrigatório.',
             'email.email' => 'O campo email deve ser um email válido.',
             'email.max' => 'O campo email deve ter no mínimo 255 caracteres.',
+            'phone.max' => 'O campo telefone deve ter no mínimo 255 caracteres.',
         ]);
 
-        Customer::query()->create([
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-        ]);
+        Customer::query()->create($request->all());
 
         session()->flash('success', 'Cliente adicionado com sucesso!');
         return redirect()->route('customer.index');
@@ -88,8 +86,8 @@ class CustomerController extends Controller
         ]);
 
         $customers = Customer::query()
-            ->where('name', 'like', '%' . $request->get('search') . '%')
-            ->orWhere('email', 'like', '%' . $request->get('search') . '%')
+            ->where('name', 'like', '%' . urldecode($request->get('search')) . '%')
+            ->orWhere('email', 'like', '%' . urldecode($request->get('search')) . '%')
             ->orderBy('id', 'desc')
             ->get();
 

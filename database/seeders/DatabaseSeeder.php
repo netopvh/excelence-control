@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -74,6 +75,7 @@ class DatabaseSeeder extends Seeder
                 'email' => 'elyton@excelencebrindes.com.br',
                 'username' => 'elyton',
                 'password' => bcrypt('123456'),
+
             ],
             [
                 'name' => 'Scarleth',
@@ -108,25 +110,25 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($admins as $admin) {
-            $user = \App\Models\User::create($admin);
+            $user = \App\Models\User::factory()->create($admin);
 
             $user->assignRole($roleAdmin, $roleDesign);
         }
 
         foreach ($produtores as $produtor) {
-            $user = \App\Models\User::create($produtor);
+            $user = \App\Models\User::factory()->create($produtor);
 
             $user->assignRole($roleProducao);
         }
 
         foreach ($vendas as $venda) {
-            $user = \App\Models\User::create($venda);
+            $user = \App\Models\User::factory()->create($venda);
 
             $user->assignRole($roleVendas);
         }
 
         foreach ($designers as $designer) {
-            $user = \App\Models\User::create($designer);
+            $user = \App\Models\User::factory()->create($designer);
 
             $user->assignRole($roleDesign);
         }

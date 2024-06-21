@@ -17,7 +17,7 @@
 @section('content')
     <div class="content">
         <div class="row">
-            <div class="col-6 col-xl-4">
+            <div class="col-12 col-xl-4">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['status' => 'approved']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
@@ -31,7 +31,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-6 col-xl-4">
+            <div class="col-12 col-xl-4">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['status' => 'waiting_approval']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
@@ -45,7 +45,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-6 col-xl-4">
+            <div class="col-12 col-xl-4">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['status' => 'waiting_design']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">

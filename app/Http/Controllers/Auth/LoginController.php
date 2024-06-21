@@ -22,6 +22,9 @@ class LoginController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
+
+            auth()->user()->createToken('auth_token')->plainTextToken;
+
             return redirect()->intended('/dashboard');
         }
 
@@ -30,6 +33,8 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
+        auth()->user()->tokens()->delete();
+
         Auth::logout();
 
         $request->session()->invalidate();

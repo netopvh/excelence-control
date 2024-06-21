@@ -24,3 +24,71 @@ legend.scheduler-border {
     padding: 0 10px; /* To give a bit of padding on the left and right */
     border-bottom: none;
 }
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+    font-size: 1.3rem !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+    min-width: 8rem !important;
+}
+
+.autocomplete-suggestions {
+    border-top: none;
+    border: 2px solid #8b6806;
+    max-height: 300px;
+    overflow-y: auto;
+    position: absolute;
+    width: 60%;
+    background: #ffc21f;
+    z-index: 1000;
+}
+
+.autocomplete-suggestion {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.autocomplete-suggestion:hover {
+    background-color: #ffda76;
+}
+
+.informacoes-cliente {
+    display: block;
+    margin: 0.5em 0;
+}
+
+.icone-informacoes-cliente {
+    vertical-align: middle;
+    margin-right: 0.5em;
+}
+
+.link-listar-clientes {
+    text-decoration: underline;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.conteudo_selecionado_autocomplete h5 {
+    margin-bottom: 0px;
+}
+
+.divider {
+    border: 1px solid #f0f0f0;
+}
+
+.custom-hide {
+    height: 0;
+    overflow: hidden;
+}
+
+.slidedown {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 10s ease-out;
+}
+
+.slidedown-active {
+    max-height: 1000px;
+    /* Ajuste conforme o necessário */
+}

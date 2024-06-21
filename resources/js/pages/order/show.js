@@ -1,207 +1,264 @@
-import { post } from "../../codebase/api";
+import { post } from '../../codebase/api'
+import jQuery from 'jquery'
+import Helpers from '../../codebase/modules/helpers'
 
 class pageShowOrder {
+  static initPage () {
+    const orderId = jQuery('meta[name="order-id"]').attr('content')
 
-  static initPage() {
+    const formPreview = document.getElementById('upload-preview')
 
-      const orderId = jQuery('meta[name="order-id"]').attr('content');
-      const url = jQuery('meta[name="base-url"]').attr('content');
+    if (formPreview) {
+      formPreview.addEventListener('submit', async function (e) {
+        e.preventDefault()
 
-      jQuery('#upload-preview').submit(function(e) {
-          e.preventDefault();
+        try {
+          const loadingPreview = document.getElementById('loading-preview')
+          loadingPreview.classList.remove('d-none')
 
-          $('#loading-preview').show();
-          $('#upload-preview').attr('disabled', 'disabled');
+          const response = await post('/dashboard/order/' + orderId + '/upload/preview', new FormData(this), {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
 
-          post('/dashboard/order/' + orderId + '/upload/preview', new FormData(this), {
-              headers: {
-                  'Content-Type': 'multipart/form-data'
-              }
-          }).then(response => {
-            location.reload();
-          }).catch(error => {
-              console.log(error);
-              $('#loading-preview').hide();
-              $('#error-msg').html(
-                  '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                  '<strong>' + data.responseJSON.message + '</strong>' +
+          loadingPreview.classList.add('d-none')
+
+          document.getElementById('upload-preview').classList.add('d-none')
+          const fileContainer = document.getElementById('preview-container')
+          fileContainer.innerHTML = ''
+          fileContainer.innerHTML = `
+          <img src="${response.fileUrl}" alt="Pré-visualização" class="img-fluid max-w-25" />
+          `
+        } catch (error) {
+          console.log(error)
+          const loadingPreview = document.getElementById('loading-preview')
+          loadingPreview.classList.add('d-none')
+          document.getElementById('error-msg').innerHTML = error.responseJSON.message
+        }
+      })
+    }
+
+    jQuery('#upload-preview').submit(function (e) {
+      e.preventDefault()
+
+      jQuery('#loading-preview').show()
+      jQuery('#upload-preview').attr('disabled', 'disabled')
+
+      post('/dashboard/order/' + orderId + '/upload/preview', new FormData(this), {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        location.reload()
+      }).catch(error => {
+        console.log(error)
+        jQuery('#loading-preview').hide()
+        jQuery('#error-msg').html(
+          '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                  '<strong>' + error.responseJSON.message + '</strong>' +
                   '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
                   '</div>'
-              );
-          });
-      });
+        )
+      })
+    })
 
-      $('#upload-design').submit(function(e) {
-          e.preventDefault();
-          $.ajax({
-              url: url + '/dashboard/order/' + orderId + '/upload/design',
-              method: "POST",
-              data: new FormData(this),
-              dataType: 'JSON',
-              contentType: false,
-              cache: false,
-              processData: false,
-              beforeSend: function() {
-                  $('#loading-design').show();
-                  $('#upload-design').attr('disabled', 'disabled');
-              },
-              success: function(data) {
-                  location.reload();
-              },
-              error: function(data) {
-                  $('#loading-design').hide();
-                  $('#error-msg').html(
-                      '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                      '<strong>' + data.responseJSON.message + '</strong>' +
-                      '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
-                      '</div>'
-                  );
-              }
+    const formDesign = document.getElementById('upload-design')
+
+    if (formDesign) {
+      formDesign.addEventListener('submit', async function (e) {
+        e.preventDefault()
+
+        try {
+          const loadingDesign = document.getElementById('loading-design')
+          loadingDesign.classList.remove('d-none')
+
+          const response = await post(`/dashboard/order/${orderId}/upload/design`, new FormData(this), {
+            'Content-Type': 'multipart/form-data'
           })
-      });
 
-      $('.dropdown-item.status').click(function() {
-          var status = $(this).data('value');
-          $.ajax({
-              url: url + '/dashboard/order/' + orderId + '/update/status',
-              method: "POST",
-              data: {
-                  _token: $('meta[name="csrf-token"]').attr('content'),
-                  status: status
-              },
-              dataType: 'JSON',
-              beforeSend: function() {
-                  $('#status-dropdown').html(
-                      '<div class="spinner-border spinner-border-sm text-white" role="status">' +
-                      '<span class="visually-hidden">Loading...</span>' +
-                      '</div>'
-                  );
-              },
-              success: function(data) {
-                  $('#status-dropdown').html('');
-                  $('#status-dropdown').html(
-                    '<i class="fa fa-fw fa-chevron-down text-white me-1"></i>' +
-                    '<span class="d-none d-sm-inline">' + data.status +
-                    '</span>'
-                  );
-                  Codebase.helpers('jq-notify', {
-                    align: 'right',
-                    from: 'top',
-                    type: 'success',
-                    icon: 'fa fa-info me-5',
-                    message: data.message
-                  });
-              },
-              error: function(data) {
-                  console.log(data);
-              }
+          loadingDesign.classList.add('d-none')
+
+          document.getElementById('upload-design').classList.add('d-none')
+          const fileContainer = document.getElementById('design-container')
+          fileContainer.innerHTML = ''
+          fileContainer.innerHTML = `
+          <div class="mt-5">
+              <a href="${response.fileUrl}"
+                  target="_blank" class="btn btn-primary">
+                  <i class="fa fa-fw fa-download text-white me-1"></i>
+                  <span class="d-sm-inline">Baixar Arquivo</span>
+              </a>
+          </div>
+          `
+
+          Helpers.run('jq-alert', {
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: true,
+            timer: 1500
           })
-      });
+        } catch (err) {
+        // Oculta o indicador de carregamento em caso de erro
+          const loadingDesign = document.getElementById('loading-design')
+          loadingDesign.classList.add('d-none')
 
-      $('.dropdown-item.designer').click(function() {
-          var designer = $(this).data('value');
-          $.ajax({
-              url: url + '/dashboard/order/' + orderId + '/update/designer',
-              method: "POST",
-              data: {
-                  _token: $('meta[name="csrf-token"]').attr('content'),
-                  designer: designer
-              },
-              dataType: 'JSON',
-              beforeSend: function() {
-                  $('#designer-dropdown').html(
-                      '<div class="spinner-border spinner-border-sm text-white" role="status">' +
-                      '<span class="visually-hidden">Loading...</span>' +
-                      '</div>'
-                  );
-              },
-              success: function(data) {
-                  $('#designer-dropdown').html('');
-                  $('#designer-dropdown').html(
-                      '<i class="fa fa-fw fa-chevron-down text-white me-1"></i>' +
-                      '<span class="d-none d-sm-inline">' + data.employee.name +
-                      '</span>'
-                  );
-                  Codebase.helpers('jq-notify', {
-                    align: 'right',
-                    from: 'top',
-                    type: 'success',
-                    icon: 'fa fa-info me-5',
-                    message: data.message
-                });
-              },
-              error: function(data) {
-                  console.log(data);
-              }
+          // Tratamento de erros
+          const errorMsg = document.getElementById('error-msg')
+          errorMsg.innerHTML = `
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>${err.data.message}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        `
+        }
+      })
+    }
+
+    const dropdownStatus = document.querySelectorAll('.dropdown-item.status')
+    dropdownStatus.forEach(dropdown => {
+      dropdown.addEventListener('click', async function () {
+        const status = this.dataset.value
+        const dropDown = document.getElementById('status-dropdown')
+
+        dropDown.innerHTML = `
+        <div class="spinner-border spinner-border-sm text-white" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      `
+
+        try {
+          const response = await post(`/dashboard/order/${orderId}/update/status`, { status })
+
+          dropDown.innerHTML = `
+          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
+          <span class="d-sm-inline">${response.status}</span>
+        `
+
+          Helpers.run('jq-alert', {
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: true,
+            timer: 1500
           })
-      });
+        } catch (error) {
+          console.error(error)
 
-      $('.dropdown-item.arrived').click(function() {
-          var status = $(this).data('value');
-          $.ajax({
-              url: url + '/dashboard/order/' + orderId + '/update/arrived',
-              method: "POST",
-              data: {
-                  _token: $('meta[name="csrf-token"]').attr('content'),
-                  arrived: status
-              },
-              dataType: 'JSON',
-              beforeSend: function() {
-                  $('#arrived-dropdown').html(
-                      '<div class="spinner-border spinner-border-sm text-white" role="status">' +
-                      '<span class="visually-hidden">Loading...</span>' +
-                      '</div>'
-                  );
-              },
-              success: function(data) {
-                  location.reload();
-              },
-              error: function(data) {
-                  console.log(data);
-                  // $('#status-dropdown').html(
-                  //     '<i class="fa fa-fw fa-chevron-down text-white me-1"></i>' +
-                  //     '<span class="d-none d-sm-inline">Alterar Status</span>'
-                  // );
-              }
+          dropDown.innerHTML = `
+          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
+          <span class="d-sm-inline">Error</span>
+        `
+        }
+      })
+    })
+
+    const dropdownDesign = document.querySelectorAll('.dropdown-item.designer')
+    dropdownDesign.forEach(dropdown => {
+      dropdown.addEventListener('click', async function () {
+        const designer = this.dataset.value
+        const dropDown = document.getElementById('designer-dropdown')
+
+        dropDown.innerHTML = `
+        <div class="spinner-border spinner-border-sm text-white" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      `
+
+        try {
+          const response = await post(`/dashboard/order/${orderId}/update/designer`, { designer })
+
+          dropDown.innerHTML = `
+          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
+          <span class="d-sm-inline">${response.employee.name}</span>
+        `
+
+          Helpers.run('jq-alert', {
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: true,
+            timer: 1500
           })
-      });
+        } catch (error) {
+          console.error(error)
+          dropDown.innerHTML = `
+          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
+          <span class="d-sm-inline">Error</span>
+        `
+        }
+      })
+    })
 
-      $('.dropdown-item.step').click(function() {
-        var step = $(this).data('value');
+    // jQuery('.dropdown-item.arrived').click(function () {
+    //   const status = jQuery(this).data('value')
+    //   jQuery.ajax({
+    //     url: url + '/dashboard/order/' + orderId + '/update/arrived',
+    //     method: 'POST',
+    //     data: {
+    //       _token: jQuery('meta[name="csrf-token"]').attr('content'),
+    //       arrived: status
+    //     },
+    //     dataType: 'JSON',
+    //     beforeSend: function () {
+    //       jQuery('#arrived-dropdown').html(
+    //         '<div class="spinner-border spinner-border-sm text-white" role="status">' +
+    //                   '<span class="visually-hidden">Loading...</span>' +
+    //                   '</div>'
+    //       )
+    //     },
+    //     success: function (data) {
+    //       location.reload()
+    //     },
+    //     error: function (data) {
+    //       console.log(data)
+    //       // $('#status-dropdown').html(
+    //       //     '<i class="fa fa-fw fa-chevron-down text-white me-1"></i>' +
+    //       //     '<span class="d-none d-sm-inline">Alterar Status</span>'
+    //       // );
+    //     }
+    //   })
+    // })
 
-        $('#arrived-dropdown').html(
-          '<div class="spinner-border spinner-border-sm text-white" role="status">' +
-          '<span class="visually-hidden">Loading...</span>' +
-          '</div>'
-        );
+    const dropdownStep = document.querySelectorAll('.dropdown-item.step')
+    dropdownStep.forEach(dropdown => {
+      dropdown.addEventListener('click', async function () {
+        const step = this.dataset.value
+        const dropDown = document.getElementById('step-dropdown')
 
-        post('/dashboard/order/' + orderId + '/update/step', {
-          step: step
-        }).then(response => {
-          $('#step-dropdown').html('');
-          $('#step-dropdown').html(
-              '<i class="fa fa-fw fa-chevron-down text-white me-1"></i>' +
-              '<span class="d-none d-sm-inline">' + response.step +
-              '</span>'
-          );
-          Codebase.helpers('jq-notify', {
-            align: 'right',
-            from: 'top',
-            type: 'success',
-            icon: 'fa fa-info me-5',
-            message: response.message
-          });
-        }).catch(error => {
-            console.log(error);
-        });
+        dropDown.innerHTML = `
+        <div class="spinner-border spinner-border-sm text-white" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      `
 
-    });
+        try {
+          const response = await post(`/dashboard/order/${orderId}/update/step`, { step })
+
+          dropDown.innerHTML = `
+          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
+          <span class="d-sm-inline">${response.step}</span>
+        `
+
+          Helpers.run('jq-alert', {
+            icon: 'success',
+            title: response.message,
+            showConfirmButton: true,
+            timer: 1500
+          })
+        } catch (error) {
+          console.error(error)
+
+          dropDown.innerHTML = `
+          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
+          <span class="d-sm-inline">Error</span>
+        `
+        }
+      })
+    })
   }
 
-  static init() {
-      this.initPage();
+  static init () {
+    this.initPage()
   }
 }
 
-Codebase.onLoad(() => pageShowOrder.init());
-Codebase.helpersOnLoad(['jq-notify']);
+window.Codebase.onLoad(() => pageShowOrder.init())

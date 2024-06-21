@@ -92,7 +92,9 @@ class OrderController extends Controller
 
     public function jsonKanban()
     {
-        $model = Order::query()->with(['customer', 'orderProducts']);
+        $model = Order::query()
+            ->with(['customer', 'orderProducts'])
+            ->orderBy('created_at', 'asc');
 
         return response()->json($model->get()->map(function ($model) {
             return [
@@ -113,20 +115,12 @@ class OrderController extends Controller
 
     public function updateKanban(Request $request, $id)
     {
-        // $request->validate([
-        //     'status' => 'required|in:aprovado,aguard. aprov,aguard. arte',
-        // ], [
-        //     'status.required' => 'O campo status é obrigatório.',
-        //     'status.in' => 'O campo status deve ser um dos seguintes valores: Aprovado, Aguard. Aprov, Aguard. Arte.',
-        // ]);
-
         $order = Order::query()->findOrFail($id);
 
         $order->update([
             'step' => $request->get('step'),
         ]);
 
-        session()->flash('success', 'Status atualizado com sucesso!');
         return response()->json([
             'success' => true,
             'message' => 'Status atualizado com sucesso!',
@@ -252,6 +246,7 @@ class OrderController extends Controller
 
         return response()->json([
             'success' => true,
+            'fileUrl' => asset('preview/' . $order->preview),
             'message' => 'Preview enviado com sucesso!',
         ]);
     }
@@ -268,16 +263,17 @@ class OrderController extends Controller
 
         $order = Order::query()->findOrFail($id);
 
-        $imageName = time() . '.' . $request->file('design')->extension();
+        $fileName = time() . '.' . $request->file('design')->extension();
 
-        $request->file('design')->storeAs('', $imageName, ['disk' => 'design']);
+        $request->file('design')->storeAs('', $fileName, ['disk' => 'design']);
 
         $order->update([
-            'design_file' => $imageName,
+            'design_file' => $fileName,
         ]);
 
         return response()->json([
             'success' => true,
+            'fileUrl' => asset('design/' . $order->design_file),
             'message' => 'Design enviado com sucesso!',
         ]);
     }
@@ -346,7 +342,7 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'employee' => $employee,
-            'message' => 'Arte Finalista atualizado com sucesso!',
+            'message' => 'Arte finalista alterado com sucesso!',
         ]);
     }
 
