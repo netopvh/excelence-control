@@ -31,9 +31,9 @@ class OrderController extends Controller
             ->make(true);
     }
 
-    public function updateStatusAndStep(Request $request)
+    public function updateStatusAndStep(Request $request, $id)
     {
-        $order = Order::query()->findOrFail($request->order_id);
+        $order = Order::query()->findOrFail($id);
         $order->status = $request->status;
         $order->step = $request->step;
         $order->save();

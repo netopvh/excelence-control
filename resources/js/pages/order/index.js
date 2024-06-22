@@ -210,17 +210,20 @@ class pageOrder {
           form.addEventListener('submit', async function (event) {
             event.preventDefault()
 
-            const formData = new FormData(this)
+            const data = {
+              step: form.querySelector('select[name="step"]').value,
+              status: form.querySelector('select[name="status"]').value
+            }
 
-            console.log(formData)
+            const orderId = form.querySelector('input[name="order_id"]').value
 
-            // const res = await post('/dashboard/order/status', formData)
+            const res = await post(`/api/order/${orderId}/store`, data)
 
-            // if (res.success) {
-            //   form.reset()
-            //   detalhesModal.hide()
-            //   table.draw()
-            // }
+            if (res.success) {
+              form.reset()
+              detalhesModal.hide()
+              table.draw()
+            }
           })
         }
       }
