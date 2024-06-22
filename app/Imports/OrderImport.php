@@ -5,20 +5,15 @@ namespace App\Imports;
 use App\Enums\MovementType;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
-use App\Rules\IsValidDate;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithMappedCells;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Events\BeforeImport;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
@@ -47,7 +42,6 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
 
     private function findOrCreateOrder(array $row): Order
     {
-
         $order = $this->customer->orders()->firstOrNew(['number' => $row['pedido']]);
 
         if (!$order->exists) {
@@ -63,15 +57,21 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
 
     private function createOrderProduct(Order $order, array $row)
     {
+        $product = $this->findOrCreateProduct($row['produto']);
+
         $order->orderProducts()->create([
-            'name' => $row['produto'],
+            'product_id' => $product->id,
             'qtd' => $row['qtd'],
         ]);
     }
 
+    private function findOrCreateProduct($productName): Product
+    {
+        return Product::firstOrCreate(['name' => $productName]);
+    }
+
     private function parseDate($date)
     {
-        // Check if the date is a valid numeric value
         if (is_numeric($date)) {
             $convertDateTime = Date::excelToDateTimeObject($date);
             if ($convertDateTime instanceof \DateTime) {
@@ -83,7 +83,6 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
 
     private function parseDeliveryDate($date)
     {
-
         $dateParts = explode('/', $date);
         if (count($dateParts) == 2) {
             $day = $dateParts[0];

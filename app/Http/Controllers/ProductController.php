@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\OrderProduct;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,10 +21,9 @@ class ProductController extends Controller
 
         $q = $request->get('query');
 
-        $products = OrderProduct::query()
-            ->select(DB::raw('MIN(id) as id'), 'name')
+        $products = Product::query()
+            ->select('id', 'name')
             ->where('name', 'LIKE', "%{$q}%")
-            ->groupBy('name')
             ->get();
 
         return response()->json($products);

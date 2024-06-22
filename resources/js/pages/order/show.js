@@ -1,10 +1,13 @@
 import { post } from '../../codebase/api'
-import jQuery from 'jquery'
 import Helpers from '../../codebase/modules/helpers'
+
+import DataTable from 'datatables.net-bs5'
+import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
+import 'datatables.net-responsive-bs5'
 
 class pageShowOrder {
   static initPage () {
-    const orderId = jQuery('meta[name="order-id"]').attr('content')
+    const orderId = document.querySelector('meta[name="order-id"]').getAttribute('content')
 
     const formPreview = document.getElementById('upload-preview')
 
@@ -39,32 +42,7 @@ class pageShowOrder {
       })
     }
 
-    jQuery('#upload-preview').submit(function (e) {
-      e.preventDefault()
-
-      jQuery('#loading-preview').show()
-      jQuery('#upload-preview').attr('disabled', 'disabled')
-
-      post('/dashboard/order/' + orderId + '/upload/preview', new FormData(this), {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(response => {
-        location.reload()
-      }).catch(error => {
-        console.log(error)
-        jQuery('#loading-preview').hide()
-        jQuery('#error-msg').html(
-          '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
-                  '<strong>' + error.responseJSON.message + '</strong>' +
-                  '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
-                  '</div>'
-        )
-      })
-    })
-
     const formDesign = document.getElementById('upload-design')
-
     if (formDesign) {
       formDesign.addEventListener('submit', async function (e) {
         e.preventDefault()
@@ -256,8 +234,40 @@ class pageShowOrder {
     })
   }
 
+  static initProductsTable () {
+    const orderId = document.querySelector('meta[name="order-id"]').getAttribute('content')
+
+    const tableElement = document.getElementById('table-products')
+    const table = new DataTable(tableElement, {
+      paging: false,
+      searching: false,
+      serverSide: true,
+      processing: true,
+      ajax: {
+        url: '/api/order/products/' + orderId,
+        type: 'GET'
+      },
+      columns: [
+        { data: 'product.name', name: 'product.name', width: '34%' },
+        { data: 'qtd', name: 'qtd', width: '10%' },
+        { data: 'in_stock', name: 'in_stock', width: '10%' },
+        { data: 'supplier', name: 'supplier', width: '23%', render: function (data) { return data || '-' } },
+        { data: 'obs', name: 'obs', width: '23%', render: function (data) { return data || '-' } }
+      ],
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      }
+    })
+
+    window.addEventListener('resize', () => {
+      table.columns.adjust()
+      table.responsive.recalc()
+    })
+  }
+
   static init () {
     this.initPage()
+    this.initProductsTable()
   }
 }
 

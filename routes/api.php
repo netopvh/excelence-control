@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CustomerController;
-use App\Http\Controllers\API\DashboardController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,4 +26,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('customer')->group(function () {
     Route::post('/', [CustomerController::class, 'store']);
+});
+
+Route::prefix('order')->group(function () {
+    Route::get('products/{orderId}', [OrderController::class, 'productsOrder']);
+    Route::post('/store', [OrderController::class, 'updateStatusAndStep']);
 });

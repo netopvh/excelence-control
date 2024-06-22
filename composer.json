@@ -18,7 +18,8 @@
         "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-permission": "^6.7",
         "watson/active": "7.0.0",
-        "yajra/laravel-datatables": "^10.0"
+        "yajra/laravel-datatables": "^10.0",
+        "yajra/laravel-datatables-editor": "1.25.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23.0",

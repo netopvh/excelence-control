@@ -1,88 +1,60 @@
-import { getParameterByName } from "../../codebase/utils";
+import DataTable from 'datatables.net-bs5'
+import { getParameterByName } from '../../codebase/utils'
+import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
+import 'datatables.net-responsive-bs5'
+import { Modal } from 'bootstrap'
+import { post } from '../../codebase/api'
+// import $ from 'jquery'
 
 class pageOrder {
+  static statusModal = null
 
-	static initDataTables() {
+  static initDataTables () {
+    const stepOptions = { in_design: 'Design e Artes', in_production: 'Produção', finished: 'Concluído', shipping: 'Entrega', pickup: 'Retirada', cancelled: 'Cancelado' }
+    const statusOptions = { approved: 'Aprovado', waiting_approval: 'Aguard. Aprov.', waiting_design: 'Aguard. Arte' }
 
-
-		// Override a few default classes
-    jQuery.extend(jQuery.fn.dataTable.ext.classes, {
-      sWrapper: "dataTables_wrapper dt-bootstrap5",
-      sFilterInput: "form-control",
-      sLengthSelect: "form-select"
-    });
-
-    // Override a few defaults
-    jQuery.extend(true, jQuery.fn.dataTable.defaults, {
-      language: {
-        lengthMenu: "_MENU_",
-        search: "_INPUT_",
-        searchPlaceholder: "Pesquisar..",
-        processing: "Processando...",
-        info: "Página <strong>_PAGE_</strong> de <strong>_PAGES_</strong>",
-        paginate: {
-          first: '<i class="fa fa-angle-double-left"></i>',
-          previous: '<i class="fa fa-angle-left"></i>',
-          next: '<i class="fa fa-angle-right"></i>',
-          last: '<i class="fa fa-angle-double-right"></i>'
-        },
-        emptyTable: "Nenhum registro encontrado",
-        buttons: {
-          copy: "Copiar",
-          print: "Imprimir"
-        },
-        infoFiltered: "(Filtrados de _MAX_ registros)",
-        infoEmpty: "Mostrando 0 a 0 de 0 registros",
-      }
-    });
-
-    // Override buttons default classes
-    jQuery.extend(true, jQuery.fn.DataTable.Buttons.defaults, {
-      dom: {
-        button: {
-          className: 'btn btn-sm btn-primary'
-        },
-      }
-    });
-
-    function format(d) {
+    const format = (d) => {
       return (
         `<table class='table table-bordered table-hover'><tr>
-            <td class='text-uppercase'>Produto</td>
-            <td class='text-uppercase'>Quantidade</td>
-          </tr>` +
-          d.order_products.map((item) => {
-            return `<tr>
-              <td class='fw-bold text-uppercase'>${item.name}</td>
-              <td>${item.qtd}</td>
-            </tr>`
-          })
-        + `</table>`
-      );
+          <td class='text-uppercase fw-bold'>Produto</td>
+          <td class='text-uppercase fw-bold'>Quantidade</td>
+          <td class='text-uppercase fw-bold'>Estoque</td>
+          <td class='text-uppercase fw-bold'>Fornecedor</td>
+          <td class='text-uppercase fw-bold'>Observação</td>
+        </tr>` +
+        d.order_products.map((item) => {
+          return `<tr>
+            <td class='fw-bold'>${item.product.name}</td>
+            <td>${item.qtd}</td>
+            <td>${item.in_stock === 'yes' ? '<span class="badge bg-success">Sim</span>' : item.in_stock === 'no' ? '<span class="badge bg-warning">Não</span>' : item.in_stock === 'partial' ? '<span class="badge bg-info">Parcial</span>' : '-'}</td>
+            <td>${item.supplier ? item.supplier : '-'}</td>
+            <td>${item.obs ? item.obs : '-'}</td>
+          </tr>`
+        }).join('') +
+        '</table>'
+      )
     }
 
-    // Init DataTable with Buttons
-    const table = jQuery('.list-latest').DataTable({
+    const tableOrders = document.querySelector('.list-latest')
+    const table = new DataTable(tableOrders, {
       serverSide: true,
       processing: true,
       paging: true,
       pageLength: 50,
       lengthMenu: [[5, 10, 20, 40, 50, 80, 100], [5, 10, 20, 40, 50, 80, 100]],
       autoWidth: false,
-      // buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-      //"<'row'<'col-sm-12'<'text-center bg-body-light py-2 mb-2'B>>>" +
-      dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+      dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+           "<'row'<'col-sm-12'tr>>" +
+           "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
       ajax: {
         url: '/dashboard/order/list',
         type: 'GET',
-        data: function (d) {
-          d.status = $('#filterByStatus option:selected').val();
-          d.month = $('#filterByMonth option:selected').val();
-          d.from = $('#from').val();
-          d.to = $('#to').val();
-        },
-      },
-      drawCallback: function (settings) {
+        data: (d) => {
+          d.status = document.querySelector('#filterByStatus').value
+          d.month = document.querySelector('#filterByMonth').value
+          d.from = document.querySelector('#from').value
+          d.to = document.querySelector('#to').value
+        }
       },
       columns: [
         {
@@ -94,87 +66,182 @@ class pageOrder {
         { data: 'date', name: 'date' },
         { data: 'number', name: 'number' },
         { data: 'customer.name', name: 'customer.name' },
-        { data: 'step', name: 'step' },
-        { data: 'employee.name', name: 'employee.name', render: function (data, type, row) {
-          return data ? data : '-';
-        }},
-        { data: 'arrived', name: 'arrived' },
+        {
+          data: 'step',
+          name: 'step',
+          type: 'select',
+          render: function (data, type, row, meta) {
+            if (data == null || !(data in stepOptions)) return '<span class="badge bg-secondary">Não definido</span>'
+            if (data === 'in_production') return '<span class="badge bg-warning">' + stepOptions[data] + '</span>'
+            if (data === 'in_design') return '<span class="badge bg-corporate">' + stepOptions[data] + '</span>'
+            if (data === 'finished') return '<span class="badge bg-success">' + stepOptions[data] + '</span>'
+            if (data === 'shipping') return '<span class="badge bg-earth">' + stepOptions[data] + '</span>'
+            if (data === 'píckup') return '<span class="badge bg-elegance">' + stepOptions[data] + '</span>'
+            return stepOptions[data]
+          }
+        },
+        {
+          data: 'employee.name',
+          name: 'employee.name',
+          render: (data, type, row) => {
+            return data || '-'
+          }
+        },
+        {
+          data: 'status',
+          name: 'status',
+          type: 'select',
+          render: function (data, type, row, meta) {
+            if (data == null || !(data in statusOptions)) return '<span class="badge bg-secondary">Não definido</span>'
+            if (data === 'approved') return '<span class="badge bg-success">' + statusOptions[data] + '</span>'
+            if (data === 'waiting_approval') return '<span class="badge bg-warning">' + statusOptions[data] + '</span>'
+            if (data === 'waiting_design') return '<span class="badge bg-corporate">' + statusOptions[data] + '</span>'
+            return stepOptions[data]
+          }
+        },
         { data: 'delivery_date', name: 'delivery_date' },
-        { data: 'action', name: 'action', orderable: false, searchable: false}
-      ],
-    });
+        { data: 'action', name: 'action', orderable: false, searchable: false }
+      ]
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // }
+    })
 
-    jQuery('#filterByStatus').on('change', function () {
-      table.draw();
-    });
+    document.querySelector('#filterByStatus').addEventListener('change', () => {
+      table.draw()
+    })
 
-    jQuery('#filterByMonth').on('change', function () {
-      table.draw();
-    });
+    document.querySelector('#filterByMonth').addEventListener('change', () => {
+      table.draw()
+    })
 
-    jQuery('#btnCleanFilters').on('click', function () {
-      $('#filterByStatus').val('all');
-      $('#filterByMonth').val('all');
-      $('#from').val('');
-      $('#to').val('');
-      table.draw();
-    });
+    document.querySelector('#btnCleanFilters').addEventListener('click', () => {
+      document.querySelector('#filterByStatus').value = 'all'
+      document.querySelector('#filterByMonth').value = 'all'
+      document.querySelector('#from').value = ''
+      document.querySelector('#to').value = ''
+      table.draw()
+    })
 
-    jQuery('#from').on('change', function () {
-      table.draw();
-    });
+    document.querySelector('#from').addEventListener('change', () => {
+      table.draw()
+    })
 
-    jQuery('#to').on('change', function () {
-      table.draw();
-    });
+    document.querySelector('#to').addEventListener('change', () => {
+      table.draw()
+    })
 
+    const detailRows = []
 
-    const detailRows = [];
+    tableOrders.addEventListener('click', (event) => {
+      if (event.target.closest('td.dt-control')) {
+        const tr = event.target.closest('tr')
+        const row = table.row(tr)
+        const rowId = tr.getAttribute('id')
+        const idx = detailRows.indexOf(rowId)
 
-    table.on('click', 'tbody td.dt-control', function () {
-      const tr = $(this).closest('tr');
-      const row = table.row(tr);
-      const idx = $.inArray(tr.attr('id'), detailRows);
-
-      if (row.child.isShown()) {
-        tr.removeClass('details');
-        row.child.hide();
-
-        detailRows.splice(idx, 1);
-      } else {
-        tr.addClass('details');
-        row.child(format(row.data())).show();
-
-        if (idx === -1) {
-          detailRows.push(tr.attr('id'));
+        if (row.child.isShown()) {
+          tr.classList.remove('details')
+          row.child.hide()
+          detailRows.splice(idx, 1)
+        } else {
+          tr.classList.add('details')
+          row.child(format(row.data())).show()
+          if (idx === -1) {
+            detailRows.push(rowId)
+          }
         }
       }
-    });
+    })
 
-    table.on('draw', function () {
-      $.each(detailRows, function (i, id) {
-        $('#' + id + ' td.dt-control').trigger('click');
-      });
-    });
+    table.on('draw', () => {
+      detailRows.forEach((id) => {
+        document.querySelector(`#${id} td.dt-control`).click()
+      })
+    })
 
-	}
+    tableOrders.addEventListener('dblclick', (event) => {
+      // Encontra o elemento tr mais próximo, que representa a linha da tabela
+      const tr = event.target.closest('tr')
 
-  static checkStatusOnUrl() {
-    const status = getParameterByName('status');
+      // Verifica se encontrou a linha (tr)
+      if (tr) {
+        // Obtém os dados da linha utilizando DataTable
+        const rowData = table.row(tr).data()
+
+        // Verifica se os dados foram encontrados
+        if (rowData) {
+          // Aqui você pode abrir o modal e preencher com os dados da linha clicada
+          // Supondo que o modal tenha o ID 'detalhesModal'
+          if (!pageOrder.statusModal) {
+            pageOrder.statusModal = new Modal(document.getElementById('detalhesModal'))
+          }
+
+          const detalhesModal = pageOrder.statusModal
+          // Preenche o conteúdo do modal com os dados da linha clicada
+          const modalTitle = document.getElementById('detalhesModal').querySelector('.block-title')
+          const modalBody = document.getElementById('detalhesModal').querySelector('.block-content')
+
+          modalTitle.textContent = `Alterar informações do pedido: #${rowData.number}`
+          modalBody.innerHTML = `
+            <form id="updateStatusForm" action="">
+              <input type="hidden" name="order_id" value="${rowData.id}" />
+              <div class="mb-3">
+                <label for="step" class="form-label">Etapa:</label>
+                <select name="step" class="form-control">
+                  <option value="">Não definido</option>
+                  ${Object.keys(stepOptions).map((key) => `<option value="${key}" ${key === rowData.step ? 'selected' : ''}>${stepOptions[key]}</option>`)}
+                </select>
+              </div>
+              <div>
+                <label for="status" class="form-label">Status:</label>
+                <select name="status" class="form-control">
+                  ${Object.keys(statusOptions).map((key) => `<option value="${key}" ${key === rowData.status ? 'selected' : ''}>${statusOptions[key]}</option>`)}
+                </select>
+              </div>
+              <div class="my-4">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+              </div>
+            </form>
+          `
+          detalhesModal.show()
+
+          const form = document.getElementById('updateStatusForm')
+          form.addEventListener('submit', async function (event) {
+            event.preventDefault()
+
+            const formData = new FormData(this)
+
+            console.log(formData)
+
+            // const res = await post('/dashboard/order/status', formData)
+
+            // if (res.success) {
+            //   form.reset()
+            //   detalhesModal.hide()
+            //   table.draw()
+            // }
+          })
+        }
+      }
+    })
+  }
+
+  static checkStatusOnUrl () {
+    const status = getParameterByName('status')
     if (status) {
-      jQuery('#filterByStatus').val(status).trigger('change');
+      const statusElement = document.querySelector('#filterByStatus')
+      statusElement.value = status
+      const event = new Event('change')
+      statusElement.dispatchEvent(event)
     }
   }
 
-	/*
-	 * Init functionality
-	 *
-	 */
-	static init() {
-		this.initDataTables();
-    this.checkStatusOnUrl();
-	}
+  static init () {
+    this.initDataTables()
+    this.checkStatusOnUrl()
+  }
 }
 
-Codebase.onLoad(() => pageOrder.init());
-Codebase.helpersOnLoad(['jq-datepicker']);
+window.Codebase.onLoad(() => pageOrder.init())
+window.Codebase.helpersOnLoad(['jq-datepicker'])

@@ -1,8 +1,5 @@
 @extends('layouts.backend')
 
-@section('css')
-@endsection
-
 @section('meta')
     <meta name="order-id" content="{{ $order->id }}">
 @endsection
@@ -154,30 +151,20 @@
                     Produtos
                 </h3>
             </div>
-            <div class="block-content block-content-full">
+            <div class="block-content block-content-full p-0 px-2 pb-2">
                 <div class="table-responsive">
-                    <table class="table table-borderless table-striped mb-0">
+                    <table class="table table-bordered table-striped table-vcenter js-dataTable-responsive list-latest"
+                        id="table-products">
                         <thead>
                             <tr>
-                                <th style="width: 100px;">ID</th>
                                 <th>Produto</th>
                                 <th class="text-center">Quantidade</th>
+                                <th>Estoque</th>
+                                <th>Fornecedor</th>
+                                <th>Observação</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($order->orderProducts as $product)
-                                <tr>
-                                    <td>
-                                        {{ $product->id }}
-                                    </td>
-                                    <td>
-                                        {{ strtoupper($product->name) }}
-                                    </td>
-                                    <td class="text-center">
-                                        {{ $product->qtd }}
-                                    </td>
-                                </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>

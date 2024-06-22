@@ -186,6 +186,7 @@ return [
              * Package Service Providers...
              */
         Yajra\DataTables\DataTablesServiceProvider::class,
+        Yajra\DataTables\EditorServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Watson\Active\ActiveServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,

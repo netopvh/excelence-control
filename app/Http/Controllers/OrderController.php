@@ -18,7 +18,7 @@ class OrderController extends Controller
     public function json(Request $request)
     {
         $model = Order::query()
-            ->with(['customer', 'orderProducts', 'employee'])
+            ->with(['customer', 'orderProducts.product', 'employee'])
             ->orderBy('date', 'desc');
 
         return DataTables::of($model)
@@ -58,28 +58,14 @@ class OrderController extends Controller
             ->editColumn('customer.name', function ($model) {
                 return strtoupper($model->customer->name);
             })
-            ->editColumn('step', function ($model) {
-                if ($model->step === MovementType::InDesign) {
-                    return '<span class="badge bg-success">Design e Arte</span>';
-                } else if ($model->step === MovementType::Created) {
-                    return '<span class="badge bg-warning">Não Definido</span>';
-                } else if ($model->step === MovementType::InProduction) {
-                    return '<span class="badge bg-info">Produção</span>';
-                } else if ($model->step === MovementType::Finished) {
-                    return '<span class="badge bg-info">Concluído</span>';
-                } else if ($model->step === MovementType::Shipping) {
-                    return '<span class="badge bg-info">Para Entrega</span>';
-                } else if ($model->step === MovementType::Pickup) {
-                    return '<span class="badge bg-info">Para Retirada</span>';
-                } else {
-                    return '<span class="badge bg-black-50">Não definido</span>';
-                }
-            })
             ->editColumn('arrived', function ($model) {
                 return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
             })
             ->addColumn('action', function ($model) {
                 return '<a href="' . route('dashboard.order.show', $model->id) . '" class="btn btn-sm btn-primary text-white"><i class="fa fa-eye" /></a>';
+            })
+            ->setRowId(function ($model) {
+                return $model->id;
             })
             ->rawColumns(['step', 'arrived', 'action'])
             ->make(true);
@@ -136,7 +122,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::query()->with(['customer', 'orderProducts'])->findOrFail($id);
+        $order = Order::query()->with(['customer', 'orderProducts.product'])->findOrFail($id);
 
         $users = User::query()->whereHas('roles', function ($query) {
             $query->where('name', 'design');
