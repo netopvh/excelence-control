@@ -33,7 +33,7 @@ class OrderController extends Controller
                     return $orderProduct->supplier;
                 }
             })
-            ->rawColumns(['in_stock'])
+            ->rawColumns(['in_stock', 'supplier'])
             ->setRowId('id')
             ->make(true);
     }
