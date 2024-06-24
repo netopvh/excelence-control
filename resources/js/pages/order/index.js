@@ -1,5 +1,5 @@
 import DataTable from 'datatables.net-bs5'
-import { getParameterByName } from '../../codebase/utils'
+import { getParameterByName, isValidURL } from '../../codebase/utils'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
 import { Modal } from 'bootstrap'
@@ -27,7 +27,7 @@ class pageOrder {
             <td class='fw-bold'>${item.product.name}</td>
             <td>${item.qtd}</td>
             <td>${item.in_stock === 'yes' ? '<span class="badge bg-success">Sim</span>' : item.in_stock === 'no' ? '<span class="badge bg-warning">Não</span>' : item.in_stock === 'partial' ? '<span class="badge bg-info">Parcial</span>' : '-'}</td>
-            <td>${item.supplier ? item.supplier : '-'}</td>
+            <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
           </tr>`
         }).join('') +
