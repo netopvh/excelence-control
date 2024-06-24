@@ -7,10 +7,12 @@ use App\Enums\StatusType;
 use App\Events\OrderStepUpdated;
 use App\Models\Customer;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -152,6 +154,8 @@ class OrderController extends Controller
     public function store(Request $request)
     {
 
+        Log::info(print_r($request->all(), true));
+
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'date' => 'required',
@@ -160,6 +164,9 @@ class OrderController extends Controller
             'product' => 'required|array',
             'product.*.name' => 'required|string|max:255',
             'product.*.qtd' => 'required|numeric|min:0.01',
+            'product.*.in_stock' => 'required',
+            'product.*.supplier' => 'nullable|string|max:255',
+            'product.*.obs' => 'nullable|string|max:255',
         ], [
             'customer_id.required' => 'O campo cliente é obrigatório.',
             'customer_id.exists' => 'O campo cliente deve ser um cliente válido.',
@@ -177,6 +184,7 @@ class OrderController extends Controller
             'product.*.qtd.required' => 'O campo quantidade é obrigatório.',
             'product.*.qtd.numeric' => 'O campo quantidade deve ser um número.',
             'product.*.qtd.min' => 'O campo quantidade deve ser no mínimo 0.01.',
+            'product.*.in_stock.required' => 'O campo estoque é obrigatório.',
         ]);
 
 
@@ -200,8 +208,11 @@ class OrderController extends Controller
 
         foreach ($request->get('product') as $product) {
             $order->orderProducts()->create([
-                'name' => $product['name'],
-                'qtd' => $product['qtd']
+                'product_id' => $this->findProduct($product['name']),
+                'qtd' => $product['qtd'],
+                'in_stock' => $product['in_stock'],
+                'supplier' => $product['supplier'],
+                'obs' => $product['obs'],
             ]);
         }
 
@@ -376,5 +387,12 @@ class OrderController extends Controller
             'step' => get_step($order->step),
             'message' => 'Etapa atualizada com sucesso!',
         ]);
+    }
+
+    private function findProduct(string $name): int
+    {
+        $product = Product::query()->where('name', trim($name))->firstOrFail();
+
+        return $product->id;
     }
 }

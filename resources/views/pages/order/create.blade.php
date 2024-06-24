@@ -80,15 +80,19 @@
                 <td><input type="text" class="form-control autocomplete-${productIndex}" name="product[${productIndex}][name]" placeholder="Informe o Produto" /></td>
                 <td><input type="number" class="form-control" name="product[${productIndex}][qtd]" placeholder="Quantidade" /></td>
                 <td>
-                    <select class="form-select" name="product[${productIndex}][in_stock]">
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
-                        <option value="2">Parcial</option>
+                    <select class="form-select" name="product[${productIndex}][in_stock]" id="in-stock-${productIndex}">
+                        <option value="yes">Sim</option>
+                        <option value="no">Não</option>
+                        <option value="partial">Parcial</option>
                     </select>
                 </td>
                 <td>
+                    <input type="text" class="form-control" name="product[${productIndex}][supplier]"
+                        placeholder="Fornecedor" id="supplier-${productIndex}">
+                </td>
+                <td>
                     <input type="text" class="form-control" name="product[${productIndex}][obs]"
-                        placeholder="Observação">
+                        placeholder="Observação" id="obs-${productIndex}">
                 </td>
                 <td>
                     <button type="button" class="btn btn-danger" onclick="removerLinha(this)">
@@ -108,6 +112,13 @@
                     });
                 }
             });
+
+            // document.getElementById('in-stock-' + productIndex).addEventListener('change', function() {
+            //     console.log(this.value)
+            //     if (this.value == 'no' || this.value == 'partial') {
+            //         console.log(document.getElementById('supplier-' + productIndex))
+            //     } else {}
+            // })
 
             productIndex++;
         }
@@ -152,6 +163,17 @@
                                 <button type="submit" class="btn btn-sm btn-outline-primary me-1 mb-1">
                                     <i class="fa-regular fa-note-sticky me-1"></i> Visualizar
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-xl-12">
+                            <div class="error-text text-danger mb-4" id="error-text">
+                                <ul>
+                                    @for ($i = 0; $i < count($errors->all()); $i++)
+                                        <li>{{ $errors->all()[$i] }}</li>
+                                    @endfor
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -219,6 +241,7 @@
                                         <th>Produto</th>
                                         <th style="width: 160px">Quantidade</th>
                                         <th>Em Estoque?</th>
+                                        <th>Fornecedor</th>
                                         <th>Observação</th>
                                         <th>Ações</th>
                                     </tr>
@@ -227,18 +250,23 @@
                                     <tr>
                                         <td>
                                             <input type="text" class="form-control autocomplete-1"
-                                                name="product[1][name]" placeholder="Informe o Produto" autocomplete="off">
+                                                name="product[1][name]" placeholder="Informe o Produto"
+                                                autocomplete="off">
                                         </td>
                                         <td>
                                             <input type="number" class="form-control" name="product[1][qtd]"
                                                 placeholder="Quantidade">
                                         </td>
                                         <td>
-                                            <select class="form-select" name="product[1][in_stock]">
-                                                <option value="1">Sim</option>
-                                                <option value="0">Não</option>
-                                                <option value="2">Parcial</option>
+                                            <select class="form-select" name="product[1][in_stock]" id="in-stock-1">
+                                                <option value="yes">Sim</option>
+                                                <option value="no">Não</option>
+                                                <option value="partial">Parcial</option>
                                             </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="product[1][supplier]"
+                                                placeholder="Fornecedor">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control" name="product[1][obs]"
