@@ -15,7 +15,9 @@ class OrderController extends Controller
     {
         $order = Order::query()->findOrFail($orderId);
 
-        return DataTables::of($order->orderProducts()->with('product'))
+        $orderProducts = $order->orderProducts()->with('product')->get();
+
+        return DataTables::of($orderProducts)
             ->editColumn('in_stock', function ($orderProduct) {
                 if ($orderProduct->in_stock === 'yes') {
                     return '<span class="badge bg-success">Sim</span>';
@@ -34,19 +36,35 @@ class OrderController extends Controller
                     return $orderProduct->supplier;
                 }
             })
+            ->setRowId(function ($orderProduct) {
+                return $orderProduct->id; // Definindo o ID correto do orderProduct
+            })
             ->rawColumns(['in_stock', 'supplier'])
-            ->setRowId('id')
             ->make(true);
     }
 
     public function updateStatusAndStep(Request $request, $id)
     {
-        Log::info(print_r($request->all(), true));
         $order = Order::query()->findOrFail($id);
         $order->status = $request->status;
         $order->step = $request->step;
         $order->employee_id = $request->employee_id;
         $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Informações atualizadas com sucesso',
+        ]);
+    }
+
+    public function updateInfo(Request $request, $id)
+    {
+        $order = Order::query()->findOrFail($id);
+        $order->orderProducts()->find($request->id)
+            ->update([
+                'supplier' => $request->supplier,
+                'obs' => $request->obs,
+            ]);
 
         return response()->json([
             'success' => true,

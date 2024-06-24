@@ -36,4 +36,5 @@ Route::prefix('user')->group(function () {
 Route::prefix('order')->group(function () {
     Route::get('products/{orderId}', [OrderController::class, 'productsOrder']);
     Route::post('/{id}/store', [OrderController::class, 'updateStatusAndStep']);
+    Route::post('/{id}/info', [OrderController::class, 'updateInfo']);
 });

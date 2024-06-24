@@ -1,3 +1,4 @@
+import { Modal } from 'bootstrap'
 import { post } from '../../codebase/api'
 import Helpers from '../../codebase/modules/helpers'
 
@@ -6,6 +7,8 @@ import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
 
 class pageShowOrder {
+  static productsModal = null
+
   static initPage () {
     const orderId = document.querySelector('meta[name="order-id"]').getAttribute('content')
 
@@ -273,10 +276,76 @@ class pageShowOrder {
         { data: 'in_stock', name: 'in_stock', width: '10%' },
         { data: 'supplier', name: 'supplier', width: '23%', render: function (data) { return data || '-' } },
         { data: 'obs', name: 'obs', width: '23%', render: function (data) { return data || '-' } }
-      ]
-      // language: {
-      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      // }
+      ],
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      }
+    })
+
+    tableElement.addEventListener('dblclick', (event) => {
+      const tr = event.target.closest('tr')
+
+      if (tr) {
+        const rowData = table.row(tr).data()
+
+        if (rowData) {
+          if (!pageShowOrder.productsModal) {
+            pageShowOrder.productsModal = new Modal(document.getElementById('productsModal'))
+          }
+
+          const productsModal = pageShowOrder.productsModal
+
+          const modalTitle = document.getElementById('productsModal').querySelector('.block-title')
+          const modalBody = document.getElementById('productsModal').querySelector('.block-content')
+
+          modalTitle.textContent = 'Alterar informações do pedido'
+          modalBody.innerHTML = `
+                <form id="updateProductsForm" action="">
+                  <input type="hidden" name="order_id" value="${rowData.order_id}" />
+                  <div class="mb-3">
+                    <label for="supplier" class="form-label">Fornecedor:</label>
+                    <input type="text" name="supplier" class="form-control" value="${rowData.supplier}" />
+                  </div>
+                  <div class="mb-3">
+                    <label for="obs" class="form-label">Observação:</label>
+                    <input type="text" name="obs" class="form-control" value="${rowData.obs}" />
+                  </div>
+                  <div class="my-4">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                  </div>
+                </form>
+              `
+          productsModal.show()
+          console.log(rowData)
+
+          const form = document.getElementById('updateProductsForm')
+          form.addEventListener('submit', async function (event) {
+            event.preventDefault()
+
+            modalBody.innerHTML = `
+                <div class="spinner-border spinner-border-sm text-white" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              `
+
+            const data = {
+              id: rowData.id,
+              supplier: form.querySelector('input[name="supplier"]').value,
+              obs: form.querySelector('input[name="obs"]').value
+            }
+
+            const orderId = form.querySelector('input[name="order_id"]').value
+
+            const res = await post(`/api/order/${orderId}/info`, data)
+
+            if (res.success) {
+              form.reset()
+              productsModal.hide()
+              table.draw()
+            }
+          })
+        }
+      }
     })
 
     window.addEventListener('resize', () => {

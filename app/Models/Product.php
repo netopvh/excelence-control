@@ -12,4 +12,11 @@ class Product extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_products')
+            ->withPivot(['qtd', 'in_stock', 'supplier', 'obs'])
+            ->withTimestamps();
+    }
 }
