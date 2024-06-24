@@ -58,7 +58,7 @@ class OrderController extends Controller
                 return $model->delivery_date->format('d/m/Y');
             })
             ->editColumn('customer.name', function ($model) {
-                return strtoupper($model->customer->name);
+                return ucwords($model->customer->name);
             })
             ->editColumn('arrived', function ($model) {
                 return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
@@ -319,6 +319,18 @@ class OrderController extends Controller
             }, $previewFiles), 'filePreview' => asset('preview/' . pathinfo($fileName, PATHINFO_FILENAME)),
             'message' => 'Design enviado com sucesso!',
         ]);
+    }
+
+    public function removeDesign($id)
+    {
+        $order = Order::query()->findOrFail($id);
+
+        $order->update([
+            'design_file' => null,
+            'preview' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Design removido com sucesso!');
     }
 
     public function updateStatus(Request $request, $id)

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('customer')->group(function () {
     Route::post('/', [CustomerController::class, 'store']);
+});
+
+Route::prefix('user')->group(function () {
+    Route::get('employees', [UserController::class, 'getEmployees']);
 });
 
 Route::prefix('order')->group(function () {

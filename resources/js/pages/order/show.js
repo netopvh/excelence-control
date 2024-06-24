@@ -51,6 +51,11 @@ class pageShowOrder {
           const loadingDesign = document.getElementById('loading-design')
           loadingDesign.classList.remove('d-none')
 
+          const btnUpload = document.getElementById('btn-upload')
+          if (btnUpload) {
+            btnUpload.setAttribute('disabled', 'disabled')
+          }
+
           const response = await post(`/dashboard/order/${orderId}/upload/design`, new FormData(this), {
             'Content-Type': 'multipart/form-data'
           })
@@ -67,6 +72,13 @@ class pageShowOrder {
                   <i class="fa fa-fw fa-download text-white me-1"></i>
                   <span class="d-sm-inline">Baixar Arquivo</span>
               </a>
+              <form
+                  action="/dashboard/order/${orderId}/remove/design"
+                  method="POST" class="mt-3">
+                  <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+                  <button type="submit" class="btn btn-danger"><i
+                          class="fa fa-fw fa-trash"></i>Excluir Arquivo</button>
+              </form>
           </div>
            <div class="preview-images mt-4">
               ${response.previewFiles.map(file => `<img src="${file}" alt="Pré-visualização" class="img-fluid max-w-25" />`).join('')}
@@ -83,6 +95,11 @@ class pageShowOrder {
         // Oculta o indicador de carregamento em caso de erro
           const loadingDesign = document.getElementById('loading-design')
           loadingDesign.classList.add('d-none')
+
+          const btnUpload = document.getElementById('btn-upload')
+          if (btnUpload) {
+            btnUpload.removeAttribute('disabled')
+          }
 
           // Tratamento de erros
           const errorMsg = document.getElementById('error-msg')
@@ -256,10 +273,10 @@ class pageShowOrder {
         { data: 'in_stock', name: 'in_stock', width: '10%' },
         { data: 'supplier', name: 'supplier', width: '23%', render: function (data) { return data || '-' } },
         { data: 'obs', name: 'obs', width: '23%', render: function (data) { return data || '-' } }
-      ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      }
+      ]
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // }
     })
 
     window.addEventListener('resize', () => {

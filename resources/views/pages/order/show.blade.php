@@ -323,6 +323,13 @@
                                                         <i class="fa fa-fw fa-download text-white me-1"></i>
                                                         <span class="d-none d-sm-inline">Baixar Arquivo</span>
                                                     </a>
+                                                    <form
+                                                        action="{{ route('dashboard.order.remove.design', $order->id) }}"
+                                                        method="POST" class="mt-3">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-danger"><i
+                                                                class="fa fa-fw fa-trash"></i>Excluir Arquivo</button>
+                                                    </form>
                                                 </div>
                                                 <div class="preview-images mt-4">
                                                     @foreach ($order->preview as $file)
@@ -445,7 +452,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                        <button type="submit" class="btn btn-primary">Importar</button>
+                                                        <button type="submit" class="btn btn-primary"
+                                                            id="btn-upload">Importar</button>
                                                     </div>
                                                 </div>
                                             </form>

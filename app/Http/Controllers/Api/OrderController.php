@@ -6,6 +6,7 @@ use App\DataTables\OrderDataTableEditor;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -40,9 +41,11 @@ class OrderController extends Controller
 
     public function updateStatusAndStep(Request $request, $id)
     {
+        Log::info(print_r($request->all(), true));
         $order = Order::query()->findOrFail($id);
         $order->status = $request->status;
         $order->step = $request->step;
+        $order->employee_id = $request->employee_id;
         $order->save();
 
         return response()->json([

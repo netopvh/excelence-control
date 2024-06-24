@@ -3,7 +3,7 @@ import { getParameterByName } from '../../codebase/utils'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
 import { Modal } from 'bootstrap'
-import { post } from '../../codebase/api'
+import { get, post } from '../../codebase/api'
 // import $ from 'jquery'
 
 class pageOrder {
@@ -102,8 +102,11 @@ class pageOrder {
         { data: 'delivery_date', name: 'delivery_date' },
         { data: 'action', name: 'action', orderable: false, searchable: false }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // },
+      initComplete: function () {
+        console.log('Table initialized')
       }
     })
 
@@ -160,7 +163,7 @@ class pageOrder {
       })
     })
 
-    tableOrders.addEventListener('dblclick', (event) => {
+    tableOrders.addEventListener('dblclick', async (event) => {
       // Encontra o elemento tr mais próximo, que representa a linha da tabela
       const tr = event.target.closest('tr')
 
@@ -176,6 +179,12 @@ class pageOrder {
           if (!pageOrder.statusModal) {
             pageOrder.statusModal = new Modal(document.getElementById('detalhesModal'))
           }
+
+          let employeeOptions = []
+
+          await get('/api/user/employees').then((response) => {
+            employeeOptions = response
+          })
 
           const detalhesModal = pageOrder.statusModal
           // Preenche o conteúdo do modal com os dados da linha clicada
@@ -193,10 +202,16 @@ class pageOrder {
                   ${Object.keys(stepOptions).map((key) => `<option value="${key}" ${key === rowData.step ? 'selected' : ''}>${stepOptions[key]}</option>`)}
                 </select>
               </div>
-              <div>
+              <div class="mb-3">
                 <label for="status" class="form-label">Status:</label>
                 <select name="status" class="form-control">
                   ${Object.keys(statusOptions).map((key) => `<option value="${key}" ${key === rowData.status ? 'selected' : ''}>${statusOptions[key]}</option>`)}
+                </select>
+              </div>
+              <div>
+                <label for="employee_id" class="form-label">Vendedor:</label>
+                <select name="employee_id" class="form-control" id="employee_id">
+                  ${employeeOptions.map((employee) => `<option value="${employee.id}" ${employee.id === rowData.employee_id ? 'selected' : ''}>${employee.name}</option>`)}
                 </select>
               </div>
               <div class="my-4">
@@ -212,7 +227,8 @@ class pageOrder {
 
             const data = {
               step: form.querySelector('select[name="step"]').value,
-              status: form.querySelector('select[name="status"]').value
+              status: form.querySelector('select[name="status"]').value,
+              employee_id: form.querySelector('select[name="employee_id"]').value
             }
 
             const orderId = form.querySelector('input[name="order_id"]').value
