@@ -26,6 +26,13 @@ class OrderController extends Controller
                     return '-';
                 }
             })
+            ->editColumn('supplier', function ($orderProduct) {
+                if ($this->checkStringIsLink($orderProduct->supplier)) {
+                    return '<a href="' . $orderProduct->supplier . '" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>';
+                } else {
+                    return $orderProduct->supplier;
+                }
+            })
             ->rawColumns(['in_stock'])
             ->setRowId('id')
             ->make(true);
@@ -42,5 +49,10 @@ class OrderController extends Controller
             'success' => true,
             'message' => 'Informações atualizadas com sucesso',
         ]);
+    }
+
+    private function checkStringIsLink($string)
+    {
+        return filter_var($string, FILTER_VALIDATE_URL) !== false;
     }
 }
