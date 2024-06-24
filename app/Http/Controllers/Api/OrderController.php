@@ -29,13 +29,6 @@ class OrderController extends Controller
                     return '-';
                 }
             })
-            ->editColumn('supplier', function ($orderProduct) {
-                if ($this->checkStringIsLink($orderProduct->supplier)) {
-                    return '<a href="' . $orderProduct->supplier . '" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>';
-                } else {
-                    return $orderProduct->supplier;
-                }
-            })
             ->setRowId(function ($orderProduct) {
                 return $orderProduct->id; // Definindo o ID correto do orderProduct
             })

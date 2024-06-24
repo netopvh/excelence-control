@@ -51,4 +51,13 @@ function focusElement (element) {
   }
 }
 
-export { getParameterByName, clearForm, focusElement }
+function isValidURL (string) {
+  try {
+    new URL(string)
+    return true
+  } catch (_) {
+    return false
+  }
+}
+
+export { getParameterByName, clearForm, focusElement, isValidURL }

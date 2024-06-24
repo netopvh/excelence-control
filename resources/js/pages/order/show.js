@@ -5,6 +5,7 @@ import Helpers from '../../codebase/modules/helpers'
 import DataTable from 'datatables.net-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
+import { isValidURL } from '../../codebase/utils'
 
 class pageShowOrder {
   static productsModal = null
@@ -274,7 +275,22 @@ class pageShowOrder {
         { data: 'product.name', name: 'product.name', width: '34%' },
         { data: 'qtd', name: 'qtd', width: '10%' },
         { data: 'in_stock', name: 'in_stock', width: '10%' },
-        { data: 'supplier', name: 'supplier', width: '23%', render: function (data) { return data || '-' } },
+        {
+          data: 'supplier',
+          name: 'supplier',
+          width: '23%',
+          render: function (data) {
+            if (data === null) {
+              return '-'
+            }
+
+            if (isValidURL(data)) {
+              return `<a href="${data}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>`
+            }
+
+            return data
+          }
+        },
         { data: 'obs', name: 'obs', width: '23%', render: function (data) { return data || '-' } }
       ],
       language: {
@@ -304,11 +320,11 @@ class pageShowOrder {
                   <input type="hidden" name="order_id" value="${rowData.order_id}" />
                   <div class="mb-3">
                     <label for="supplier" class="form-label">Fornecedor:</label>
-                    <input type="text" name="supplier" class="form-control" value="${rowData.supplier}" />
+                    <input type="text" name="supplier" class="form-control" value="${rowData.supplier ? rowData.supplier : ''}" />
                   </div>
                   <div class="mb-3">
                     <label for="obs" class="form-label">Observação:</label>
-                    <input type="text" name="obs" class="form-control" value="${rowData.obs}" />
+                    <input type="text" name="obs" class="form-control" value="${rowData.obs ? rowData.obs : ''}" />
                   </div>
                   <div class="my-4">
                     <button type="submit" class="btn btn-primary">Salvar</button>
@@ -316,7 +332,6 @@ class pageShowOrder {
                 </form>
               `
           productsModal.show()
-          console.log(rowData)
 
           const form = document.getElementById('updateProductsForm')
           form.addEventListener('submit', async function (event) {
