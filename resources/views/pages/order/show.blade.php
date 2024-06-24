@@ -184,7 +184,7 @@
                             <div class="block-content fs-md">
                                 <div id="error-msg"></div>
                                 <div class="row mb-4">
-                                    <div class="col-12 col-md-6">
+                                    {{-- <div class="col-12 col-md-6">
                                         <div class="fw-bold">
                                             Pré-visualização
                                         </div>
@@ -310,19 +310,27 @@
                                                 </div>
                                             </form>
                                         @endif
+                                    </div> --}}
+                                    <div class="fw-bold">
+                                        Arquivo de Design PDF
                                     </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="fw-bold">
-                                            Arquivo de Design PDF
-                                        </div>
-                                        <div id="design-container">
-                                            @if ($order->design_file)
+                                    <div class="col-12 col-md-12">
+                                        <div id="design-container" class="align-items-center">
+                                            @if ($order->design_file && $order->preview)
                                                 <div class="mt-5">
                                                     <a href="{{ asset('design/' . $order->design_file) }}"
                                                         target="_blank" class="btn btn-primary">
                                                         <i class="fa fa-fw fa-download text-white me-1"></i>
                                                         <span class="d-none d-sm-inline">Baixar Arquivo</span>
                                                     </a>
+                                                </div>
+                                                <div class="preview-images mt-4">
+                                                    @foreach ($order->preview as $file)
+                                                        <div class="preview-image">
+                                                            <img src="{{ asset($file) }}" alt="Pré-visualização"
+                                                                class="max-w-25 img-fluid">
+                                                        </div>
+                                                    @endforeach
                                                 </div>
                                             @else
                                                 <img src="{{ asset('media/photos/noimage.jpg') }}" alt="Pré-visualização"

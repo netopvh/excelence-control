@@ -52,4 +52,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderMovement::class, 'order_id');
     }
+
+    public function getPreviewAttribute($value)
+    {
+        return json_decode($value, true);
+    }
 }

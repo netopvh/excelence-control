@@ -68,6 +68,9 @@ class pageShowOrder {
                   <span class="d-sm-inline">Baixar Arquivo</span>
               </a>
           </div>
+           <div class="preview-images mt-4">
+              ${response.previewFiles.map(file => `<img src="${file}" alt="Pré-visualização" class="img-fluid max-w-25" />`).join('')}
+          </div>
           `
 
           Helpers.run('jq-alert', {

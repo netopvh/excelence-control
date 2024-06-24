@@ -12,7 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
+use Imagick;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -261,16 +261,62 @@ class OrderController extends Controller
         $order = Order::query()->findOrFail($id);
 
         $fileName = time() . '.' . $request->file('design')->extension();
-
         $request->file('design')->storeAs('', $fileName, ['disk' => 'design']);
+        $storagePath = storage_path('app/design/' . $fileName);
+
+        $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
+        $outputPath = storage_path('app/preview/' . $outputDir);
+
+        if (!file_exists($outputPath)) {
+            mkdir($outputPath, 0777, true);
+        }
+
+        try {
+            // Crie uma nova instância do Imagick
+            $imagick = new Imagick();
+
+            // Leia o arquivo PDF
+            $imagick->readImage($storagePath);
+
+            $previewFiles = [];
+
+            // Itere por cada página do PDF e converta para JPG
+            foreach ($imagick as $index => $page) {
+                // Defina a resolução desejada
+                $page->setResolution(300, 300);
+
+                // Defina o formato de saída como JPG
+                $page->setImageFormat('jpeg');
+
+                // Salve a imagem JPG
+                $outputFile = $outputPath . "/page-" . ($index + 1) . ".jpg";
+                $page->writeImage($outputFile);
+
+                // Adicione o caminho da imagem gerada à lista
+                $previewFiles[] = 'preview/' . $outputDir . '/page-' . ($index + 1) . '.jpg';
+            }
+
+            // Limpe a memória
+            $imagick->clear();
+            $imagick->destroy();
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao converter o PDF: ' . $e->getMessage(),
+            ], 500);
+        }
 
         $order->update([
             'design_file' => $fileName,
+            'preview' => json_encode($previewFiles)
         ]);
 
         return response()->json([
             'success' => true,
             'fileUrl' => asset('design/' . $order->design_file),
+            'previewFiles' => array_map(function ($file) {
+                return asset($file);
+            }, $previewFiles), 'filePreview' => asset('preview/' . pathinfo($fileName, PATHINFO_FILENAME)),
             'message' => 'Design enviado com sucesso!',
         ]);
     }
