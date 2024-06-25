@@ -278,7 +278,14 @@ class pageShowOrder {
         {
           data: 'supplier',
           name: 'supplier',
-          width: '23%',
+          width: '15%',
+          render: function (data) {
+            return data || '-'
+          }
+        },
+        {
+          data: 'link',
+          name: 'link',
           render: function (data) {
             if (data === null) {
               return '-'

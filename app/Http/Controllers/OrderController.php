@@ -215,6 +215,7 @@ class OrderController extends Controller
                 'qtd' => $product['qtd'],
                 'in_stock' => $product['in_stock'],
                 'supplier' => $product['supplier'],
+                'link' => $product['link'],
                 'obs' => $product['obs'],
             ]);
         }

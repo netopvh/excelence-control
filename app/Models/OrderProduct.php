@@ -45,6 +45,7 @@ class OrderProduct extends Model
         'order_id',
         'in_stock',
         'supplier',
+        'link',
         'obs'
     ];
 

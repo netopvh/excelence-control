@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('qtd');
             $table->enum('in_stock', ['yes', 'no', 'partial'])->default('yes');
             $table->string('supplier')->nullable();
+            $table->string('link')->nullable();
             $table->string('obs')->nullable();
             $table->timestamps();
             $table->softDeletes();

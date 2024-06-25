@@ -20,6 +20,7 @@
     <meta property="og:image" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="api-token" content="{{ Auth::user()->api_token }}">
+    <meta name="user" content="{{ Auth::user()->id }}">
     <meta name="base-url" content="{{ url('/') }}">
     @yield('meta')
     <!-- Icons -->

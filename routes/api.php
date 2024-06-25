@@ -42,4 +42,7 @@ Route::prefix('order')->group(function () {
 
 Route::prefix('purchase')->group(function () {
     Route::get('/', [PurchaseController::class, 'index']);
+    Route::get('/{id}/viewed', [PurchaseController::class, 'checkUserViewed']);
+    Route::post('/{id}/view', [PurchaseController::class, 'userViewed']);
+    Route::get('/{id}/show', [PurchaseController::class, 'show']);
 });

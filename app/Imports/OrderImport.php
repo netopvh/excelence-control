@@ -2,7 +2,9 @@
 
 namespace App\Imports;
 
+use App\Enums\ActionType;
 use App\Enums\MovementType;
+use App\Enums\OriginType;
 use App\Enums\StatusType;
 use App\Models\Customer;
 use App\Models\Order;
@@ -54,20 +56,32 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
                 'delivery_date' => $this->parseDate($row['entrega']),
                 'status' => $this->validateStatus($row['arte']),
             ])->save();
+
+            $this->createOrderMovement($order, $row);
         }
         return $order;
     }
 
     private function createOrderProduct(Order $order, array $row)
     {
-        Log::info($row['estoque']);
-
         $product = $this->findOrCreateProduct($row['produto']);
 
         $order->orderProducts()->create([
             'product_id' => $product->id,
             'qtd' => $row['qtd'],
             'in_stock' => $this->validateInStock($row['estoque']),
+        ]);
+    }
+
+    private function createOrderMovement(Order $order, array $row)
+    {
+        $order->movements()->create([
+            'action_date' => now(),
+            'action_type' => ActionType::Register(),
+            'action_user_id' => auth()->user()->id,
+            'order_id' => $order->id,
+            'origin' => OriginType::Order(),
+            'movement_type' => MovementType::InDesign(),
         ]);
     }
 

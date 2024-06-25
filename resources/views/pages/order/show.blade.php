@@ -161,6 +161,7 @@
                                 <th class="text-center">Quantidade</th>
                                 <th>Estoque</th>
                                 <th>Fornecedor</th>
+                                <th>Link</th>
                                 <th>Observação</th>
                             </tr>
                         </thead>

@@ -91,6 +91,10 @@
                         placeholder="Fornecedor" id="supplier-${productIndex}">
                 </td>
                 <td>
+                    <input type="text" class="form-control" name="product[${productIndex}][link]"
+                        placeholder="Link" id="link-${productIndex}">
+                </td>
+                <td>
                     <input type="text" class="form-control" name="product[${productIndex}][obs]"
                         placeholder="Observação" id="obs-${productIndex}">
                 </td>
@@ -112,13 +116,6 @@
                     });
                 }
             });
-
-            // document.getElementById('in-stock-' + productIndex).addEventListener('change', function() {
-            //     console.log(this.value)
-            //     if (this.value == 'no' || this.value == 'partial') {
-            //         console.log(document.getElementById('supplier-' + productIndex))
-            //     } else {}
-            // })
 
             productIndex++;
         }
@@ -240,8 +237,9 @@
                                     <tr>
                                         <th>Produto</th>
                                         <th style="width: 160px">Quantidade</th>
-                                        <th>Em Estoque?</th>
+                                        <th>Estoque</th>
                                         <th>Fornecedor</th>
+                                        <th>Link</th>
                                         <th>Observação</th>
                                         <th>Ações</th>
                                     </tr>
@@ -267,6 +265,10 @@
                                         <td>
                                             <input type="text" class="form-control" name="product[1][supplier]"
                                                 placeholder="Fornecedor">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" name="product[1][link]"
+                                                placeholder="Link">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control" name="product[1][obs]"
