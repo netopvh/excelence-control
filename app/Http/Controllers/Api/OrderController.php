@@ -56,6 +56,7 @@ class OrderController extends Controller
         $order->orderProducts()->find($request->id)
             ->update([
                 'supplier' => $request->supplier,
+                'link' => $request->link,
                 'obs' => $request->obs,
             ]);
 

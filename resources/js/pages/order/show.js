@@ -330,6 +330,10 @@ class pageShowOrder {
                     <input type="text" name="supplier" class="form-control" value="${rowData.supplier ? rowData.supplier : ''}" />
                   </div>
                   <div class="mb-3">
+                    <label for="link" class="form-label">Link:</label>
+                    <input type="text" name="link" class="form-control" value="${rowData.link ? rowData.link : ''}" />
+                  </div>
+                  <div class="mb-3">
                     <label for="obs" class="form-label">Observação:</label>
                     <input type="text" name="obs" class="form-control" value="${rowData.obs ? rowData.obs : ''}" />
                   </div>
@@ -353,6 +357,7 @@ class pageShowOrder {
             const data = {
               id: rowData.id,
               supplier: form.querySelector('input[name="supplier"]').value,
+              link: form.querySelector('input[name="link"]').value,
               obs: form.querySelector('input[name="obs"]').value
             }
 
