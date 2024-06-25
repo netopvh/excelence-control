@@ -16,7 +16,8 @@ export default defineConfig({
         'resources/js/pages/order/index.js',
         'resources/js/pages/order/create.js',
         'resources/js/pages/order/show.js',
-        'resources/js/pages/order/kanban.js'
+        'resources/js/pages/order/kanban.js',
+        'resources/js/pages/purchase/index.js'
       ],
       refresh: true
     })
