@@ -17,7 +17,6 @@
         "maatwebsite/excel": "^3.1",
         "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-permission": "^6.7",
-        "spatie/pdf-to-image": "^3.0",
         "watson/active": "7.0.0",
         "yajra/laravel-datatables": "^10.0",
         "yajra/laravel-datatables-editor": "1.25.4"
