@@ -92,3 +92,7 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
     max-height: 1000px;
     /* Ajuste conforme o necessário */
 }
+
+.dt-search label {
+    display: none !important;
+}

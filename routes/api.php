@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,4 +38,8 @@ Route::prefix('order')->group(function () {
     Route::get('products/{orderId}', [OrderController::class, 'productsOrder']);
     Route::post('/{id}/store', [OrderController::class, 'updateStatusAndStep']);
     Route::post('/{id}/info', [OrderController::class, 'updateInfo']);
+});
+
+Route::prefix('purchase')->group(function () {
+    Route::get('/', [PurchaseController::class, 'index']);
 });

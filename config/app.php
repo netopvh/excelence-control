@@ -190,6 +190,7 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Watson\Active\ActiveServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         /*
              * Application Service Providers...
              */

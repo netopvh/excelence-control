@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ActionType;
 use App\Enums\MovementType;
+use App\Enums\OriginType;
 use App\Enums\StatusType;
 use App\Events\OrderStepUpdated;
 use App\Models\Customer;
@@ -13,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Imagick;
+use Spatie\PdfToImage\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -154,8 +157,6 @@ class OrderController extends Controller
     public function store(Request $request)
     {
 
-        Log::info(print_r($request->all(), true));
-
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'date' => 'required',
@@ -202,8 +203,10 @@ class OrderController extends Controller
 
         $order->movements()->create([
             'action_date' => now(),
-            'responsable_id' => auth()->user()->id,
+            'action_type' => ActionType::Register(),
+            'action_user_id' => auth()->user()->id,
             'movement_type' => MovementType::InDesign(),
+            'origin' => OriginType::Order(),
         ]);
 
         foreach ($request->get('product') as $product) {
@@ -273,6 +276,7 @@ class OrderController extends Controller
 
         try {
             // Crie uma nova instância do Imagick
+            // $pdf = new Pdf($storagePath);
             $imagick = new Imagick();
 
             // Leia o arquivo PDF

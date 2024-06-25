@@ -15,9 +15,11 @@ return new class extends Migration
         Schema::create('order_movements', function (Blueprint $table) {
             $table->id();
             $table->dateTime('action_date')->nullable();
+            $table->char('action_type', 1)->nullable()->comment('R - registro, C - ciencia');
+            $table->foreignId('action_user_id')->nullable()->constrained('users');
             $table->foreignId('order_id')->constrained();
-            $table->foreignId('responsable_id')->nullable()->constrained('users');
-            $table->dateTime('accepted_date')->nullable();
+            $table->char('origin', 1)->nullable()->comment('P - purchase, O - order');
+            $table->enum('arrived', ['Y', 'N'])->nullable()->default(null);
             $table->enum('movement_type', MovementType::getValues())->default(MovementType::Created);
             $table->string('description')->nullable();
             $table->timestamps();

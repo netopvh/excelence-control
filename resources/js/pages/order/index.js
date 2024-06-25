@@ -1,6 +1,5 @@
 import DataTable from 'datatables.net-bs5'
 import { getParameterByName, isValidURL } from '../../codebase/utils'
-import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
 import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'

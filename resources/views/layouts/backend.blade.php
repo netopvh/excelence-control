@@ -205,6 +205,13 @@
                                     <span class="nav-main-link-name">Clientes</span>
                                 </a>
                             </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link{{ active(['dashboard.purchase.*'], ' active') }}"
+                                    href="{{ route('dashboard.purchase.index') }}">
+                                    <i class="nav-main-link-icon fa fa-shopping-cart"></i>
+                                    <span class="nav-main-link-name">Compras</span>
+                                </a>
+                            </li>
                             <li class="nav-main-heading">Administração</li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link{{ active(['dashboard.import.index'], ' active') }}"

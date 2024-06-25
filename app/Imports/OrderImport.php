@@ -3,12 +3,14 @@
 namespace App\Imports;
 
 use App\Enums\MovementType;
+use App\Enums\StatusType;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -48,8 +50,9 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
             $order->fill([
                 'employee_id' => $this->findUser($row['vendedor']),
                 'date' => $this->parseDate($row['data']),
-                'step' => $this->validateStep($row['arte']),
+                'step' => MovementType::InDesign(),
                 'delivery_date' => $this->parseDate($row['entrega']),
+                'status' => $this->validateStatus($row['arte']),
             ])->save();
         }
         return $order;
@@ -57,11 +60,14 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
 
     private function createOrderProduct(Order $order, array $row)
     {
+        Log::info($row['estoque']);
+
         $product = $this->findOrCreateProduct($row['produto']);
 
         $order->orderProducts()->create([
             'product_id' => $product->id,
             'qtd' => $row['qtd'],
+            'in_stock' => $this->validateInStock($row['estoque']),
         ]);
     }
 
@@ -114,6 +120,30 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
         }
 
         return MovementType::Created;
+    }
+
+    private function validateStatus($status)
+    {
+        if ($status === 'Aprovado(C)' || $status === 'Aprovado(D)' || $status === 'Aprovado(R)') {
+            return StatusType::Approved();
+        } else if ($status === 'Aguard Aprov') {
+            return StatusType::WaitingApproval();
+        } else if ($status === 'Aguard Arte') {
+            return StatusType::WaitingDesign();
+        }
+
+        return StatusType::WaitingDesign();
+    }
+
+    private function validateInStock($data): string
+    {
+        if ($data === 'S' || $data === 'OK') {
+            return 'yes';
+        } else if ($data === 'E') {
+            return 'no';
+        }
+
+        return 'yes';
     }
 
     private function findUser($name)

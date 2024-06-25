@@ -5,6 +5,53 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\Order
+ *
+ * @property int $id
+ * @property int $customer_id
+ * @property int|null $employee_id
+ * @property int|null $designer_id
+ * @property \Illuminate\Support\Carbon $date
+ * @property \Illuminate\Support\Carbon|null $delivery_date
+ * @property string $number
+ * @property string $step
+ * @property string $status
+ * @property int $arrived
+ * @property string|null $preview
+ * @property string|null $design_file
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $deleted_at
+ * @property-read \App\Models\Customer $customer
+ * @property-read \App\Models\User|null $designer
+ * @property-read \App\Models\User|null $employee
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderMovement> $movements
+ * @property-read int|null $movements_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderProduct> $orderProducts
+ * @property-read int|null $order_products_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereArrived($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCustomerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeliveryDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDesignFile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereDesignerId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order wherePreview($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereStep($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Order extends Model
 {
     use HasFactory;
