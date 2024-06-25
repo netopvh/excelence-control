@@ -10,6 +10,7 @@ import Template from './modules/template'
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 import 'sweetalert2/src/sweetalert2.scss'
+import 'vanillajs-datepicker/css/datepicker-bs5.css'
 // import $ from 'jquery';
 
 // App extends Template

@@ -6,6 +6,7 @@ use App\Enums\ActionType;
 use App\Enums\OriginType;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -59,6 +60,9 @@ class PurchaseController extends Controller
             ->findOrFail($id);
 
         return DataTables::of($order->orderProducts)
+            ->editColumn('arrival_date', function ($model) {
+                return $model->arrival_date ? Carbon::parse($model->arrival_date)->format('d/m/Y') : null;
+            })
             ->setRowId('id')
             ->make(true);
     }
@@ -95,6 +99,20 @@ class PurchaseController extends Controller
             'action_type' => ActionType::Ciencia(),
             'action_user_id' => $request->user_id,
             'action_date' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Registro salvo com sucesso',
+        ]);
+    }
+
+    public function updateProductInfo(Request $request, $id, $productId)
+    {
+        $order = Order::query()->findOrFail($id);
+
+        $order->orderProducts()->where('id', $productId)->update([
+            'arrived' => $request->arrived,
+            'arrival_date' => $request->arrival_date,
         ]);
 
         return response()->json([

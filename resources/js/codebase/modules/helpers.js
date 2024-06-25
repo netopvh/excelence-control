@@ -2,6 +2,7 @@ import { Popover, Tooltip } from 'bootstrap'
 import { ClassicEditor, InlineEditor } from 'ckeditor5/src/index.js'
 import flatpickr from 'flatpickr'
 import Swal from 'sweetalert2'
+import { Datepicker } from 'vanillajs-datepicker'
 
 // Helpers
 export default class Helpers {
@@ -27,6 +28,7 @@ export default class Helpers {
       'jq-appear': (el) => this.jqAppear(el),
       'jq-magnific-popup': () => this.jqMagnific(),
       'jq-datepicker': () => this.jqDatepicker(),
+      'date-input': () => this.dateInput(),
       'jq-masked-inputs': () => this.jqMaskedInputs(),
       'jq-select2': () => this.jqSelect2(),
       'jq-notify': (options) => this.jqNotify(options),
@@ -573,6 +575,13 @@ export default class Helpers {
         container: el.data('container') || '#page-container',
         orientation: 'bottom' // Position issue when using BS5, set it to bottom until officially supported
       })
+    })
+  }
+
+  static dateInput () {
+    const elem = document.querySelector('.datepicker')
+    const datepicker = new Datepicker(elem, {
+      format: 'dd/mm/yyyy'
     })
   }
 

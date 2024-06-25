@@ -1,13 +1,15 @@
 import DataTable from 'datatables.net-bs5'
-import { getParameterByName, isValidURL } from '../../codebase/utils'
+import { convertDateToISO, getParameterByName, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'
 import Swal from 'sweetalert2'
+import { Datepicker } from 'vanillajs-datepicker'
 // import $ from 'jquery'
 
 class pagePurchase {
   static purchaseModal = null
+  static purchaseProductModal = null
 
   static initDataTables () {
     const format = (d) => {
@@ -109,17 +111,6 @@ class pagePurchase {
                                 </tr>
                             </thead>
                             <tbody>
-                                ${response.order_products.map((item) => {
-                                  return `<tr>
-                                    <td class="fw-bold">${item.product.name}</td>
-                                    <td>${item.qtd}</td>
-                                    <td>${item.supplier ? item.supplier : '-'}</td>
-                                    <td>${item.link ? '<a href="' + item.link + '" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>' : '-'}</td>
-                                    <td>${item.arrival_date ? item.arrival_date : '-'}</td>
-                                    <td>${!item.arrived ? '-' : item.arrived === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}</td>
-                                    <td>${item.obs ? item.obs : '-'}</td>
-                                    </tr>`
-                                })}
                             </tbody>
                         </table>
                     </div>
@@ -131,7 +122,7 @@ class pagePurchase {
           const tablePurchaseEl = document.querySelector('.list-purchase')
 
           if (tablePurchaseEl) {
-            const table = new DataTable(tablePurchaseEl, {
+            const tablePurchase = new DataTable(tablePurchaseEl, {
               ajax: {
                 url: `/api/purchase/${id}/items`,
                 type: 'GET'
@@ -152,6 +143,74 @@ class pagePurchase {
                 { data: 'arrived', render: function (data) { return !data ? '-' : data === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>' } },
                 { data: 'obs' }
               ]
+            })
+
+            tablePurchaseEl.addEventListener('dblclick', async (event) => {
+              const tr = event.target.closest('tr')
+              if (tr) {
+                const rowData = tablePurchase.row(tr).data()
+
+                if (rowData) {
+                  if (!pagePurchase.purchaseProductModal) {
+                    pagePurchase.purchaseProductModal = new Modal(document.getElementById('purchaseProductModal'))
+                  }
+
+                  const purchaseProductModal = pagePurchase.purchaseProductModal
+
+                  console.log()
+
+                  const modalProductBody = document.getElementById('purchaseProductModal').querySelector('.block-content')
+                  modalProductBody.innerHTML = `
+                    <form id="updatePurchaseProductForm" action="">
+                    <input type="hidden" name="order_id" value="${id}" />
+                      <input type="hidden" name="order_product_id" value="${rowData.id}" />
+                      <div class="mb-3">
+                        <label for="arrived" class="form-label">Chegou:</label>
+                        <select name="arrived" class="form-control" id="arrived">
+                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === rowData.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="arrival_date" class="form-label">Previsão de Entrega:</label>
+                        <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${rowData.arrival_date ? convertDateToISO(rowData.arrival_date) : ''}" />
+                      </div>
+                      <div class="d-flex gap-2 mb-4">
+                        <div class="col-12 col-md-6"><button type="submit" class="btn btn-primary w-100">Salvar</button></div>
+                        <div class="col-12 col-md-6"><button type="button" class="btn btn-danger w-100">Cancelar</button></div>
+                      </div>
+                    </form>
+                  `
+                  purchaseModal.hide()
+                  purchaseProductModal.show()
+
+                  const form = document.getElementById('updatePurchaseProductForm')
+                  form.addEventListener('submit', async function (event) {
+                    event.preventDefault()
+
+                    const data = {
+                      arrived: form.querySelector('select[name="arrived"]').value,
+                      arrival_date: form.querySelector('input[name="arrival_date"]').value
+                    }
+
+                    const orderId = form.querySelector('input[name="order_id"]').value
+                    const orderProductId = form.querySelector('input[name="order_product_id"]').value
+
+                    const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
+
+                    if (res) {
+                      tablePurchase.draw()
+                    }
+
+                    purchaseProductModal.hide()
+                    purchaseModal.show()
+                  })
+
+                  form.querySelector('button[type="button"]').addEventListener('click', function () {
+                    purchaseProductModal.hide()
+                    purchaseModal.show()
+                  })
+                }
+              }
             })
           }
 
@@ -245,9 +304,9 @@ class pagePurchase {
           }
         }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      },
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // },
       initComplete: function (settings, json) {
         json.data.forEach((item) => {
           document.querySelector(`#show-order-${item.id}`).addEventListener('click', () => {
@@ -346,4 +405,4 @@ class pagePurchase {
 }
 
 window.Codebase.onLoad(() => pagePurchase.init())
-window.Codebase.helpersOnLoad(['jq-datepicker'])
+window.Codebase.helpersOnLoad(['js-datepicker'])

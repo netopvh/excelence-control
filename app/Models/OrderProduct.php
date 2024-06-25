@@ -51,6 +51,10 @@ class OrderProduct extends Model
         'arrived'
     ];
 
+    public $casts = [
+        'arrival_date' => 'datetime',
+    ];
+
     public function order()
     {
         return $this->belongsTo(Order::class);

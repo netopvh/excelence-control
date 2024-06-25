@@ -301,4 +301,4 @@ class pageCreateOrder {
 window.Codebase.onLoad(() => {
   pageCreateOrder.init()
 })
-window.Codebase.helpersOnLoad(['jq-appear'])
+window.Codebase.helpersOnLoad(['jq-appear', 'jq-datepicker'])

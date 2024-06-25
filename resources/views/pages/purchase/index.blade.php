@@ -3,9 +3,7 @@
 @section('css')
     <!-- Page JS Plugins CSS -->
     <link rel="stylesheet" href="{{ asset('js/plugins/datatables-bs5/css/dataTables.bootstrap5.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/datatables-buttons-bs5/css/buttons.bootstrap5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('js/plugins/datatables-responsive-bs5/css/responsive.bootstrap5.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
 @endsection
 
 @section('js')
@@ -139,6 +137,20 @@
                         </div>
                     </div>
                     <div class="block-content" style="background: #f2f2f2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="purchaseProductModal" data-bs-backdrop='static' tabindex="-1" role="dialog"
+        aria-labelledby="purchaseProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="block block-rounded shadow-none mb-0">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Alterar Produtos</h3>
+                    </div>
+                    <div class="block-content">
                     </div>
                 </div>
             </div>

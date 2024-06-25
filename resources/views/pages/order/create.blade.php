@@ -12,11 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
     @vite(['resources/js/pages/order/create.js'])
     <script>
-        jQuery(function() {
-
-            Codebase.helpersOnLoad(['jq-datepicker']);
-        });
-
         @if (session('success'))
             jQuery.notify({
                 icon: 'fa fa-fw fa-check',

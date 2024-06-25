@@ -60,4 +60,14 @@ function isValidURL (string) {
   }
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL }
+function convertDateToISO (dateString) {
+  // Dividir a string de data original
+  const [day, month, year] = dateString.split('/')
+
+  // Criar a nova string no formato Y-m-d
+  const isoDateString = `${year}-${month}-${day}`
+
+  return isoDateString
+}
+
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO }
