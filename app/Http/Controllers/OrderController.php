@@ -217,6 +217,7 @@ class OrderController extends Controller
                 'supplier' => $product['supplier'],
                 'link' => $product['link'],
                 'obs' => $product['obs'],
+                'arrived' => 'N'
             ]);
         }
 

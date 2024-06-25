@@ -46,7 +46,9 @@ class OrderProduct extends Model
         'in_stock',
         'supplier',
         'link',
-        'obs'
+        'obs',
+        'arrival_date',
+        'arrived'
     ];
 
     public function order()

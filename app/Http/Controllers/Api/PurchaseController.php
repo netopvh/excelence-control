@@ -49,6 +49,20 @@ class PurchaseController extends Controller
         return response()->json($order);
     }
 
+    public function orderItems($id)
+    {
+        $order = Order::whereHas('orderProducts', function ($query) {
+            $query->where('in_stock', 'no');
+        })->with(['orderProducts' => function ($query) {
+            $query->where('in_stock', 'no');
+        }, 'orderProducts.product', 'customer', 'employee'])
+            ->findOrFail($id);
+
+        return DataTables::of($order->orderProducts)
+            ->setRowId('id')
+            ->make(true);
+    }
+
     public function checkUserViewed(Request $request, $id)
     {
         $orders = Order::whereId($id)

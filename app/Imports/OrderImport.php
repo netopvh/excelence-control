@@ -70,6 +70,7 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
             'product_id' => $product->id,
             'qtd' => $row['qtd'],
             'in_stock' => $this->validateInStock($row['estoque']),
+            'arrived' => $row['estoque'] === 'S' || $row['estoque'] === 'OK' ? 'Y' : 'N',
         ]);
     }
 

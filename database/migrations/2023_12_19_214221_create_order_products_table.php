@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('supplier')->nullable();
             $table->string('link')->nullable();
             $table->string('obs')->nullable();
+            $table->dateTime('arrival_date')->nullable();
+            $table->enum('arrived', ['Y', 'N', 'P'])->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();
         });

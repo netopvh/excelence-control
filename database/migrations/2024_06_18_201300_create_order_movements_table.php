@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('action_user_id')->nullable()->constrained('users');
             $table->foreignId('order_id')->constrained();
             $table->char('origin', 1)->nullable()->comment('P - purchase, O - order');
-            $table->enum('arrived', ['Y', 'N'])->nullable()->default(null);
             $table->enum('movement_type', MovementType::getValues())->nullable()->default(null);
             $table->string('description')->nullable();
             $table->timestamps();

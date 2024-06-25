@@ -64,28 +64,6 @@ class pagePurchase {
           const modalBody = document.getElementById('purchaseModal').querySelector('.block-content')
           modalBody.innerHTML = `
           <div class="block block-rounded">
-            <div class="block-content block-content-full">
-              <fieldset class="border px-2 pb-2 mb-2">
-                <legend class="float-none w-auto h5">Ações</legend>
-                <div class="row">
-                  <div class="col-12 col-md-3">
-                    <span class="fw-bold">Status dos Produtos:</span>
-                    <div class="dropdown">
-                      <button type="button" class="btn btn-warning dropdown-toggle w-100" id="status-dropdown"
-                          data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
-                          <span class="d-sm-inline">${response.status}</span>
-                      </button>
-                      <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-primary">
-
-                      </div>
-                  </div>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-          <div class="block block-rounded">
             <div class="block-header block-header-default">
                 <h3 class="block-title fw-bold">
                     Informações do Cliente
@@ -118,13 +96,15 @@ class pagePurchase {
             <div class="block-content">
                 <div class="row items-push">
                     <div class="col-md-12">
-                        <table class="table table-bordered table-striped table-vcenter">
+                        <table class="table table-bordered table-striped table-vcenter list-purchase">
                             <thead>
                                 <tr>
                                     <th class="text-center">Nome</th>
                                     <th class="text-center">Quantidade</th>
                                     <th class="text-center">Fornecedor</th>
                                     <th class="text-center">Link</th>
+                                    <th class="text-center">Previsão</th>
+                                    <th class="text-center">Chegou</th>
                                     <th class="text-center">Observação</th>
                                 </tr>
                             </thead>
@@ -134,7 +114,9 @@ class pagePurchase {
                                     <td class="fw-bold">${item.product.name}</td>
                                     <td>${item.qtd}</td>
                                     <td>${item.supplier ? item.supplier : '-'}</td>
-                                    <td>${item.link ? item.link : '-'}</td>
+                                    <td>${item.link ? '<a href="' + item.link + '" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>' : '-'}</td>
+                                    <td>${item.arrival_date ? item.arrival_date : '-'}</td>
+                                    <td>${!item.arrived ? '-' : item.arrived === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}</td>
                                     <td>${item.obs ? item.obs : '-'}</td>
                                     </tr>`
                                 })}
@@ -145,6 +127,33 @@ class pagePurchase {
             </div>
           </div>
           `
+
+          const tablePurchaseEl = document.querySelector('.list-purchase')
+
+          if (tablePurchaseEl) {
+            const table = new DataTable(tablePurchaseEl, {
+              ajax: {
+                url: `/api/purchase/${id}/items`,
+                type: 'GET'
+              },
+              searching: false,
+              paging: false,
+              processing: true,
+              serverSide: true,
+              // language: {
+              //   url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
+              // },
+              columns: [
+                { data: 'product.name' },
+                { data: 'qtd' },
+                { data: 'supplier' },
+                { data: 'link', render: (data) => (data ? `<a href="${data}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : '-') },
+                { data: 'arrival_date', render: (data) => (data || '-') },
+                { data: 'arrived', render: function (data) { return !data ? '-' : data === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>' } },
+                { data: 'obs' }
+              ]
+            })
+          }
 
           purchaseModal.show()
         }
