@@ -214,13 +214,22 @@
                                 </a>
                             </li>
                             <li class="nav-main-heading">Administração</li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link{{ active(['dashboard.import.index'], ' active') }}"
-                                    href="{{ route('dashboard.import.index') }}">
-                                    <i class="nav-main-link-icon fa fa-object-group"></i>
-                                    <span class="nav-main-link-name">Importar Dados</span>
-                                </a>
-                            </li>
+                            @role('admin')
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link{{ active(['dashboard.import.index'], ' active') }}"
+                                        href="{{ route('dashboard.import.index') }}">
+                                        <i class="nav-main-link-icon fa fa-object-group"></i>
+                                        <span class="nav-main-link-name">Importar Dados</span>
+                                    </a>
+                                </li>
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link{{ active(['dashboard.import.index'], ' active') }}"
+                                        href="{{ route('dashboard.import.index') }}">
+                                        <i class="nav-main-link-icon fa fa-object-group"></i>
+                                        <span class="nav-main-link-name">Importar Dados</span>
+                                    </a>
+                                </li>
+                            @endrole
                             <li class="nav-main-item">
                                 <a class="nav-main-link" href="#">
                                     <i class="nav-main-link-icon fa fa-newspaper"></i>

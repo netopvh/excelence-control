@@ -1,9 +1,11 @@
 import DataTable from 'datatables.net-bs5'
 import { getParameterByName, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
+import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'
 import Button from '../../codebase/components/button'
+import Swal from 'sweetalert2'
 // import $ from 'jquery'
 
 class pageOrder {
@@ -52,8 +54,8 @@ class pageOrder {
         data: (d) => {
           d.status = document.querySelector('#filterByStatus').value
           d.month = document.querySelector('#filterByMonth').value
-          d.from = document.querySelector('#from').value
-          d.to = document.querySelector('#to').value
+          d.type = document.getElementById('filterType').value
+          d.date = document.getElementById('filterDate').value
         }
       },
       columns: [
@@ -118,6 +120,25 @@ class pageOrder {
       table.draw()
     })
 
+    document.querySelector('#filterType').addEventListener('change', () => {
+      if (document.getElementById('filterDate').value !== '') {
+        table.draw()
+      }
+    })
+
+    document.getElementById('filterDate').addEventListener('change', () => {
+      if (document.getElementById('filterType').value === '') {
+        Swal.fire({
+          icon: 'info',
+          title: 'Atenção',
+          text: 'Selecione o tipo de data',
+          confirmButtonText: 'OK'
+        })
+      } else {
+        table.draw()
+      }
+    })
+
     document.querySelector('#btnCleanFilters').addEventListener('click', () => {
       document.querySelector('#filterByStatus').value = 'all'
       document.querySelector('#filterByMonth').value = 'all'
@@ -126,13 +147,13 @@ class pageOrder {
       table.draw()
     })
 
-    document.querySelector('#from').addEventListener('change', () => {
-      table.draw()
-    })
+    // document.querySelector('#from').addEventListener('change', () => {
+    //   table.draw()
+    // })
 
-    document.querySelector('#to').addEventListener('change', () => {
-      table.draw()
-    })
+    // document.querySelector('#to').addEventListener('change', () => {
+    //   table.draw()
+    // })
 
     const detailRows = []
 

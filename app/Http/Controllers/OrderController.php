@@ -49,9 +49,8 @@ class OrderController extends Controller
                     $query->whereMonth('date', $request->get('month'));
                 }
 
-                if (trim($request->get('from')) !== '' && trim($request->get('to')) !== '') {
-                    $query->whereDate('date', '>=', Carbon::createFromFormat('d/m/Y', $request->get('from')))
-                        ->whereDate('date', '<=', Carbon::createFromFormat('d/m/Y', $request->get('to')));
+                if (trim($request->get('type')) !== '' && trim($request->get('date')) !== '') {
+                    $query->whereDate($request->get('type'), $request->get('date'));
                 }
             })
             ->editColumn('date', function ($model) {
