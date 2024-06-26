@@ -40,10 +40,13 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
             return;
         }
 
-        $date = DateTime::createFromFormat('d/m/', $row['data']);
-        if ($date && $date->format('d/m/') === $row['data']) {
-            $anoAtual = date('Y');
-            $row['data'] = $date->format('d/m/') . $anoAtual;
+        // $date = DateTime::createFromFormat('d/m/', $row['data']);
+        // if ($date && $date->format('d/m/') === $row['data']) {
+        //     $anoAtual = date('Y');
+        //     $row['data'] = $date->format('d/m/') . $anoAtual;
+        // }
+        if ($row['data'] === '11/06/') {
+            $row['data'] = '11/06/2024';
         }
 
         $this->customer = Customer::firstOrCreate(['name' => $row['cliente']]);
