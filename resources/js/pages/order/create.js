@@ -3,9 +3,23 @@ import Helpers from '../../codebase/modules/helpers'
 import { Modal } from 'bootstrap'
 import { clearForm, focusElement } from '../../codebase/utils'
 import Swal from 'sweetalert2'
+import LoadingSpinner from '../../codebase/components/loading'
+import SearchComplete from '../../codebase/components/search-complete'
 
 class pageCreateOrder {
   static customerModal = null
+  static spinner = null
+
+  static initCompleteInput () {
+    const inputElement = document.getElementById('create-autoload')
+    const searchAutoComplete = new SearchComplete(
+      'Cliente',
+      'Informe o nome do cliente',
+      'Listar todos os Clientes'
+    )
+
+    inputElement.append(searchAutoComplete.render())
+  }
 
   static initAutoComplete () {
     const inputElement = document.getElementById('autocomplete-input')
@@ -22,51 +36,8 @@ class pageCreateOrder {
       }
 
       this.debounceTimer = setTimeout(async () => {
-        const nomeCodificado = encodeURIComponent(query)
-
-        try {
-          const res = await get('/dashboard/customer/filter', { search: nomeCodificado })
-          const suggestions = res.data.slice(0, 6)
-          suggestionsContainer.classList.remove('d-none')
-          suggestionsContainer.innerHTML = ''
-
-          if (suggestions.length === 0) {
-            const noResultElement = document.createElement('div')
-            noResultElement.classList.add('autocomplete-suggestion')
-            noResultElement.innerHTML = `
-              <div>
-                <small class="muted">Cliente "<strong>${query}</strong>" não está cadastrado.</small>
-                <br/>
-                <h5>
-                  <small class="muted">
-                    <i class="fas fa-plus"></i> Cadastrar "<strong>${query}</strong>" como novo cliente.
-                  </small>
-                </h5>
-              </div>
-            `
-            noResultElement.addEventListener('click', () => pageCreateOrder.cadastrarNovoCliente(query))
-            suggestionsContainer.appendChild(noResultElement)
-          } else {
-            suggestions.forEach(suggestion => {
-              const suggestionElement = document.createElement('div')
-              suggestionElement.classList.add('autocomplete-suggestion')
-              suggestionElement.innerHTML = `
-                <div><strong>${suggestion.name}</strong></div>
-                <div><span class="informacoes-cliente"><i class="fas fa-envelope"></i> ${suggestion.email || 'Não informado'}</span></div>
-                <div><span class="informacoes-cliente"><i class="fas fa-phone"></i> ${suggestion.phone || 'Não informado'}</span></div>
-                <div class="divider"></div>
-              `
-              suggestionElement.addEventListener('click', () => {
-                pageCreateOrder.selecionarCliente(suggestion)
-                suggestionsContainer.innerHTML = ''
-              })
-              suggestionsContainer.appendChild(suggestionElement)
-            })
-          }
-        } catch (error) {
-          console.error('Error fetching autocomplete suggestions:', error)
-        }
-      }, 300) // Delay de 300ms
+        pageCreateOrder.ajaxCall(query)
+      }, 400)
     })
 
     inputElement.addEventListener('focus', async function () {
@@ -74,78 +45,84 @@ class pageCreateOrder {
 
       if (query.length < 2) {
         suggestionsContainer.innerHTML = ''
+        suggestionsContainer.classList.add('d-none')
         return
       }
-      const nomeCodificado = encodeURIComponent(query)
 
-      try {
-        const res = await get('/dashboard/customer/filter', { search: nomeCodificado })
-        const suggestions = res.data.slice(0, 6)
-        suggestionsContainer.classList.remove('d-none')
-        suggestionsContainer.innerHTML = ''
-
-        if (suggestions.length === 0) {
-          const noResultElement = document.createElement('div')
-          noResultElement.classList.add('autocomplete-suggestion')
-          noResultElement.innerHTML = `
-            <div>
-              <small class="muted">Cliente "<strong>${query}</strong>" não está cadastrado.</small>
-              <br/>
-              <h5>
-                <small class="muted">
-                  <i class="fas fa-plus"></i> Cadastrar "<strong>${query}</strong>" como novo cliente.
-                </small>
-              </h5>
-            </div>
-          `
-          noResultElement.addEventListener('click', () => pageCreateOrder.cadastrarNovoCliente(query))
-          suggestionsContainer.appendChild(noResultElement)
-        } else {
-          suggestions.forEach(suggestion => {
-            const suggestionElement = document.createElement('div')
-            suggestionElement.classList.add('autocomplete-suggestion')
-            suggestionElement.innerHTML = `
-              <div><strong>${suggestion.name}</strong></div>
-              <div><span class="informacoes-cliente"><i class="fas fa-envelope"></i> ${suggestion.email || 'Não informado'}</span></div>
-              <div><span class="informacoes-cliente"><i class="fas fa-phone"></i> ${suggestion.phone || 'Não informado'}</span></div>
-              <div class="divider"></div>
-            `
-            suggestionElement.addEventListener('click', () => {
-              pageCreateOrder.selecionarCliente(suggestion)
-              suggestionsContainer.innerHTML = ''
-            })
-            suggestionsContainer.appendChild(suggestionElement)
-          })
-        }
-      } catch (error) {
-        console.error('Error fetching autocomplete suggestions:', error)
-      }
+      pageCreateOrder.ajaxCall(query)
     })
   }
 
-  static async mostrarListagem () {
-    document.getElementById('listar-clientes').addEventListener('click', async () => {
-      const suggestionsContainer = document.getElementById('autocomplete-suggestions')
+  static async ajaxCall (query) {
+    const suggestionsContainer = document.getElementById('autocomplete-suggestions')
+    suggestionsContainer.innerHTML = ''
+
+    const nomeCodificado = encodeURIComponent(query)
+    const loadAutocomplete = document.getElementById('autocomplete-loading')
+
+    if (!pageCreateOrder.spinner) {
+      pageCreateOrder.spinner = new LoadingSpinner(20, '#000000')
+    }
+
+    if (!pageCreateOrder.spinner.rendered()) {
+      loadAutocomplete.appendChild(pageCreateOrder.spinner.render())
+    }
+
+    try {
+      const res = await get('/dashboard/customer/filter', { search: nomeCodificado })
+
+      if (res) {
+        if (pageCreateOrder.spinner.rendered()) {
+          loadAutocomplete.removeChild(pageCreateOrder.spinner.instance())
+        }
+      }
+
+      const suggestions = res.data.slice(0, 6)
+      suggestionsContainer.classList.remove('d-none')
       suggestionsContainer.innerHTML = ''
 
-      try {
-        const res = await get('/dashboard/customer/filter')
-        res.data.forEach(suggestion => {
+      if (suggestions.length === 0) {
+        const noResultElement = document.createElement('div')
+        noResultElement.classList.add('autocomplete-suggestion')
+        noResultElement.innerHTML = `
+          <div>
+            <small class="muted">Cliente "<strong>${query}</strong>" não está cadastrado.</small>
+            <br/>
+            <h5>
+              <small class="muted">
+                <i class="fas fa-plus"></i> Cadastrar "<strong>${query}</strong>" como novo cliente.
+              </small>
+            </h5>
+          </div>
+        `
+        noResultElement.addEventListener('click', () => pageCreateOrder.cadastrarNovoCliente(query))
+        suggestionsContainer.appendChild(noResultElement)
+      } else {
+        suggestions.forEach(suggestion => {
           const suggestionElement = document.createElement('div')
           suggestionElement.classList.add('autocomplete-suggestion')
           suggestionElement.innerHTML = `
-          <div><strong>${suggestion.name}</strong></div>
-          <div><span class="informacoes-cliente"><i class="fas fa-envelope"></i> ${suggestion.email || 'Não informado'}</span></div>
-          <div><span class="informacoes-cliente"><i class="fas fa-phone"></i> ${suggestion.phone || 'Não informado'}</span></div>
-          <div class="divider"></div>
-        `
-          suggestionElement.addEventListener('click', () => pageCreateOrder.selecionarCliente(suggestion))
+            <div><strong>${suggestion.name}</strong></div>
+            <div><span class="informacoes-cliente"><i class="fas fa-envelope"></i> ${suggestion.email || 'Não informado'}</span></div>
+            <div><span class="informacoes-cliente"><i class="fas fa-phone"></i> ${suggestion.phone || 'Não informado'}</span></div>
+            <div class="divider"></div>
+          `
+
+          suggestionElement.addEventListener('click', () => {
+            pageCreateOrder.selecionarCliente(suggestion)
+            suggestionsContainer.innerHTML = ''
+          })
           suggestionsContainer.appendChild(suggestionElement)
         })
-        suggestionsContainer.classList.remove('d-none')
-      } catch (error) {
-        console.error('Error fetching autocomplete suggestions:', error)
       }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  static async mostrarListagem () {
+    document.querySelector('.listar-clientes').addEventListener('click', async () => {
+      this.ajaxCall('')
     })
   }
 
@@ -288,6 +265,7 @@ class pageCreateOrder {
   }
 
   static init () {
+    // this.initCompleteInput()
     this.initAutoComplete()
 
     this.mostrarListagem()

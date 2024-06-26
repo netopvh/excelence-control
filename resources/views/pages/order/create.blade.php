@@ -158,16 +158,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 col-xl-12">
-                            <div class="error-text text-danger mb-4" id="error-text">
-                                <ul>
-                                    @for ($i = 0; $i < count($errors->all()); $i++)
-                                        <li>{{ $errors->all()[$i] }}</li>
-                                    @endfor
-                                </ul>
-                            </div>
-                        </div>
+                    <div id="create-autoload">
                     </div>
                     <div class="row">
                         <div class="col-md-6 col-xl-12">
@@ -180,9 +171,10 @@
                             <div id="autocomplete-suggestions" class="autocomplete-suggestions d-none"></div>
                         </div>
                     </div>
+                    <div id="autocomplete-loading"></div>
                     <div class="row">
                         <div class="col-md-6" id="listar-clientes-group">
-                            <a class="muted text-black link-listar-clientes" href="javascript:void(0)" id="listar-clientes">
+                            <a class="muted text-black listar-clientes" href="javascript:void(0)">
                                 <span>
                                     <i class="fas fa-caret-down"></i>
                                 </span>
@@ -243,8 +235,7 @@
                                     <tr>
                                         <td>
                                             <input type="text" class="form-control autocomplete-1"
-                                                name="product[1][name]" placeholder="Informe o Produto"
-                                                autocomplete="off">
+                                                name="product[1][name]" placeholder="Informe o Produto" autocomplete="off">
                                         </td>
                                         <td>
                                             <input type="number" class="form-control" name="product[1][qtd]"
@@ -318,13 +309,17 @@
                                     placeholder="Digite o contato do cliente">
                             </div>
                         </div>
-                        <div class="block-content block-content-full block-content-sm text-end border-top">
-                            <button type="button" class="btn btn-alt-secondary" id="close-customer-modal">
-                                Fechar
-                            </button>
-                            <button type="submit" class="btn btn-alt-primary">
-                                Salvar
-                            </button>
+                        <div class="block-content block-content-full border-top d-flex">
+                            <div class="col-12 col-md-6">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Salvar
+                                </button>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <button type="button" class="btn btn-danger w-100" id="close-customer-modal">
+                                    Fechar
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

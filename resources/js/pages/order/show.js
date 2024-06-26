@@ -6,6 +6,7 @@ import DataTable from 'datatables.net-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
 import { isValidURL } from '../../codebase/utils'
+import Button from '../../codebase/components/button'
 
 class pageShowOrder {
   static productsModal = null
@@ -272,13 +273,13 @@ class pageShowOrder {
         type: 'GET'
       },
       columns: [
-        { data: 'product.name', name: 'product.name', width: '34%' },
+        { data: 'product.name', name: 'product.name', width: '30%' },
         { data: 'qtd', name: 'qtd', width: '10%' },
         { data: 'in_stock', name: 'in_stock', width: '10%' },
         {
           data: 'supplier',
           name: 'supplier',
-          width: '15%',
+          width: '17%',
           render: function (data) {
             return data || '-'
           }
@@ -337,22 +338,28 @@ class pageShowOrder {
                     <label for="obs" class="form-label">Observação:</label>
                     <input type="text" name="obs" class="form-control" value="${rowData.obs ? rowData.obs : ''}" />
                   </div>
-                  <div class="my-4">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
+                  <div class="d-flex gap-2 mb-4">
+                    <div class="col-12 col-md-6" id="btn-submit-container">
+                    </div>
+                    <div class="col-12 col-md-6" id="btn-cancel-container">
+                    </div>
                   </div>
                 </form>
               `
+
+          const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
+          const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
+
+          document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
+          document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+
           productsModal.show()
 
           const form = document.getElementById('updateProductsForm')
           form.addEventListener('submit', async function (event) {
             event.preventDefault()
 
-            modalBody.innerHTML = `
-                <div class="spinner-border spinner-border-sm text-white" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              `
+            btnSubmit.setLoading(true)
 
             const data = {
               id: rowData.id,
@@ -366,10 +373,16 @@ class pageShowOrder {
             const res = await post(`/api/order/${orderId}/info`, data)
 
             if (res.success) {
+              btnSubmit.setLoading(false)
               form.reset()
               productsModal.hide()
               table.draw()
             }
+          })
+
+          btnCancel.setOnClick(() => {
+            form.reset()
+            productsModal.hide()
           })
         }
       }

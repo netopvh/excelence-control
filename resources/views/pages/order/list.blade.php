@@ -151,11 +151,6 @@
                 <div class="block block-rounded shadow-none mb-0">
                     <div class="block-header block-header-default">
                         <h3 class="block-title">Detalhes do Pedido</h3>
-                        <div class="block-options">
-                            <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </div>
                     </div>
                     <div class="block-content">
                     </div>

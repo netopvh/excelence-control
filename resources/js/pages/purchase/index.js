@@ -5,6 +5,7 @@ import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'
 import Swal from 'sweetalert2'
 import { Datepicker } from 'vanillajs-datepicker'
+import Button from '../../codebase/components/button'
 // import $ from 'jquery'
 
 class pagePurchase {
@@ -131,9 +132,9 @@ class pagePurchase {
               paging: false,
               processing: true,
               serverSide: true,
-              // language: {
-              //   url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
-              // },
+              language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
+              },
               columns: [
                 { data: 'product.name' },
                 { data: 'qtd' },
@@ -157,8 +158,6 @@ class pagePurchase {
 
                   const purchaseProductModal = pagePurchase.purchaseProductModal
 
-                  console.log()
-
                   const modalProductBody = document.getElementById('purchaseProductModal').querySelector('.block-content')
                   modalProductBody.innerHTML = `
                     <form id="updatePurchaseProductForm" action="">
@@ -175,17 +174,28 @@ class pagePurchase {
                         <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${rowData.arrival_date ? convertDateToISO(rowData.arrival_date) : ''}" />
                       </div>
                       <div class="d-flex gap-2 mb-4">
-                        <div class="col-12 col-md-6"><button type="submit" class="btn btn-primary w-100">Salvar</button></div>
-                        <div class="col-12 col-md-6"><button type="button" class="btn btn-danger w-100">Cancelar</button></div>
+                        <div class="col-12 col-md-6" id="btn-submit-container">
+                        </div>
+                        <div class="col-12 col-md-6" id="btn-cancel-container">
+                        </div>
                       </div>
                     </form>
                   `
+
+                  const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
+                  const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
+
+                  document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
+                  document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+
                   purchaseModal.hide()
                   purchaseProductModal.show()
 
                   const form = document.getElementById('updatePurchaseProductForm')
                   form.addEventListener('submit', async function (event) {
                     event.preventDefault()
+
+                    btnSubmit.setLoading(true)
 
                     const data = {
                       arrived: form.querySelector('select[name="arrived"]').value,
@@ -198,6 +208,7 @@ class pagePurchase {
                     const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
 
                     if (res) {
+                      btnSubmit.setLoading(false)
                       tablePurchase.draw()
                     }
 
@@ -205,7 +216,7 @@ class pagePurchase {
                     purchaseModal.show()
                   })
 
-                  form.querySelector('button[type="button"]').addEventListener('click', function () {
+                  btnCancel.setOnClick(function () {
                     purchaseProductModal.hide()
                     purchaseModal.show()
                   })
@@ -304,9 +315,9 @@ class pagePurchase {
           }
         }
       ],
-      // language: {
-      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      // },
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      },
       initComplete: function (settings, json) {
         json.data.forEach((item) => {
           document.querySelector(`#show-order-${item.id}`).addEventListener('click', () => {

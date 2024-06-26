@@ -3,6 +3,7 @@ import { getParameterByName, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'
+import Button from '../../codebase/components/button'
 // import $ from 'jquery'
 
 class pageOrder {
@@ -207,22 +208,34 @@ class pageOrder {
                   ${Object.keys(statusOptions).map((key) => `<option value="${key}" ${key === rowData.status ? 'selected' : ''}>${statusOptions[key]}</option>`)}
                 </select>
               </div>
-              <div>
+              <div class="mb-3">
                 <label for="employee_id" class="form-label">Vendedor:</label>
                 <select name="employee_id" class="form-control" id="employee_id">
                   ${employeeOptions.map((employee) => `<option value="${employee.id}" ${employee.id === rowData.employee_id ? 'selected' : ''}>${employee.name}</option>`)}
                 </select>
               </div>
-              <div class="my-4">
-                <button type="submit" class="btn btn-primary">Salvar</button>
+              <div class="d-flex gap-2 mb-4">
+                <div class="col-12 col-md-6" id="btn-submit-container">
+                </div>
+                <div class="col-12 col-md-6" id="btn-cancel-container">
+                </div>
               </div>
             </form>
           `
+
+          const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
+          const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
+
+          document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
+          document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+
           detalhesModal.show()
 
           const form = document.getElementById('updateStatusForm')
           form.addEventListener('submit', async function (event) {
             event.preventDefault()
+
+            btnSubmit.setLoading(true)
 
             const data = {
               step: form.querySelector('select[name="step"]').value,
@@ -235,10 +248,16 @@ class pageOrder {
             const res = await post(`/api/order/${orderId}/store`, data)
 
             if (res.success) {
+              btnSubmit.setLoading(false)
               form.reset()
               detalhesModal.hide()
               table.draw()
             }
+          })
+
+          btnCancel.setOnClick(() => {
+            form.reset()
+            detalhesModal.hide()
           })
         }
       }

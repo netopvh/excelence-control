@@ -82,7 +82,7 @@ class CustomerController extends Controller
     public function filter(Request $request)
     {
         $this->validate($request, [
-            'search' => 'string|max:255',
+            'search' => 'max:255',
         ]);
 
         $customers = Customer::query()
