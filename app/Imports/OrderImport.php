@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -37,6 +38,12 @@ class OrderImport implements ToCollection, WithHeadingRow, WithBatchInserts
     {
         if (!isset($row['cliente']) || is_null($row['cliente'])) {
             return;
+        }
+
+        $date = DateTime::createFromFormat('d/m/', $row['data']);
+        if ($date && $date->format('d/m/') === $row['data']) {
+            $anoAtual = date('Y');
+            $row['data'] = $date->format('d/m/') . $anoAtual;
         }
 
         $this->customer = Customer::firstOrCreate(['name' => $row['cliente']]);
