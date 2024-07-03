@@ -58,9 +58,9 @@ class pageUser {
           }
         }
       ],
-      // language: {
-      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      // },
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      },
       drawCallback: function () {
         const api = this.api()
         api.rows().every(function () {

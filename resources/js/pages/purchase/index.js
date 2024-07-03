@@ -311,7 +311,9 @@ class pagePurchase {
           orderable: false,
           searchable: false,
           render: (data) => {
-            return `<button type="button" class="btn btn-sm btn-success" data-id="${data}" id="show-order-${data}">Ver</button>`
+            return `<button type="button" class="btn btn-sm btn-primary" data-id="${data}" id="show-order-${data}">
+             <i class="fa fa-eye"></i>
+            </button>`
           }
         }
       ],
