@@ -1,11 +1,12 @@
 class Button {
-  constructor (text, onClick = null, classname = '', type = 'button', loading = false) {
+  constructor (text, onClick = null, classname = '', type = 'button', form = null, loading = false) {
     this.text = text
     this.onClick = onClick
     this.loading = loading
     this.class = classname
     this.type = type
     this.button = null // Armazenar a referência do botão
+    this.form = form
   }
 
   render () {
@@ -19,6 +20,10 @@ class Button {
 
       if (this.class) {
         this.class.split(' ').forEach(cls => this.button.classList.add(cls))
+      }
+
+      if (this.form) {
+        this.button.setAttribute('form', this.form)
       }
 
       if (this.onClick) {

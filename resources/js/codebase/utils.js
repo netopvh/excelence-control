@@ -70,4 +70,74 @@ function convertDateToISO (dateString) {
   return isoDateString
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO }
+function showErrors (el, data) {
+  // Remove qualquer conteúdo anterior do elemento
+  el.innerHTML = ''
+
+  // Cria o elemento de alerta com as classes Bootstrap
+  const alertDiv = document.createElement('div')
+  alertDiv.className = 'alert alert-danger'
+  alertDiv.setAttribute('role', 'alert')
+
+  // Cria um contêiner flexível
+  const flexDiv = document.createElement('div')
+  flexDiv.className = 'd-flex'
+
+  // Adiciona um elemento div para a mensagem principal
+  const mainMessageDiv = document.createElement('div')
+  const mainMessageStrong = document.createElement('strong')
+  mainMessageStrong.textContent = 'Erro ao cadastrar:'
+  mainMessageDiv.appendChild(mainMessageStrong)
+  flexDiv.appendChild(mainMessageDiv)
+
+  // Adiciona a mensagem principal ao alertDiv
+  alertDiv.appendChild(flexDiv)
+
+  // Cria um novo elemento ul para os erros específicos
+  const errorList = document.createElement('ul')
+
+  // Itera sobre os erros específicos e adiciona cada um como um li na ul
+  for (const key in data.errors) {
+    if (data.errors.hasOwnProperty(key)) {
+      data.errors[key].forEach(errorMsg => {
+        const errorItem = document.createElement('li')
+        errorItem.textContent = errorMsg
+        errorList.appendChild(errorItem)
+      })
+    }
+  }
+
+  // Adiciona a ul ao alertDiv
+  alertDiv.appendChild(errorList)
+
+  // Adiciona o alertDiv ao elemento
+  el.appendChild(alertDiv)
+
+  el.classList.remove('d-none')
+  el.classList.add('d-block')
+}
+
+function clearErrors (el) {
+  el.innerHTML = ''
+  el.classList.remove('d-none')
+  el.classList.add('d-none')
+}
+
+function getRoleName (role) {
+  switch (role) {
+    case 'admin':
+      return 'Administração'
+    case 'financeiro':
+      return 'Financeiro'
+    case 'vendas':
+      return 'Vendas'
+    case 'design':
+      return 'Design e Arte'
+    case 'producao':
+      return 'Produção'
+    default:
+      return 'Nenhum'
+  }
+}
+
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, showErrors, clearErrors, getRoleName }

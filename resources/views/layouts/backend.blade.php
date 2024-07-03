@@ -216,10 +216,10 @@
                             <li class="nav-main-heading">Administração</li>
                             @role('admin')
                                 <li class="nav-main-item">
-                                    <a class="nav-main-link{{ active(['dashboard.import.index'], ' active') }}"
-                                        href="{{ route('dashboard.import.index') }}">
-                                        <i class="nav-main-link-icon fa fa-object-group"></i>
-                                        <span class="nav-main-link-name">Importar Dados</span>
+                                    <a class="nav-main-link{{ active(['dashboard.user.index'], ' active') }}"
+                                        href="{{ route('dashboard.user.index') }}">
+                                        <i class="nav-main-link-icon fa fa-user-lock"></i>
+                                        <span class="nav-main-link-name">Usuários</span>
                                     </a>
                                 </li>
                                 <li class="nav-main-item">

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PurchaseController;
+use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,8 +31,17 @@ Route::prefix('customer')->group(function () {
     Route::post('/', [CustomerController::class, 'store']);
 });
 
+Route::prefix('role')->group(function () {
+    Route::get('/list', [RoleController::class, 'getRoles']);
+});
+
 Route::prefix('user')->group(function () {
+    Route::post('/', [UserController::class, 'store']);
+    Route::get('list', [UserController::class, 'getUsers']);
     Route::get('employees', [UserController::class, 'getEmployees']);
+    Route::post('/{id}/password', [UserController::class, 'updatePassword']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::put('/{id}', [UserController::class, 'update']);
 });
 
 Route::prefix('order')->group(function () {

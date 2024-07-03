@@ -1,10 +1,10 @@
 import DataTable from 'datatables.net-bs5'
 import { convertDateToISO, getParameterByName, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
+import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'
 import Swal from 'sweetalert2'
-import { Datepicker } from 'vanillajs-datepicker'
 import Button from '../../codebase/components/button'
 // import $ from 'jquery'
 
