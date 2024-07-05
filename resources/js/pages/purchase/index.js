@@ -73,7 +73,6 @@ class pagePurchase {
         })
 
         if (response) {
-          console.log(response)
           modalBody.innerHTML = `
           <div class="block block-rounded">
             <div class="block-header block-header-default">
@@ -142,9 +141,9 @@ class pagePurchase {
               paging: false,
               processing: true,
               serverSide: true,
-              // language: {
-              //   url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
-              // },
+              language: {
+                url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
+              },
               columns: [
                 { data: 'product.name' },
                 { data: 'qtd' },
@@ -345,9 +344,9 @@ class pagePurchase {
           }
         }
       ],
-      // language: {
-      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      // },
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      },
       drawCallback: function () {
         const api = this.api()
         api.rows().every(function () {

@@ -105,10 +105,10 @@ class pageOrder {
         },
         { data: 'delivery_date', name: 'delivery_date' },
         { data: 'action', name: 'action', orderable: false, searchable: false }
-      ]
-      // language: {
-      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      // }
+      ],
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      }
     })
 
     document.querySelector('#filterByStatus').addEventListener('change', () => {
