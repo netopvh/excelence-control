@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\ActionType;
 use App\Enums\OriginType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -15,10 +16,10 @@ class PurchaseController extends Controller
     public function index()
     {
         $orders = Order::whereHas('orderProducts', function ($query) {
-            $query->where('in_stock', 'no');
+            $query->whereIn('in_stock', ['no', 'partial']);
         })
             ->with(['orderProducts' => function ($query) {
-                $query->where('in_stock', 'no');
+                $query->whereIn('in_stock', ['no', 'partial']);
             }, 'orderProducts.product', 'customer', 'employee'])
             ->orderBy('date', 'desc')
             ->get();
@@ -41,9 +42,9 @@ class PurchaseController extends Controller
     public function show($id)
     {
         $order = Order::whereHas('orderProducts', function ($query) {
-            $query->where('in_stock', 'no');
+            $query->whereIn('in_stock', ['no', 'partial']);
         })->with(['orderProducts' => function ($query) {
-            $query->where('in_stock', 'no');
+            $query->whereIn('in_stock', ['no', 'partial']);
         }, 'orderProducts.product', 'customer', 'employee'])
             ->findOrFail($id);
 
@@ -53,9 +54,9 @@ class PurchaseController extends Controller
     public function orderItems($id)
     {
         $order = Order::whereHas('orderProducts', function ($query) {
-            $query->where('in_stock', 'no');
+            $query->whereIn('in_stock', ['no', 'partial']);
         })->with(['orderProducts' => function ($query) {
-            $query->where('in_stock', 'no');
+            $query->whereIn('in_stock', ['no', 'partial']);
         }, 'orderProducts.product', 'customer', 'employee'])
             ->findOrFail($id);
 
@@ -106,6 +107,17 @@ class PurchaseController extends Controller
         ]);
     }
 
+    public function showProductInfo($id, $productId)
+    {
+        $order = Order::query()->findOrFail($id);
+        $product = $order->orderProducts()->where('id', $productId)->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => ProductResource::make($product),
+        ]);
+    }
+
     public function updateProductInfo(Request $request, $id, $productId)
     {
         $order = Order::query()->findOrFail($id);
@@ -113,6 +125,7 @@ class PurchaseController extends Controller
         $order->orderProducts()->where('id', $productId)->update([
             'arrived' => $request->arrived,
             'arrival_date' => $request->arrival_date,
+            'was_bought' => $request->was_bought,
         ]);
 
         return response()->json([

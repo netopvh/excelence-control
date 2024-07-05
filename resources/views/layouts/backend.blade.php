@@ -199,18 +199,42 @@
                                     <span class="nav-main-link-name">Pedidos</span>
                                 </a>
                             </li>
-                            <li class="nav-main-item">
-                                <a class="nav-main-link{{ active(['dashboard.customer.*'], ' active') }}"
-                                    href="{{ route('dashboard.customer.index') }}">
-                                    <i class="nav-main-link-icon fa fa-users"></i>
-                                    <span class="nav-main-link-name">Clientes</span>
-                                </a>
-                            </li>
+                            @role('admin')
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link{{ active(['dashboard.customer.*'], ' active') }}"
+                                        href="{{ route('dashboard.customer.index') }}">
+                                        <i class="nav-main-link-icon fa fa-users"></i>
+                                        <span class="nav-main-link-name">Clientes</span>
+                                    </a>
+                                </li>
+                            @endrole
                             <li class="nav-main-item">
                                 <a class="nav-main-link{{ active(['dashboard.purchase.*'], ' active') }}"
                                     href="{{ route('dashboard.purchase.index') }}">
                                     <i class="nav-main-link-icon fa fa-shopping-cart"></i>
                                     <span class="nav-main-link-name">Compras</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-heading">Financeiro</li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link{{ active(['dashboard.entry.*'], ' active') }}"
+                                    href="{{ route('dashboard.entry.index') }}">
+                                    <i class="nav-main-link-icon fa fa-cash-register"></i>
+                                    <span class="nav-main-link-name">Lançamentos</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link{{ active(['dashboard.expense.*'], ' active') }}"
+                                    href="{{ route('dashboard.expense.index') }}">
+                                    <i class="nav-main-link-icon fa fa-file-invoice"></i>
+                                    <span class="nav-main-link-name">Contas a Pagar</span>
+                                </a>
+                            </li>
+                            <li class="nav-main-item">
+                                <a class="nav-main-link{{ active(['dashboard.income.*'], ' active') }}"
+                                    href="{{ route('dashboard.income.index') }}">
+                                    <i class="nav-main-link-icon fa fa-file-invoice-dollar"></i>
+                                    <span class="nav-main-link-name">Contas a Receber</span>
                                 </a>
                             </li>
                             <li class="nav-main-heading">Administração</li>

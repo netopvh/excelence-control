@@ -140,4 +140,21 @@ function getRoleName (role) {
   }
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, showErrors, clearErrors, getRoleName }
+function skeletonLoading (paragraph = 1, lines = 5, margin = 'mb-3') {
+  const skeletonContainer = document.createElement('div')
+  skeletonContainer.classList.add(margin)
+
+  for (let i = 0; i < paragraph; i++) {
+    const paragraphElement = document.createElement('p')
+    paragraphElement.classList.add('card-text', 'placeholder-glow')
+    for (let j = 0; j < lines; j++) {
+      const lineElement = document.createElement('span')
+      lineElement.classList.add('placeholder', 'col-12', 'placeholder-lg')
+      paragraphElement.appendChild(lineElement)
+    }
+    skeletonContainer.appendChild(paragraphElement)
+  }
+  return skeletonContainer
+}
+
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, showErrors, clearErrors, getRoleName, skeletonLoading }

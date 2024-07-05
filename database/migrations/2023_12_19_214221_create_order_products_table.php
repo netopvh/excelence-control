@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->string('qtd');
             $table->enum('in_stock', ['yes', 'no', 'partial'])->default('yes');
+            $table->enum('was_bought', ['Y', 'N'])->nullable()->default('N');
             $table->string('supplier')->nullable();
             $table->string('link')->nullable();
             $table->string('obs')->nullable();

@@ -16,25 +16,27 @@ class pageOrder {
     const statusOptions = { approved: 'Aprovado', waiting_approval: 'Aguard. Aprov.', waiting_design: 'Aguard. Arte' }
 
     const format = (d) => {
-      return (
-        `<table class='table table-bordered table-hover'><tr>
+      const subTableHtml = `
+      <table class='table table-bordered table-hover sub-table' data-order-id='${d.id}'>
+        <tr>
           <td class='text-uppercase fw-bold'>Produto</td>
           <td class='text-uppercase fw-bold'>Quantidade</td>
-          <td class='text-uppercase fw-bold'>Estoque</td>
+          <td class='text-uppercase fw-bold'>Status</td>
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
-        </tr>` +
-        d.order_products.map((item) => {
-          return `<tr>
+        </tr>
+        ${d.order_products.map((item, index) => `
+          <tr class='sub-table-row' data-index='${index}' data-id='${item.id}' data-order-id='${d.id}'>
             <td class='fw-bold'>${item.product.name}</td>
             <td>${item.qtd}</td>
-            <td>${item.in_stock === 'yes' ? '<span class="badge bg-success">Sim</span>' : item.in_stock === 'no' ? '<span class="badge bg-warning">Não</span>' : item.in_stock === 'partial' ? '<span class="badge bg-info">Parcial</span>' : '-'}</td>
+            <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '-'}</td>
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
-          </tr>`
-        }).join('') +
-        '</table>'
-      )
+          </tr>`).join('')}
+      </table>
+    `
+
+      return subTableHtml
     }
 
     const tableOrders = document.querySelector('.list-latest')
@@ -103,10 +105,10 @@ class pageOrder {
         },
         { data: 'delivery_date', name: 'delivery_date' },
         { data: 'action', name: 'action', orderable: false, searchable: false }
-      ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      }
+      ]
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // }
     })
 
     document.querySelector('#filterByStatus').addEventListener('change', () => {
@@ -144,14 +146,6 @@ class pageOrder {
       table.draw()
     })
 
-    // document.querySelector('#from').addEventListener('change', () => {
-    //   table.draw()
-    // })
-
-    // document.querySelector('#to').addEventListener('change', () => {
-    //   table.draw()
-    // })
-
     const detailRows = []
 
     tableOrders.addEventListener('click', (event) => {
@@ -182,10 +176,26 @@ class pageOrder {
     })
 
     tableOrders.addEventListener('dblclick', async (event) => {
-      // Encontra o elemento tr mais próximo, que representa a linha da tabela
       const tr = event.target.closest('tr')
 
-      // Verifica se encontrou a linha (tr)
+      // Verifica se a linha clicada pertence à subtabela
+      if (tr && tr.classList.contains('sub-table-row')) {
+        const orderId = tr.getAttribute('data-order-id')
+        const productId = tr.getAttribute('data-id')
+
+        const res = await get(`/api/purchase/${orderId}/product/${productId}/show`)
+        Swal.fire({
+          icon: 'info',
+          title: 'Detalhes do item',
+          html: `
+          <strong>Status</strong>: ${res.data.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '-'} <br><br>
+          <strong>Previsão de Entrega</strong>: ${res.data.arrival_date ? res.data.arrival_date : '-'}
+          `
+        })
+        return
+      }
+
+      // Verifica se a linha clicada não pertence à subtabela
       if (tr) {
         // Obtém os dados da linha utilizando DataTable
         const rowData = table.row(tr).data()
@@ -205,7 +215,6 @@ class pageOrder {
           })
 
           const detalhesModal = pageOrder.statusModal
-          // Preenche o conteúdo do modal com os dados da linha clicada
           const modalTitle = document.getElementById('detalhesModal').querySelector('.block-title')
           const modalBody = document.getElementById('detalhesModal').querySelector('.block-content')
 

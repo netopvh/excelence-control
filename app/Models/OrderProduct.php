@@ -48,7 +48,8 @@ class OrderProduct extends Model
         'link',
         'obs',
         'arrival_date',
-        'arrived'
+        'arrived',
+        'was_bought',
     ];
 
     public $casts = [

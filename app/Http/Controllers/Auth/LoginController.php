@@ -17,23 +17,24 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['bail', 'required', 'email'],
+            'username' => ['required'],
             'password' => ['required'],
         ]);
 
         if (Auth::attempt($credentials)) {
 
-            auth()->user()->createToken('auth_token')->plainTextToken;
+            $request->session()->regenerate();
+            // auth()->user()->createToken('auth_token')->plainTextToken;
 
             return redirect()->intended('/dashboard');
         }
 
-        return redirect()->back()->withErrors(['email' => 'User credentials are incorrect']);
+        return back()->withErrors(['username' => 'usuário ou senha inválidos'])->onlyInput('username');
     }
 
     public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        // auth()->user()->tokens()->delete();
 
         Auth::logout();
 

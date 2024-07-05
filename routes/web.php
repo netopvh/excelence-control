@@ -3,7 +3,10 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EntryController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
@@ -33,12 +36,15 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/chart', [DashboardController::class, 'chartJson'])->name('chart');
+
+    // Comercial (Pedidos, Clientes, Compras)
+
     Route::prefix('import')->name('import.')->group(function () {
         Route::get('/', [ImportController::class, 'index'])->name('index');
         Route::post('/', [ImportController::class, 'import'])->name('store');
     });
 
-    Route::prefix('/order')->name('order.')->group(function () {
+    Route::prefix('order')->name('order.')->group(function () {
         //Order Lists
         Route::get('/list', [OrderController::class, 'json'])->name('list');
         Route::get('/', [OrderController::class, 'index'])->name('index');
@@ -61,7 +67,7 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::post('/{id}/remove/design', [OrderController::class, 'removeDesign'])->name('remove.design');
     });
 
-    Route::prefix('/customer')->name('customer.')->group(function () {
+    Route::prefix('customer')->name('customer.')->group(function () {
 
         Route::get('/filter', [CustomerController::class, 'filter']);
 
@@ -85,6 +91,18 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::get('/', [UserController::class, 'index'])->name('index');
     });
 
+    // Financeiro
+    Route::prefix('entry')->name('entry.')->group(function () {
+        Route::get('/', [EntryController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('income')->name('income.')->group(function () {
+        Route::get('/', [IncomeController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('expense')->name('expense.')->group(function () {
+        Route::get('/', [ExpenseController::class, 'index'])->name('index');
+    });
 });
 Route::view('/pages/slick', 'pages.slick');
 Route::view('/pages/datatables', 'pages.datatables');

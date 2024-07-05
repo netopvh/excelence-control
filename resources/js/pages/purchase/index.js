@@ -1,5 +1,5 @@
 import DataTable from 'datatables.net-bs5'
-import { convertDateToISO, getParameterByName, isValidURL } from '../../codebase/utils'
+import { convertDateToISO, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
@@ -19,6 +19,7 @@ class pagePurchase {
           <td class='text-uppercase fw-bold'>Produto</td>
           <td class='text-uppercase fw-bold'>Quantidade</td>
           <td class='text-uppercase fw-bold'>Estoque</td>
+          <td class='text-uppercase fw-bold'>Status</td>
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
         </tr>` +
@@ -27,6 +28,7 @@ class pagePurchase {
             <td class='fw-bold'>${item.product.name}</td>
             <td>${item.qtd}</td>
             <td>${item.in_stock === 'yes' ? '<span class="badge bg-success">Sim</span>' : item.in_stock === 'no' ? '<span class="badge bg-warning">Não</span>' : item.in_stock === 'partial' ? '<span class="badge bg-info">Parcial</span>' : '-'}</td>
+            <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '<span class="badge bg-warning">Não Comprado</span>'}</td>
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
           </tr>`
@@ -58,13 +60,20 @@ class pagePurchase {
 
       const purchaseModal = pagePurchase.purchaseModal
 
+      const modalBody = document.getElementById('purchaseModal').querySelector('.block-content')
+
+      purchaseModal.show()
+
+      modalBody.innerHTML = ''
+      modalBody.appendChild(skeletonLoading(3, 5))
+
       try {
         const response = await get(`/api/purchase/${id}/show`, {
           user_id: document.querySelector('meta[name="user"]').content
         })
 
         if (response) {
-          const modalBody = document.getElementById('purchaseModal').querySelector('.block-content')
+          console.log(response)
           modalBody.innerHTML = `
           <div class="block block-rounded">
             <div class="block-header block-header-default">
@@ -98,6 +107,7 @@ class pagePurchase {
             </div>
             <div class="block-content">
                 <div class="row items-push">
+                    <div class="col-md-12">${response.order_products.some(product => product.in_stock === 'partial') ? '<span class="fw-bold"><span class="text-danger">ATENÇÃO</span>: O Pedido contém produtos em quantidade parcial, favor olhar a <span class="text-uppercase">observação</span>.</span>' : ''}</div>
                     <div class="col-md-12">
                         <table class="table table-bordered table-striped table-vcenter list-purchase">
                             <thead>
@@ -132,9 +142,9 @@ class pagePurchase {
               paging: false,
               processing: true,
               serverSide: true,
-              language: {
-                url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
-              },
+              // language: {
+              //   url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
+              // },
               columns: [
                 { data: 'product.name' },
                 { data: 'qtd' },
@@ -157,21 +167,37 @@ class pagePurchase {
                   }
 
                   const purchaseProductModal = pagePurchase.purchaseProductModal
-
                   const modalProductBody = document.getElementById('purchaseProductModal').querySelector('.block-content')
-                  modalProductBody.innerHTML = `
+
+                  purchaseModal.hide()
+                  purchaseProductModal.show()
+
+                  modalProductBody.innerHTML = ''
+                  modalProductBody.appendChild(skeletonLoading(3, 3))
+
+                  const res = await get(`/api/purchase/${id}/product/${rowData.id}/show`)
+
+                  if (res.success) {
+                    modalProductBody.innerHTML = ''
+                    modalProductBody.innerHTML = `
                     <form id="updatePurchaseProductForm" action="">
                     <input type="hidden" name="order_id" value="${id}" />
                       <input type="hidden" name="order_product_id" value="${rowData.id}" />
                       <div class="mb-3">
                         <label for="arrived" class="form-label">Chegou:</label>
                         <select name="arrived" class="form-control" id="arrived">
-                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === rowData.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
+                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="was_bought" class="form-label">Status do Item:</label>
+                        <select name="was_bought" class="form-control" id="was_bought">
+                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.was_bought ? 'selected' : ''}>${key === 'Y' ? 'Comprado' : 'Não Comprado'}</option>`)}
                         </select>
                       </div>
                       <div class="mb-3">
                         <label for="arrival_date" class="form-label">Previsão de Entrega:</label>
-                        <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${rowData.arrival_date ? convertDateToISO(rowData.arrival_date) : ''}" />
+                        <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${res.data.arrival_date ? convertDateToISO(res.data.arrival_date) : ''}" />
                       </div>
                       <div class="d-flex gap-2 mb-4">
                         <div class="col-12 col-md-6" id="btn-submit-container">
@@ -181,15 +207,13 @@ class pagePurchase {
                       </div>
                     </form>
                   `
+                  }
 
                   const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
                   const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
 
                   document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
                   document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
-
-                  purchaseModal.hide()
-                  purchaseProductModal.show()
 
                   const form = document.getElementById('updatePurchaseProductForm')
                   form.addEventListener('submit', async function (event) {
@@ -199,21 +223,27 @@ class pagePurchase {
 
                     const data = {
                       arrived: form.querySelector('select[name="arrived"]').value,
-                      arrival_date: form.querySelector('input[name="arrival_date"]').value
+                      arrival_date: form.querySelector('input[name="arrival_date"]').value,
+                      was_bought: form.querySelector('select[name="was_bought"]').value
                     }
 
                     const orderId = form.querySelector('input[name="order_id"]').value
                     const orderProductId = form.querySelector('input[name="order_product_id"]').value
 
-                    const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
+                    try {
+                      const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
 
-                    if (res) {
+                      if (res) {
+                        btnSubmit.setLoading(false)
+                        tablePurchase.draw()
+                      }
+
+                      purchaseProductModal.hide()
+                      purchaseModal.show()
+                    } catch (error) {
                       btnSubmit.setLoading(false)
-                      tablePurchase.draw()
+                      console.error(error)
                     }
-
-                    purchaseProductModal.hide()
-                    purchaseModal.show()
                   })
 
                   btnCancel.setOnClick(function () {
@@ -224,8 +254,6 @@ class pagePurchase {
               }
             })
           }
-
-          purchaseModal.show()
         }
       } catch (error) {
         console.error(error)
@@ -317,14 +345,17 @@ class pagePurchase {
           }
         }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      },
-      initComplete: function (settings, json) {
-        json.data.forEach((item) => {
-          document.querySelector(`#show-order-${item.id}`).addEventListener('click', () => {
-            validateModal(item.id)
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // },
+      drawCallback: function () {
+        const api = this.api()
+        api.rows().every(function () {
+          const data = this.data()
+          document.querySelector(`#show-order-${data.id}`).addEventListener('click', () => {
+            validateModal(data.id)
           })
+          return true
         })
       }
     })

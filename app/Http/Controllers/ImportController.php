@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Imports\OrderImport;
+use App\Imports\OrderSheetImport;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,7 +21,8 @@ class ImportController extends Controller
         ]);
 
         try {
-            (new OrderImport)->import($request->file('file'));
+            // (new OrderSheetImport())->import($request->file('file'));
+            Excel::import(new OrderImport(), $request->file('file'));
 
             return response()->json([
                 'message' => 'Importação realizada com sucesso!'

@@ -57,4 +57,5 @@ Route::prefix('purchase')->group(function () {
     Route::get('/{id}/show', [PurchaseController::class, 'show']);
     Route::get('/{id}/items', [PurchaseController::class, 'orderItems']);
     Route::post('/{id}/product/{productId}', [PurchaseController::class, 'updateProductInfo']);
+    Route::get('/{id}/product/{productId}/show', [PurchaseController::class, 'showProductInfo']);
 });
