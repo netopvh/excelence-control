@@ -75,6 +75,19 @@
                                     </div>
                                     <div class="col-12 col-md-3">
                                         <div class="form-group">
+                                            <label for="filterByStep" class="fw-bold mb-1">Filtrar por Etapa</label>
+                                            <select class="form-control" id="filterByStep">
+                                                <option value="all">Todos</option>
+                                                <option value="in_design">Design e Arte</option>
+                                                <option value="in_production">Produção</option>
+                                                <option value="finished">Concluídos</option>
+                                                <option value="shipping">Para Entrega</option>
+                                                <option value="pickup">Para Retirada</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-2">
+                                        <div class="form-group">
                                             <label for="filterByMonth" class="fw-bold mb-1">Filtrar por mês</label>
                                             <select class="form-control" id="filterByMonth">
                                                 <option value="all">Todos</option>
@@ -93,7 +106,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-2">
                                         <div class="form-group">
                                             <label for="filterType" class="fw-bold mb-1">Tipo de Data</label>
                                             <select class="form-control" id="filterType">
@@ -103,7 +116,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-3">
+                                    <div class="col-12 col-md-2">
                                         <div class="form-group">
                                             <label for="filterDate" class="fw-bold mb-1">Data</label>
                                             <input type="date" class="form-control" id="filterDate"

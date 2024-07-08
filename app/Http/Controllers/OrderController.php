@@ -45,6 +45,10 @@ class OrderController extends Controller
                     $query->where('status', $request->get('status'));
                 }
 
+                if ($request->get('step') !== 'all') {
+                    $query->where('step', $request->get('step'));
+                }
+
                 if ($request->get('month') !== 'all') {
                     $query->whereMonth('date', $request->get('month'));
                 }

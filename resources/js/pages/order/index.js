@@ -56,6 +56,7 @@ class pageOrder {
         data: (d) => {
           d.status = document.querySelector('#filterByStatus').value
           d.month = document.querySelector('#filterByMonth').value
+          d.step = document.querySelector('#filterByStep').value
           d.type = document.getElementById('filterType').value
           d.date = document.getElementById('filterDate').value
         }
@@ -105,13 +106,17 @@ class pageOrder {
         },
         { data: 'delivery_date', name: 'delivery_date' },
         { data: 'action', name: 'action', orderable: false, searchable: false }
-      ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      }
+      ]
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // }
     })
 
     document.querySelector('#filterByStatus').addEventListener('change', () => {
+      table.draw()
+    })
+
+    document.querySelector('#filterByStep').addEventListener('change', () => {
       table.draw()
     })
 
@@ -293,11 +298,20 @@ class pageOrder {
 
   static checkStatusOnUrl () {
     const status = getParameterByName('status')
+    const step = getParameterByName('step')
+
     if (status) {
       const statusElement = document.querySelector('#filterByStatus')
       statusElement.value = status
       const event = new Event('change')
       statusElement.dispatchEvent(event)
+    }
+
+    if (step) {
+      const stepElement = document.querySelector('#filterByStep')
+      stepElement.value = step
+      const event = new Event('change')
+      stepElement.dispatchEvent(event)
     }
   }
 

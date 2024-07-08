@@ -17,7 +17,7 @@
 @section('content')
     <div class="content">
         <div class="row">
-            <div class="col-12 col-xl-4">
+            <div class="col-12 col-xl-3">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['status' => 'approved']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
@@ -31,7 +31,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-12 col-xl-4">
+            <div class="col-12 col-xl-3">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['status' => 'waiting_approval']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
@@ -45,7 +45,7 @@
                     </div>
                 </a>
             </div>
-            <div class="col-12 col-xl-4">
+            <div class="col-12 col-xl-3">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['status' => 'waiting_design']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
@@ -63,8 +63,13 @@
         <div class="row">
             <div class="col-12">
                 <div class="block block-rounded">
-                    <div class="block-header block-header-default">
-                        <h3 class="block-title fw-bold">Pedidos por Etapa</h3>
+                    <div class="block-header block-header-default d-flex justify-content-between flex-row">
+                        <div>
+                            <h3 class="block-title fw-bold">Pedidos por Etapa</h3>
+                        </div>
+                        <div>
+                            <a href="{{ route('dashboard.order.kanban') }}" class="btn btn-sm btn-primary">Processos</a>
+                        </div>
                     </div>
                     <div class="block-content block-content-full">
                         <div class="table-responsive">
@@ -80,35 +85,46 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td class="bg-info text-center">
-                                            <span class="fw-bold text-white h3">
-                                                <i class="fa-solid fa-pen-ruler me-3"></i>
-                                                {{ $stepInDesign }}
-                                            </span>
+                                        <td class="bg-info text-center" style="cursor: pointer">
+                                            <a href="{{ route('dashboard.order.index', ['step' => 'in_design']) }}"
+                                                class="w-100">
+                                                <span class="fw-bold text-white h3">
+                                                    <i class="fa-solid fa-pen-ruler me-3"></i>
+                                                    {{ $stepInDesign }}
+                                                </span>
+                                            </a>
                                         </td>
-                                        <td class="bg-elegance text-center">
-                                            <span class="fw-bold text-white h3">
-                                                <i class="fa-solid fa-tarp-droplet me-3"></i>
-                                                {{ $stepInProduction }}
-                                            </span>
+                                        <td class="bg-elegance text-center" style="cursor: pointer">
+                                            <a href="{{ route('dashboard.order.index', ['step' => 'in_production']) }}">
+                                                <span class="fw-bold text-white h3">
+                                                    <i class="fa-solid fa-tarp-droplet me-3"></i>
+                                                    {{ $stepInProduction }}
+                                                </span>
+                                            </a>
                                         </td>
-                                        <td class="bg-success text-center">
-                                            <span class="fw-bold text-white h3">
-                                                <i class="fa-solid fa-clipboard-check me-3"></i>
-                                                {{ $stepFinished }}
-                                            </span>
+                                        <td class="bg-success text-center" style="cursor: pointer">
+                                            <a href="{{ route('dashboard.order.index', ['step' => 'finished']) }}">
+                                                <span class="fw-bold text-white h3">
+                                                    <i class="fa-solid fa-clipboard-check me-3"></i>
+                                                    {{ $stepFinished }}
+                                                </span>
+                                            </a>
                                         </td>
-                                        <td class="bg-earth text-center">
-                                            <span class="fw-bold text-white h3">
-                                                <i class="fa-solid fa-truck-ramp-box me-3"></i>
-                                                {{ $stepShipped }}
-                                            </span>
+                                        <td class="bg-earth text-center" style="cursor: pointer">
+                                            <a href="{{ route('dashboard.order.index', ['step' => 'shipping']) }}">
+                                                <span class="fw-bold text-white h3">
+                                                    <i class="fa-solid fa-truck-ramp-box me-3"></i>
+                                                    {{ $stepShipped }}
+                                                </span>
+                                            </a>
                                         </td>
-                                        <td class="bg-gd-cherry text-center h3">
-                                            <span class="fw-bold text-white">
-                                                <i class="fa-solid fa-box me-3"></i>
-                                                {{ $stepPickup }}
-                                            </span>
+                                        <td class="bg-gd-cherry text-center h3" style="cursor: pointer">
+                                            <a href="{{ route('dashboard.order.index', ['step' => 'pickup']) }}">
+                                                <span class="fw-bold text-white">
+                                                    <i class="fa-solid fa-box me-3"></i>
+                                                    {{ $stepPickup }}
+                                                </span>
+                                            </a>
                                         </td>
                                     </tr>
                             </table>

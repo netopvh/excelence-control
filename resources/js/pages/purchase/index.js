@@ -15,7 +15,8 @@ class pagePurchase {
   static initDataTables () {
     const format = (d) => {
       return (
-        `<table class='table table-bordered table-hover'><tr>
+        `<table class='table table-bordered table-hover sub-table' data-order-id='${d.id}'>
+        <tr>
           <td class='text-uppercase fw-bold'>Produto</td>
           <td class='text-uppercase fw-bold'>Quantidade</td>
           <td class='text-uppercase fw-bold'>Estoque</td>
@@ -23,8 +24,9 @@ class pagePurchase {
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
         </tr>` +
-        d.order_products.map((item) => {
-          return `<tr>
+        d.order_products.map((item, index) => {
+          return `
+          <tr class='sub-table-row' data-index='${index}' data-id='${item.id}' data-order-id='${d.id}'>
             <td class='fw-bold'>${item.product.name}</td>
             <td>${item.qtd}</td>
             <td>${item.in_stock === 'yes' ? '<span class="badge bg-success">Sim</span>' : item.in_stock === 'no' ? '<span class="badge bg-warning">Não</span>' : item.in_stock === 'partial' ? '<span class="badge bg-info">Parcial</span>' : '-'}</td>
@@ -235,6 +237,7 @@ class pagePurchase {
                       if (res) {
                         btnSubmit.setLoading(false)
                         tablePurchase.draw()
+                        table.draw()
                       }
 
                       purchaseProductModal.hide()
@@ -344,9 +347,9 @@ class pagePurchase {
           }
         }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      },
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // },
       drawCallback: function () {
         const api = this.api()
         api.rows().every(function () {
@@ -424,6 +427,16 @@ class pagePurchase {
       }
     })
 
+    tableOrders.addEventListener('dblclick', async (event) => {
+      const tr = event.target.closest('tr')
+
+      if (tr && tr.classList.contains('sub-table-row')) {
+        const orderId = tr.getAttribute('data-order-id')
+        const productId = tr.getAttribute('data-id')
+        console.log(orderId, productId)
+      }
+    })
+
     table.on('draw', () => {
       detailRows.forEach((id) => {
         document.querySelector(`#${id} td.dt-control`).click()
@@ -433,11 +446,19 @@ class pagePurchase {
 
   static checkStatusOnUrl () {
     const status = getParameterByName('status')
+    const step = getParameterByName('step')
     if (status) {
       const statusElement = document.querySelector('#filterByStatus')
       statusElement.value = status
       const event = new Event('change')
       statusElement.dispatchEvent(event)
+    }
+
+    if (step) {
+      const stepElement = document.querySelector('#filterByStep')
+      stepElement.value = step
+      const event = new Event('change')
+      stepElement.dispatchEvent(event)
     }
   }
 

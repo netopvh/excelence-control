@@ -44,7 +44,7 @@
                         <fieldset class="border px-2 pb-2 mb-2">
                             <legend class="float-none w-auto px-4 h5">Filtros</legend>
                             <div class="row">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <div class="form-group">
                                         <label for="filterByStatus" class="fw-bold mb-1">Filtrar por status</label>
                                         <select class="form-control" id="filterByStatus">
@@ -55,7 +55,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <div class="form-group">
                                         <label for="filterByMonth" class="fw-bold mb-1">Filtrar por mês</label>
                                         <select class="form-control" id="filterByMonth">
@@ -75,7 +75,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <div class="mb-4">
                                         <label for="filterByMonth" class="fw-bold mb-1">Filtrar por data</label>
                                         <div class="input-daterange input-group" data-date-format="dd/mm/yyyy"

@@ -16,7 +16,8 @@ class PurchaseController extends Controller
     public function index()
     {
         $orders = Order::whereHas('orderProducts', function ($query) {
-            $query->whereIn('in_stock', ['no', 'partial']);
+            $query->whereIn('in_stock', ['no', 'partial'])
+                ->where('was_bought', 'N');
         })
             ->with(['orderProducts' => function ($query) {
                 $query->whereIn('in_stock', ['no', 'partial']);
