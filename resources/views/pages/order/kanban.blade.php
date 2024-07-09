@@ -28,129 +28,7 @@
 @endsection
 
 @section('js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const apiEndpoint = '{{ url('/') }}'; // Replace with your API endpoint
-
-            // Fetch and render cards from the API
-            fetch(`${apiEndpoint}/dashboard/order/list-kanban`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(card => {
-                        const cardElement = createCardElement(card);
-                        const columnCards = document.getElementById(`${card.step}-cards`);
-                        if (columnCards) {
-                            columnCards.appendChild(cardElement);
-                        } else {
-                            console.error(`Column with ID ${card.step}-cards not found.`);
-                        }
-                    });
-                })
-                .catch(error => console.error('Error fetching cards:', error));
-
-            // Create a card element
-            function createCardElement(card) {
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'kanban-card';
-                cardDiv.id = `card-${card.id}`;
-                cardDiv.draggable = true;
-                cardDiv.innerHTML =
-                    `<strong>N. do Pedido:</strong> #${card.number} <br> <strong>Data:</strong> ${card.date} <br> <strong>Cliente:</strong> ${card.customer}`;
-                cardDiv.addEventListener('dragstart', handleDragStart);
-                return cardDiv;
-            }
-
-            // Handle drag start
-            function handleDragStart(event) {
-                event.dataTransfer.setData('text/plain', event.target.id);
-            }
-
-            // Handle drop event
-            function handleDrop(event) {
-                event.preventDefault();
-                const cardId = event.dataTransfer.getData('text/plain');
-                const cardElement = document.getElementById(cardId);
-                const newColumn = event.target.closest('.kanban-column');
-
-                if (newColumn) {
-                    const newStatus = newColumn.id.replace('-cards', '');
-                    newColumn.appendChild(cardElement);
-
-                    // Update card status via API
-                    const cardData = {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        step: newStatus
-                    };
-                    fetch(`${apiEndpoint}/dashboard/order/list-kanban/${cardId.replace('card-', '')}`, {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify(cardData)
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                console.error('Error updating card status:', response.statusText);
-                            }
-                        })
-                        .catch(error => console.error('Error updating card status:', error));
-                }
-            }
-
-            // Handle drag over
-            function handleDragOver(event) {
-                event.preventDefault();
-            }
-
-            // Attach event listeners to columns
-            const columns = document.querySelectorAll('.kanban-column');
-            columns.forEach(column => {
-                column.addEventListener('drop', handleDrop);
-                column.addEventListener('dragover', handleDragOver);
-            });
-
-            const filters = document.querySelectorAll('.kanban-filter');
-            filters.forEach(filter => {
-                filter.addEventListener('input', function() {
-                    const columnId = this.dataset.column;
-                    const filterType = this.dataset.filter;
-                    const filterText = this.value.trim().toLowerCase();
-                    const cards = document.querySelectorAll(`#${columnId}-cards .kanban-card`);
-
-                    cards.forEach(card => {
-                        const cardInfo = card.textContent.toLowerCase();
-                        let shouldShow = true;
-
-                        if (filterType === 'number') {
-                            const cardNumberMatch = cardInfo.match(
-                                /N\. do Pedido:\s*#(\d+)/i);
-                            if (cardNumberMatch && cardNumberMatch.length > 1) {
-                                const cardNumber = cardNumberMatch[1];
-                                shouldShow = cardNumber.includes(filterText);
-                            } else {
-                                shouldShow = false;
-                            }
-                        } else if (filterType === 'customer') {
-                            const customerInfoMatch = cardInfo.match(/Cliente:\s*(.*)/i);
-                            if (customerInfoMatch && customerInfoMatch.length > 1) {
-                                const customerName = customerInfoMatch[1];
-                                shouldShow = customerName.includes(filterText);
-                            } else {
-                                shouldShow = false;
-                            }
-                        }
-
-                        if (shouldShow) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                });
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/order/kanban.js'])
 @endsection
 
 @section('content')
@@ -270,4 +148,24 @@
                 </div>
             </div>
         </div>
-    @endsection
+    </div>
+    <div class="modal" id="orderInfoModal" data-bs-backdrop='static' tabindex="-1" role="dialog"
+        aria-labelledby="orderInfoModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="block block-rounded shadow-none mb-0">
+                    <div class="block-header block-header-default">
+                        <h3 class="block-title">Detalhes do Pedido</h3>
+                        <div class="block-options">
+                            <button type="button" class="btn-block-option" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="block-content">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StatusType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,6 +24,9 @@ return new class extends Migration
             $table->string('obs')->nullable();
             $table->date('arrival_date')->nullable();
             $table->enum('arrived', ['Y', 'N', 'P'])->nullable()->default(null);
+            $table->enum('status', StatusType::getValues())->default(StatusType::WaitingApproval);
+            $table->string('preview')->nullable();
+            $table->string('design_file')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

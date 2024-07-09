@@ -16,19 +16,24 @@ class UserController extends Controller
 
     public function getUsers()
     {
-        $users = User::with('roles')->get();
+        $users = User::with(['roles' => function ($query) {
+            $query->where('name', '!=', 'superadmin');
+        }]);
 
         return DataTables::of($users)
             ->editColumn('created_at', function ($model) {
                 return $model->created_at->format('d/m/Y');
             })
             ->editColumn('roles', function ($model) {
-                return implode(', ', $model->roles->pluck('name')->toArray());
+                return $model->roles->map(function ($role) {
+                    return '<span class="badge bg-primary">' . e($role->name) . '</span>';
+                })->implode(' ');
             })
             ->addColumn('action', function ($model) {
                 return $model->id;
             })
             ->setRowId('id')
+            ->rawColumns(['roles'])
             ->make(true);
     }
 

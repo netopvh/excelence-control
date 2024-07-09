@@ -1,6 +1,10 @@
+import { Modal } from 'bootstrap'
 import { get, patch } from '../../codebase/api'
+import { skeletonLoading } from '../../codebase/utils'
 
 class pageShowKanban {
+  static modalOrderInfo = null
+
   static initPage () {
     get('/dashboard/order/list-kanban')
       .then(data => {
@@ -35,9 +39,90 @@ class pageShowKanban {
     cardDiv.id = `card-${card.id}`
     cardDiv.draggable = true
     cardDiv.innerHTML =
-          `<strong>N. do Pedido:</strong> #${card.number} <br> <strong>Data:</strong> ${card.date} <br> <strong>Cliente:</strong> ${card.customer}`
+        `<strong>N. do Pedido:</strong> #${card.number} <br> <strong>Data:</strong> ${card.date} <br> <strong>Cliente:</strong> ${card.customer}`
     cardDiv.addEventListener('dragstart', this.handleDragStart)
+    cardDiv.addEventListener('click', () => this.showOrderInfo(card))
     return cardDiv
+  }
+
+  static async showOrderInfo (order) {
+    const modal = document.getElementById('orderInfoModal')
+
+    if (!this.modalOrderInfo) {
+      this.modalOrderInfo = new Modal(document.getElementById('orderInfoModal'))
+    }
+
+    const modalBody = modal.querySelector('.block-content')
+
+    this.modalOrderInfo.show()
+
+    modalBody.innerHTML = ''
+    modalBody.appendChild(skeletonLoading(3, 3))
+
+    const response = await get(`/api/order/${order.id}`)
+
+    if (response.success) {
+      modalBody.innerHTML = `
+        <div class="block block-rounded">
+            <div class="block-header block-header-default">
+                <h3 class="block-title fw-bold">
+                    Informações do Cliente
+                </h3>
+            </div>
+            <div class="block-content">
+                <div class="row items-push">
+                    <div class="col-md-12">
+                        <div class="block block-rounded h-100 mb-0">
+                            <div class="block-content fs-md">
+                                <div class="fw-bold mb-1">${response.data.customer.name}</div>
+                                <address>
+                                    <i class="fa fa-phone me-1"></i>
+                                    ${response.data.customer.phone ? response.data.customer.phone : 'Não cadastrado'}<br>
+                                    <i class="far fa-envelope me-1"></i> <a
+                                        href="javascript:void(0)">${response.data.customer.email ? response.data.customer.email : 'Não cadastrado'}</a>
+                                </address>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+            <div class="block block-rounded">
+              <div class="block-header block-header-default">
+                  <h3 class="block-title fw-bold">
+                      Produtos do Pedido
+                  </h3>
+              </div>
+              <div class="block-content">
+                <table class="table table-bordered table-striped table-vcenter">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase fw-bold">Nome</th>
+                      <th class="text-uppercase fw-bold">Quantidade</th>
+                      <th class="text-uppercase fw-bold">Fornecedor</th>
+                      <th class="text-uppercase fw-bold">Observação</th>
+                      <th class="text-uppercase fw-bold">Status</th>
+                      <td class="text-uppercase fw-bold">Arte</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  ${response.data.order_products.map(item => `
+                    <tr>
+                      <td>${item.product.name}</td>
+                      <td>${item.qtd}</td>
+                      <td>${item.supplier ? item.supplier : '-'}</td>
+                      <td>${item.obs ? item.obs : '-'}</td>
+                      <td><span class="badge bg-success">Aprovado</span></td>
+                      <td><a href="#" class="btn btn-sm btn-primary">Visualizar</a></td>
+                    </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+      `
+    }
   }
 
   static handleDragStart (event) {
@@ -51,8 +136,8 @@ class pageShowKanban {
     const newColumn = event.target.closest('.kanban-column')
 
     if (newColumn) {
-      const newStep = newColumn.id.replace('-cards', '')
-      newColumn.insertBefore(cardElement, newColumn.firstChild)
+      const newStatus = newColumn.id.replace('-cards', '')
+      newColumn.appendChild(cardElement)
 
       try {
         await patch(`/dashboard/order/list-kanban/${cardId.replace('card-', '')}`, {

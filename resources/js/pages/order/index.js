@@ -3,13 +3,14 @@ import { getParameterByName, getTomorrowDate, isValidURL } from '../../codebase/
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
-import { get, post } from '../../codebase/api'
+import { get, post, delete as del } from '../../codebase/api'
 import Button from '../../codebase/components/button'
 import Swal from 'sweetalert2'
 // import $ from 'jquery'
 
 class pageOrder {
   static statusModal = null
+  static tableOrders = null
 
   static initDataTables () {
     const stepOptions = { in_design: 'Design e Artes', in_production: 'Produção', finished: 'Concluído', shipping: 'Entrega', pickup: 'Retirada', cancelled: 'Cancelado' }
@@ -22,6 +23,7 @@ class pageOrder {
           <td class='text-uppercase fw-bold'>Produto</td>
           <td class='text-uppercase fw-bold'>Quantidade</td>
           <td class='text-uppercase fw-bold'>Status</td>
+          <td class='text-uppercase fw-bold'>Situação</td>
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
         </tr>
@@ -29,6 +31,7 @@ class pageOrder {
           <tr class='sub-table-row' data-index='${index}' data-id='${item.id}' data-order-id='${d.id}'>
             <td class='fw-bold'>${item.product.name}</td>
             <td>${item.qtd}</td>
+            <td>${item.status === 'approved' ? '<span class="badge bg-success">Aprovado</span>' : item.status === 'waiting_approval' ? '<span class="badge bg-warning">Aguard. Aprov.</span>' : '<span class="badge bg-info">Aguard. Arte</span> '}</td>
             <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : (item.was_bought === 'N') && (item.in_stock === 'no' || item.in_stock === 'partial') ? '<span class="badge bg-warning">Não Comprado</span>' : '-'}</td>
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
@@ -40,7 +43,7 @@ class pageOrder {
     }
 
     const tableOrders = document.querySelector('.list-latest')
-    const table = new DataTable(tableOrders, {
+    this.tableOrders = new DataTable(tableOrders, {
       serverSide: true,
       processing: true,
       paging: true,
@@ -92,25 +95,29 @@ class pageOrder {
             return data || '-'
           }
         },
-        {
-          data: 'status',
-          name: 'status',
-          type: 'select',
-          render: function (data, type, row, meta) {
-            if (data == null || !(data in statusOptions)) return '<span class="badge bg-secondary">Não definido</span>'
-            if (data === 'approved') return '<span class="badge bg-success">' + statusOptions[data] + '</span>'
-            if (data === 'waiting_approval') return '<span class="badge bg-warning">' + statusOptions[data] + '</span>'
-            if (data === 'waiting_design') return '<span class="badge bg-corporate">' + statusOptions[data] + '</span>'
-            return stepOptions[data]
-          }
-        },
         { data: 'delivery_date', name: 'delivery_date' },
-        { data: 'action', name: 'action', orderable: false, searchable: false }
-      ]
+        {
+          data: 'action',
+          name: 'action',
+          orderable: false,
+          searchable: false
+        }
+      ],
       // language: {
       //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
       // }
+      drawCallback: function () {
+        const api = this.api()
+
+        api.rows().every(function () {
+          const data = this.data()
+          document.querySelector(`#delete-order-${data.id}`).addEventListener('click', () => pageOrder.deleteOrder(data.id))
+          return true
+        })
+      }
     })
+
+    const table = this.tableOrders
 
     document.querySelector('#filterByStatus').addEventListener('change', () => {
       table.draw()
@@ -292,6 +299,28 @@ class pageOrder {
             form.reset()
             detalhesModal.hide()
           })
+        }
+      }
+    })
+  }
+
+  static deleteOrder (id) {
+    const table = this.tableOrders
+
+    Swal.fire({
+      title: 'Tem certeza que deseja excluir este pedido?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await del(`/api/order/${id}`)
+
+        if (res.success) {
+          table.draw()
         }
       }
     })

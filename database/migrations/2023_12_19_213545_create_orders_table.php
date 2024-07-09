@@ -1,7 +1,6 @@
 <?php
 
 use App\Enums\MovementType;
-use App\Enums\StatusType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -21,7 +20,6 @@ return new class extends Migration
             $table->date('date');
             $table->string('number');
             $table->enum('step', MovementType::getValues())->default(MovementType::Created);
-            $table->enum('status', StatusType::getValues())->default(StatusType::WaitingApproval);
             $table->timestamps();
             $table->softDeletes();
         });

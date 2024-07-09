@@ -45,9 +45,11 @@ Route::prefix('user')->group(function () {
 });
 
 Route::prefix('order')->group(function () {
+    Route::get('/{id}', [OrderController::class, 'show']);
     Route::get('products/{orderId}', [OrderController::class, 'productsOrder']);
     Route::post('/{id}/store', [OrderController::class, 'updateStatusAndStep']);
     Route::post('/{id}/info', [OrderController::class, 'updateInfo']);
+    Route::delete('/{id}', [OrderController::class, 'destroy']);
 });
 
 Route::prefix('purchase')->group(function () {

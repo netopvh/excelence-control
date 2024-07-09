@@ -29,6 +29,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMovement whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMovement whereResponsableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMovement whereUpdatedAt($value)
+ * @property string|null $action_type
+ * @property int|null $action_user_id
+ * @property string|null $origin
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMovement whereActionType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMovement whereActionUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMovement whereOrigin($value)
  * @mixin \Eloquent
  */
 class OrderMovement extends Model

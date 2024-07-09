@@ -33,6 +33,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereQtd($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereSupplier($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereUpdatedAt($value)
+ * @property string|null $was_bought
+ * @property string|null $link
+ * @property \Illuminate\Support\Carbon|null $arrival_date
+ * @property string|null $arrived
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereArrivalDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereArrived($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereLink($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderProduct whereWasBought($value)
  * @mixin \Eloquent
  */
 class OrderProduct extends Model
@@ -50,6 +58,9 @@ class OrderProduct extends Model
         'arrival_date',
         'arrived',
         'was_bought',
+        'status',
+        'preview',
+        'design_file'
     ];
 
     public $casts = [

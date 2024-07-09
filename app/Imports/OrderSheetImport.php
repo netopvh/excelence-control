@@ -62,8 +62,7 @@ class OrderSheetImport implements ToCollection, WithHeadingRow, WithBatchInserts
                 'employee_id' => $this->findUser($row['vendedor']),
                 'date' => $this->parseDate($row['data']),
                 'step' => MovementType::InDesign(),
-                'delivery_date' => $this->parseDate($row['entrega']),
-                'status' => $this->validateStatus($row['arte']),
+                'delivery_date' => $this->parseDate($row['entrega'])
             ])->save();
 
             $this->createOrderMovement($order, $row);
@@ -80,6 +79,7 @@ class OrderSheetImport implements ToCollection, WithHeadingRow, WithBatchInserts
             'qtd' => $row['qtd'],
             'in_stock' => $this->validateInStock($row['estoque']),
             'arrived' => $row['estoque'] === 'S' || $row['estoque'] === 'OK' ? 'Y' : 'N',
+            'status' => $this->validateStatus($row['arte']),
         ]);
     }
 

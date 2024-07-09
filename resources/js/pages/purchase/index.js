@@ -11,6 +11,7 @@ import Button from '../../codebase/components/button'
 class pagePurchase {
   static purchaseModal = null
   static purchaseProductModal = null
+  static tablePurchases = null
 
   static initDataTables () {
     const format = (d) => {
@@ -303,7 +304,7 @@ class pagePurchase {
     }
 
     const tableOrders = document.querySelector('.list-latest')
-    const table = new DataTable(tableOrders, {
+    this.tablePurchases = new DataTable(tableOrders, {
       serverSide: true,
       processing: true,
       paging: true,
@@ -368,6 +369,8 @@ class pagePurchase {
         })
       }
     })
+
+    const table = this.tablePurchases
 
     document.querySelector('#filterByStatus').addEventListener('change', () => {
       table.draw()

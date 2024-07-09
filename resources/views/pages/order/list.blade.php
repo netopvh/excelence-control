@@ -143,7 +143,6 @@
                                         <th>Cliente</th>
                                         <th class="text-center" style="width: 110px">Etapa</th>
                                         <th class="text-center" style="width: 20%;">Vendedor</th>
-                                        <th class="text-center" style="width: 100px;">Status</th>
                                         <th style="width: 120px;">Entrega</th>
                                         <th class="text-center" style="width: 10%;">Ação</th>
                                     </tr>

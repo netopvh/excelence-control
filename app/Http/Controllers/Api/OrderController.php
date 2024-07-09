@@ -11,6 +11,26 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
+    public function show($id)
+    {
+        $order = Order::query()->with('customer', 'orderProducts.product', 'employee')->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $order,
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $order = Order::query()->findOrFail($id);
+        $order->delete();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
     public function productsOrder(Request $request, $orderId)
     {
         $order = Order::query()->findOrFail($orderId);

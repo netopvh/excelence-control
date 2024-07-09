@@ -41,9 +41,9 @@ class OrderController extends Controller
                         });
                 }
 
-                if ($request->get('status') !== 'all') {
-                    $query->where('status', $request->get('status'));
-                }
+                // if ($request->get('status') !== 'all') {
+                //     $query->where('status', $request->get('status'));
+                // }
 
                 if ($request->get('step') !== 'all') {
                     $query->where('step', $request->get('step'));
@@ -70,7 +70,22 @@ class OrderController extends Controller
                 return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
             })
             ->addColumn('action', function ($model) {
-                return '<a href="' . route('dashboard.order.show', $model->id) . '" class="btn btn-sm btn-primary text-white"><i class="fa fa-eye" /></a>';
+
+                $buttons = '<div class="btn-group">';
+
+                $buttons .= '<a href="' . route('dashboard.order.show', ['id' => $model->id]) . '" class="btn btn-primary btn-sm">
+                    <i class="fa fa-eye"></i>
+                </a>';
+
+                if (auth()->user()->hasRole('superadmin')) {
+                    $buttons .= '<a href="javascript:void(0);" class="btn btn-primary btn-sm" id="delete-order-' . $model->id . '">
+                        <i class="fa fa-trash"></i>
+                    </a>';
+                }
+
+                $buttons .= '</div>';
+
+                return $buttons;
             })
             ->setRowId(function ($model) {
                 return $model->id;
@@ -200,7 +215,6 @@ class OrderController extends Controller
             'date' => Carbon::createFromFormat('d/m/Y', $request->get('date'))->format('Y-m-d'),
             'number' => $request->get('number'),
             'delivery_date' => Carbon::createFromFormat('d/m/Y', $request->get('delivery_date'))->format('Y-m-d'),
-            'status' => StatusType::WaitingDesign(),
             'step' => MovementType::InDesign(),
         ]);
 
@@ -220,7 +234,8 @@ class OrderController extends Controller
                 'supplier' => $product['supplier'],
                 'link' => $product['link'],
                 'obs' => $product['obs'],
-                'arrived' => 'N'
+                'arrived' => 'N',
+                'status' => StatusType::WaitingDesign(),
             ]);
         }
 

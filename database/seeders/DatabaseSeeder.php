@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
+        $roleSuperAdmin = Role::create([
+            'name' => 'superadmin',
+        ]);
+
         $roleAdmin = Role::create([
             'name' => 'admin',
         ]);
@@ -42,12 +46,6 @@ class DatabaseSeeder extends Seeder
                 'email' => 'robson@excelencebrindes.com.br',
                 'username' => 'robson',
                 'password' => bcrypt('123456'),
-            ],
-            [
-                'name' => 'Rubens Coelho',
-                'email' => 'rubens@excelencebrindes.com.br',
-                'username' => 'rubens',
-                'password' => bcrypt('021208'),
             ],
             [
                 'name' => 'Dayane Azevedo',
@@ -133,7 +131,6 @@ class DatabaseSeeder extends Seeder
             $user->assignRole($roleDesign);
         }
 
-
         $joao = \App\Models\User::factory()->create([
             'name' => 'João',
             'email' => 'joao@excelencebrindes.com.br',
@@ -142,5 +139,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $joao->assignRole($roleFinanceiro);
+
+        $rubens = \App\Models\User::factory()->create([
+            'name' => 'Rubens Coelho',
+            'email' => 'rubens@excelencebrindes.com.br',
+            'username' => 'rubens',
+            'password' => bcrypt('021208'),
+        ]);
+
+        $rubens->assignRole($roleSuperAdmin, $roleAdmin, $roleVendas, $roleDesign, $roleProducao, $roleFinanceiro);
     }
 }

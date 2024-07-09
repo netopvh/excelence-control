@@ -40,23 +40,6 @@
                 <fieldset class="border px-2 pb-2 mb-2">
                     <legend class="float-none w-auto h5">Ações</legend>
                     <div class="row">
-                        <div class="col-12 col-md-3">
-                            <span class="fw-bold">Status:</span>
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-warning dropdown-toggle w-100" id="status-dropdown"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
-                                    <span class="d-sm-inline">{{ status_type($order->status) }}</span>
-                                </button>
-                                <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-primary">
-                                    @foreach ($status as $key => $value)
-                                        <a class="dropdown-item status" data-value="{{ $key }}"
-                                            href="javascript:void(0)">{{ $value }}</a>
-                                        <div class="dropdown-divider"></div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
                         <div class="col-12 d-none">
                             <span class="fw-bold">Etapa:</span>
                             <div class="dropdown">
@@ -175,291 +158,49 @@
         <div class="block block-rounded">
             <div class="block-header block-header-default">
                 <h3 class="block-title fw-bold">
-                    Arquivos
+                    Arquivos de Design
                 </h3>
             </div>
             <div class="block-content block-content-full">
                 <div class="row items-push">
                     <div class="col-md-12">
-                        <div class="block block-rounded h-100 mb-0">
+                        <div class="block block-rounded mb-0">
                             <div class="block-content fs-md">
                                 <div id="error-msg"></div>
                                 <div class="row mb-4">
-                                    {{-- <div class="col-12 col-md-6">
-                                        <div class="fw-bold">
-                                            Pré-visualização
+                                    @foreach ($order->orderProducts as $item)
+                                        @php
+                                            $colSize = max(12 / $order->orderProducts->count(), 3);
+                                        @endphp
+                                        <div class="col-12 col-md-{{ $colSize }}">
+                                            <div class="card mb-3">
+                                                <div class="card-body text-center">
+                                                    <h5 class="card-title">{{ $item->product->name }}</h5>
+                                                    @if ($item->preview)
+                                                        <img src="{{ $item->preview }}" alt=""
+                                                            class="img-fluid">
+                                                    @else
+                                                        <img src="{{ asset('media/photos/noimage.jpg') }}"
+                                                            alt="Pré-visualização" class="img-fluid" />
+                                                    @endif
+                                                    @if (is_null($item->design_file))
+                                                        <form
+                                                            action="{{ route('dashboard.order.upload.design', $order->id) }}"
+                                                            method="POST" enctype="multipart/form-data">
+                                                            @csrf
+                                                            <div class="mb-3">
+                                                                <input type="file" name="design_file"
+                                                                    class="form-control">
+                                                            </div>
+                                                            <button type="submit" class="btn btn-primary">Upload</button>
+                                                        </form>
+                                                    @else
+                                                        <a href="#" class="btn btn-success">Download Design File</a>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div id="preview-container">
-                                            @if ($order->preview)
-                                                <img src="{{ asset('preview/' . $order->preview) }}"
-                                                    alt="Pré-visualização" class="img-fluid mt-4 gap-5" />
-                                            @else
-                                                <img src="{{ asset('media/photos/noimage.jpg') }}" alt="Pré-visualização"
-                                                    class="img-fluid" />
-                                            @endif
-                                        </div>
-                                        <div id="loading-preview" class="mx-4 mt-4 d-none">
-                                            <svg width="32" height="32" viewBox="0 0 32 32"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <style>
-                                                    .spinner_DupU {
-                                                        animation: spinner_sM3D 1.2s infinite
-                                                    }
-
-                                                    .spinner_GWtZ {
-                                                        animation-delay: .1s
-                                                    }
-
-                                                    .spinner_dwN6 {
-                                                        animation-delay: .2s
-                                                    }
-
-                                                    .spinner_46QP {
-                                                        animation-delay: .3s
-                                                    }
-
-                                                    .spinner_PD82 {
-                                                        animation-delay: .4s
-                                                    }
-
-                                                    .spinner_eUgh {
-                                                        animation-delay: .5s
-                                                    }
-
-                                                    .spinner_eUaP {
-                                                        animation-delay: .6s
-                                                    }
-
-                                                    .spinner_j38H {
-                                                        animation-delay: .7s
-                                                    }
-
-                                                    .spinner_tVmX {
-                                                        animation-delay: .8s
-                                                    }
-
-                                                    .spinner_DQhX {
-                                                        animation-delay: .9s
-                                                    }
-
-                                                    .spinner_GIL4 {
-                                                        animation-delay: 1s
-                                                    }
-
-                                                    .spinner_n0Yb {
-                                                        animation-delay: 1.1s
-                                                    }
-
-                                                    @keyframes spinner_sM3D {
-
-                                                        0%,
-                                                        50% {
-                                                            animation-timing-function: cubic-bezier(0, 1, 0, 1);
-                                                            r: 0
-                                                        }
-
-                                                        10% {
-                                                            animation-timing-function: cubic-bezier(.53, 0, .61, .73);
-                                                            r: 2px
-                                                        }
-                                                    }
-                                                </style>
-                                                <circle class="spinner_DupU" cx="12" cy="3" r="0" />
-                                                <circle class="spinner_DupU spinner_GWtZ" cx="16.50" cy="4.21"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_n0Yb" cx="7.50" cy="4.21"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_dwN6" cx="19.79" cy="7.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_GIL4" cx="4.21" cy="7.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_46QP" cx="21.00" cy="12.00"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_DQhX" cx="3.00" cy="12.00"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_PD82" cx="19.79" cy="16.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_tVmX" cx="4.21" cy="16.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_eUgh" cx="16.50" cy="19.79"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_j38H" cx="7.50" cy="19.79"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_eUaP" cx="12" cy="21"
-                                                    r="0" />
-                                            </svg>
-                                        </div>
-                                        @if (!$order->preview)
-                                            <form action="{{ route('dashboard.order.upload.preview', $order->id) }}"
-                                                id="upload-preview" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="row mb-4">
-                                                    <div class="col-md-12 col-xl-12 fw-bold">
-                                                        Nenhum arquivo foi enviado
-                                                    </div>
-                                                </div>
-                                                <div class="row d-block">
-                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                        <div class="mb-4">
-                                                            <input class="form-control" type="file" name="preview"
-                                                                id="example-file-input">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                        <button type="submit" class="btn btn-primary">Importar</button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        @endif
-                                    </div> --}}
-                                    <div class="fw-bold">
-                                        Arquivo de Design PDF
-                                    </div>
-                                    <div class="col-12 col-md-12">
-                                        <div id="design-container" class="align-items-center">
-                                            @if ($order->design_file && $order->preview)
-                                                <div class="mt-5">
-                                                    <a href="{{ asset('design/' . $order->design_file) }}"
-                                                        target="_blank" class="btn btn-primary">
-                                                        <i class="fa fa-fw fa-download text-white me-1"></i>
-                                                        <span class="d-none d-sm-inline">Baixar Arquivo</span>
-                                                    </a>
-                                                    <form
-                                                        action="{{ route('dashboard.order.remove.design', $order->id) }}"
-                                                        method="POST" class="mt-3">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-danger"><i
-                                                                class="fa fa-fw fa-trash"></i>Excluir Arquivo</button>
-                                                    </form>
-                                                </div>
-                                                <div class="preview-images mt-4">
-                                                    @foreach ($order->preview as $file)
-                                                        <div class="preview-image">
-                                                            <img src="{{ asset($file) }}" alt="Pré-visualização"
-                                                                class="max-w-25 img-fluid">
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                            @else
-                                                <img src="{{ asset('media/photos/noimage.jpg') }}" alt="Pré-visualização"
-                                                    class="img-fluid" />
-                                            @endif
-                                        </div>
-                                        <div id="loading-design" class="mx-4 mt-4 d-none">
-                                            <svg width="32" height="32" viewBox="0 0 32 32"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <style>
-                                                    .spinner_DupU {
-                                                        animation: spinner_sM3D 1.2s infinite
-                                                    }
-
-                                                    .spinner_GWtZ {
-                                                        animation-delay: .1s
-                                                    }
-
-                                                    .spinner_dwN6 {
-                                                        animation-delay: .2s
-                                                    }
-
-                                                    .spinner_46QP {
-                                                        animation-delay: .3s
-                                                    }
-
-                                                    .spinner_PD82 {
-                                                        animation-delay: .4s
-                                                    }
-
-                                                    .spinner_eUgh {
-                                                        animation-delay: .5s
-                                                    }
-
-                                                    .spinner_eUaP {
-                                                        animation-delay: .6s
-                                                    }
-
-                                                    .spinner_j38H {
-                                                        animation-delay: .7s
-                                                    }
-
-                                                    .spinner_tVmX {
-                                                        animation-delay: .8s
-                                                    }
-
-                                                    .spinner_DQhX {
-                                                        animation-delay: .9s
-                                                    }
-
-                                                    .spinner_GIL4 {
-                                                        animation-delay: 1s
-                                                    }
-
-                                                    .spinner_n0Yb {
-                                                        animation-delay: 1.1s
-                                                    }
-
-                                                    @keyframes spinner_sM3D {
-
-                                                        0%,
-                                                        50% {
-                                                            animation-timing-function: cubic-bezier(0, 1, 0, 1);
-                                                            r: 0
-                                                        }
-
-                                                        10% {
-                                                            animation-timing-function: cubic-bezier(.53, 0, .61, .73);
-                                                            r: 2px
-                                                        }
-                                                    }
-                                                </style>
-                                                <circle class="spinner_DupU" cx="12" cy="3" r="0" />
-                                                <circle class="spinner_DupU spinner_GWtZ" cx="16.50" cy="4.21"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_n0Yb" cx="7.50" cy="4.21"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_dwN6" cx="19.79" cy="7.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_GIL4" cx="4.21" cy="7.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_46QP" cx="21.00" cy="12.00"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_DQhX" cx="3.00" cy="12.00"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_PD82" cx="19.79" cy="16.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_tVmX" cx="4.21" cy="16.50"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_eUgh" cx="16.50" cy="19.79"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_j38H" cx="7.50" cy="19.79"
-                                                    r="0" />
-                                                <circle class="spinner_DupU spinner_eUaP" cx="12" cy="21"
-                                                    r="0" />
-                                            </svg>
-                                        </div>
-                                        @if (!$order->design_file)
-                                            <form action="{{ route('dashboard.order.upload.design', $order->id) }}"
-                                                id="upload-design" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="row mb-4">
-                                                    <div class="col-md-12 col-xl-12 fw-bold">
-                                                        Nenhum arquivo foi enviado
-                                                    </div>
-                                                </div>
-                                                <div class="row d-block">
-                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                        <div class="mb-4">
-                                                            <input class="form-control" type="file" name="design"
-                                                                id="example-file-input">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-12 col-xl-12 overflow-hidden">
-                                                        <button type="submit" class="btn btn-primary"
-                                                            id="btn-upload">Importar</button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        @endif
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

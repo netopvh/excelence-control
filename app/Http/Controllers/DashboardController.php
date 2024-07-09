@@ -17,15 +17,23 @@ class DashboardController extends Controller
         $notInSteps = ['finished', 'shipping', 'canceled', 'pickup'];
 
         $approved = Order::query()
-            ->where('status', StatusType::Approved())
+            ->whereHas('orderProducts', function ($query) {
+                $query->where('status', StatusType::Approved());
+            })
             ->whereNotIn('step', $notInSteps)
             ->count();
+
         $waitingApproval = Order::query()
-            ->where('status', StatusType::WaitingApproval())
+            ->whereHas('orderProducts', function ($query) {
+                $query->where('status', StatusType::WaitingApproval());
+            })
             ->whereNotIn('step', $notInSteps)
             ->count();
+
         $waitingArt = Order::query()
-            ->where('status', StatusType::WaitingDesign())
+            ->whereHas('orderProducts', function ($query) {
+                $query->where('status', StatusType::WaitingDesign());
+            })
             ->whereNotIn('step', $notInSteps)
             ->count();
 
