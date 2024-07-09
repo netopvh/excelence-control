@@ -29,7 +29,7 @@ class pageOrder {
           <tr class='sub-table-row' data-index='${index}' data-id='${item.id}' data-order-id='${d.id}'>
             <td class='fw-bold'>${item.product.name}</td>
             <td>${item.qtd}</td>
-            <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '-'}</td>
+            <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : (item.was_bought === 'N') && (item.in_stock === 'no' || item.in_stock === 'partial') ? '<span class="badge bg-warning">Não Comprado</span>' : '-'}</td>
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
           </tr>`).join('')}

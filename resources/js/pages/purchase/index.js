@@ -143,9 +143,9 @@ class pagePurchase {
               paging: false,
               processing: true,
               serverSide: true,
-              language: {
-                url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
-              },
+              // language: {
+              //   url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
+              // },
               columns: [
                 { data: 'product.name' },
                 { data: 'qtd' },
@@ -248,6 +248,12 @@ class pagePurchase {
                     }
                   })
 
+                  form.querySelector('select[name="was_bought"]').addEventListener('change', function () {
+                    if (form.querySelector('select[name="was_bought"]').value !== 'Y') {
+                      form.querySelector('input[name="arrival_date"]').value = null
+                    }
+                  })
+
                   btnCancel.setOnClick(function () {
                     purchaseProductModal.hide()
                     purchaseModal.show()
@@ -313,8 +319,6 @@ class pagePurchase {
         data: (d) => {
           d.status = document.querySelector('#filterByStatus').value
           d.month = document.querySelector('#filterByMonth').value
-          d.from = document.querySelector('#from').value
-          d.to = document.querySelector('#to').value
         }
       },
       columns: [
@@ -350,6 +354,9 @@ class pagePurchase {
       // language: {
       //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
       // },
+      rowCallback: function (row, data) {
+        $(row).addClass('bg-success')
+      },
       drawCallback: function () {
         const api = this.api()
         api.rows().every(function () {
@@ -371,18 +378,8 @@ class pagePurchase {
     })
 
     document.querySelector('#btnCleanFilters').addEventListener('click', () => {
-      document.querySelector('#filterByStatus').value = 'all'
+      document.querySelector('#filterByStatus').value = 'N'
       document.querySelector('#filterByMonth').value = 'all'
-      document.querySelector('#from').value = ''
-      document.querySelector('#to').value = ''
-      table.draw()
-    })
-
-    document.querySelector('#from').addEventListener('change', () => {
-      table.draw()
-    })
-
-    document.querySelector('#to').addEventListener('change', () => {
       table.draw()
     })
 

@@ -49,9 +49,8 @@
                                         <label for="filterByStatus" class="fw-bold mb-1">Filtrar por status</label>
                                         <select class="form-control" id="filterByStatus">
                                             <option value="all">Todos</option>
-                                            <option value="waiting_approval">Aguardando Aprovação</option>
-                                            <option value="waiting_design">Aguardando Arte</option>
-                                            <option value="approved">Aprovado</option>
+                                            <option value="Y">Comprados</option>
+                                            <option value="N" selected>Não Comprados</option>
                                         </select>
                                     </div>
                                 </div>
@@ -60,39 +59,22 @@
                                         <label for="filterByMonth" class="fw-bold mb-1">Filtrar por mês</label>
                                         <select class="form-control" id="filterByMonth">
                                             <option value="all">Todos</option>
-                                            <option value="01">Janeiro</option>
-                                            <option value="02">Fevereiro</option>
-                                            <option value="03">Março</option>
-                                            <option value="04">Abril</option>
-                                            <option value="05">Maio</option>
-                                            <option value="06">Junho</option>
-                                            <option value="07">Julho</option>
-                                            <option value="08">Agosto</option>
-                                            <option value="09">Setembro</option>
+                                            <option value="1">Janeiro</option>
+                                            <option value="2">Fevereiro</option>
+                                            <option value="3">Março</option>
+                                            <option value="4">Abril</option>
+                                            <option value="5">Maio</option>
+                                            <option value="6">Junho</option>
+                                            <option value="7">Julho</option>
+                                            <option value="8">Agosto</option>
+                                            <option value="9">Setembro</option>
                                             <option value="10">Outubro</option>
                                             <option value="11">Novembro</option>
                                             <option value="12">Dezembro</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-12 col-md-3">
-                                    <div class="mb-4">
-                                        <label for="filterByMonth" class="fw-bold mb-1">Filtrar por data</label>
-                                        <div class="input-daterange input-group" data-date-format="dd/mm/yyyy"
-                                            data-week-start="1" data-autoclose="true" data-today-highlight="true">
-                                            <input type="text" class="form-control" id="from"
-                                                name="example-daterange1" placeholder="De" data-week-start="1"
-                                                data-autoclose="true" data-today-highlight="true">
-                                            <span class="input-group-text fw-semibold">
-                                                <i class="fa fa-fw fa-arrow-right"></i>
-                                            </span>
-                                            <input type="text" class="form-control" id="to"
-                                                name="example-daterange2" placeholder="Até" data-week-start="1"
-                                                data-autoclose="true" data-today-highlight="true">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4 align-content-center">
+                                <div class="col-12 col-md-4 align-content-center mt-4">
                                     <button type="button" class="btn btn-primary btn-block text-white"
                                         id="btnCleanFilters">
                                         <i class="fa fa-fw fa-broom mr-1"></i> Limpar Filtros
@@ -101,15 +83,14 @@
                             </div>
                         </fieldset>
                         <div class="table-responsive">
-                            <table
-                                class="table table-bordered table-striped table-vcenter js-dataTable-responsive list-latest">
+                            <table class="table table-bordered table-striped table-vcenter list-latest">
                                 <thead>
                                     <tr>
                                         <th style="width: 8%;"></th>
                                         <th style="width: 120px;">Data</th>
                                         <th style="width: 100px;">Pedido</th>
                                         <th>Cliente</th>
-                                        <th style="width: 120px;">Entrega</th>
+                                        <th style="width: 220px;">Entrega do Pedido</th>
                                         <th class="text-center" style="width: 20%;">Vendedor</th>
                                         <th class="text-center" style="width: 10%;">Ação</th>
                                     </tr>

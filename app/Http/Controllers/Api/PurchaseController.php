@@ -9,23 +9,35 @@ use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class PurchaseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::whereHas('orderProducts', function ($query) {
-            $query->whereIn('in_stock', ['no', 'partial'])
-                ->where('was_bought', 'N');
+        $ordersQuery = Order::whereHas('orderProducts', function ($query) use ($request) {
+            $query->whereIn('in_stock', ['no', 'partial']);
         })
             ->with(['orderProducts' => function ($query) {
                 $query->whereIn('in_stock', ['no', 'partial']);
             }, 'orderProducts.product', 'customer', 'employee'])
-            ->orderBy('date', 'desc')
-            ->get();
+            ->orderBy('date', 'desc');
 
-        return DataTables::of($orders)
+        return DataTables::of($ordersQuery)
+            ->filter(function ($query) use ($request) {
+                if ($request->get('status') !== 'all') {
+                    $query->whereHas('orderProducts', function ($query) use ($request) {
+                        $query->where('was_bought', $request->get('status'));
+                    });
+                }
+
+                if ($request->get('month') !== 'all') {
+                    $query->whereHas('orderProducts', function ($query) use ($request) {
+                        $query->whereMonth('arrival_date', $request->get('month'));
+                    });
+                }
+            })
             ->editColumn('date', function ($model) {
                 return $model->date->format('d/m/Y');
             })
