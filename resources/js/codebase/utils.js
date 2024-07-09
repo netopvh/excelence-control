@@ -157,4 +157,20 @@ function skeletonLoading (paragraph = 1, lines = 5, margin = 'mb-3') {
   return skeletonContainer
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, showErrors, clearErrors, getRoleName, skeletonLoading }
+function getTomorrowDate () {
+  // Crie uma nova data com a data atual
+  const today = new Date()
+
+  // Adicione um dia
+  today.setDate(today.getDate() + 1)
+
+  // Obtenha os componentes da data
+  const year = today.getFullYear()
+  const month = (today.getMonth() + 1).toString().padStart(2, '0') // O mês é base 0
+  const day = today.getDate().toString().padStart(2, '0')
+
+  // Formate a data no formato Y-m-d
+  return `${year}-${month}-${day}`
+}
+
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, showErrors, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }

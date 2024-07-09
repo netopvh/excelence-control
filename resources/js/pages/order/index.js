@@ -1,5 +1,5 @@
 import DataTable from 'datatables.net-bs5'
-import { getParameterByName, isValidURL } from '../../codebase/utils'
+import { getParameterByName, getTomorrowDate, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
@@ -126,6 +126,7 @@ class pageOrder {
 
     document.querySelector('#filterType').addEventListener('change', () => {
       if (document.getElementById('filterDate').value !== '') {
+        console.log('date')
         table.draw()
       }
     })
@@ -299,6 +300,7 @@ class pageOrder {
   static checkStatusOnUrl () {
     const status = getParameterByName('status')
     const step = getParameterByName('step')
+    const type = getParameterByName('type')
 
     if (status) {
       const statusElement = document.querySelector('#filterByStatus')
@@ -312,6 +314,15 @@ class pageOrder {
       stepElement.value = step
       const event = new Event('change')
       stepElement.dispatchEvent(event)
+    }
+
+    if (type) {
+      document.querySelector('#filterDate').value = getTomorrowDate()
+
+      const typeElement = document.getElementById('filterType')
+      typeElement.value = 'delivery_date'
+      const event = new Event('change')
+      typeElement.dispatchEvent(event)
     }
   }
 

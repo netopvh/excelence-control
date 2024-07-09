@@ -442,20 +442,12 @@ class pagePurchase {
   }
 
   static checkStatusOnUrl () {
-    const status = getParameterByName('status')
-    const step = getParameterByName('step')
-    if (status) {
+    const type = getParameterByName('type')
+    if (type) {
       const statusElement = document.querySelector('#filterByStatus')
-      statusElement.value = status
+      statusElement.value = 'Y'
       const event = new Event('change')
       statusElement.dispatchEvent(event)
-    }
-
-    if (step) {
-      const stepElement = document.querySelector('#filterByStep')
-      stepElement.value = step
-      const event = new Event('change')
-      stepElement.dispatchEvent(event)
     }
   }
 

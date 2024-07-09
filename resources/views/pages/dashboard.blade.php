@@ -73,7 +73,8 @@
                 </a>
             </div>
             <div class="col-12 col-xl-3">
-                <a class="block block-rounded block-link-rotate text-end" href="{{ route('dashboard.order.index') }}">
+                <a class="block block-rounded block-link-rotate text-end"
+                    href="{{ route('dashboard.order.index', ['type' => 'late']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
                         <div class="d-none d-sm-block">
                             <i class="fa fa-file-excel fa-2x text-danger"></i>
@@ -86,7 +87,8 @@
                 </a>
             </div>
             <div class="col-12 col-xl-3">
-                <a class="block block-rounded block-link-rotate text-end" href="{{ route('dashboard.purchase.index') }}">
+                <a class="block block-rounded block-link-rotate text-end"
+                    href="{{ route('dashboard.purchase.index', ['type' => 'late']) }}">
                     <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
                         <div class="d-none d-sm-block">
                             <i class="fa fa-cart-arrow-down fa-2x text-danger"></i>
