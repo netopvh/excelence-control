@@ -59,6 +59,45 @@
                     </div>
                 </a>
             </div>
+            <div class="col-12 col-xl-3">
+                <a class="block block-rounded block-link-rotate text-end" href="{{ route('dashboard.purchase.index') }}">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                        <div class="d-none d-sm-block">
+                            <i class="fa fa-cart-shopping fa-2x text-info"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold">{{ $itemsToBuy }}</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Itens para Compra</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-xl-3">
+                <a class="block block-rounded block-link-rotate text-end" href="{{ route('dashboard.order.index') }}">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                        <div class="d-none d-sm-block">
+                            <i class="fa fa-file-excel fa-2x text-danger"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold">{{ $lateOrders }}</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Pedidos Atrasados</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-12 col-xl-3">
+                <a class="block block-rounded block-link-rotate text-end" href="{{ route('dashboard.purchase.index') }}">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                        <div class="d-none d-sm-block">
+                            <i class="fa fa-cart-arrow-down fa-2x text-danger"></i>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-3 fw-semibold">{{ $lateProducts }}</div>
+                            <div class="fs-sm fw-semibold text-uppercase text-muted">Produtos Atrasados</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
         <div class="row">
             <div class="col-12">

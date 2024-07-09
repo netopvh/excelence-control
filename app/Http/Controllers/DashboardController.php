@@ -49,7 +49,41 @@ class DashboardController extends Controller
             ->where('step', MovementType::Pickup())
             ->count();
 
-        return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt', 'stepInDesign', 'stepInProduction', 'stepFinished', 'stepShipped', 'stepPickup'));
+        $orderItems = Order::query()
+            ->with(['orderProducts' => function ($query) {
+                $query->whereIn('in_stock', ['no', 'partial'])
+                    ->where('was_bought', 'N');
+            }])
+            ->whereHas('orderProducts', function ($query) {
+                $query->whereIn('in_stock', ['no', 'partial'])
+                    ->where('was_bought', 'N');
+            })
+            ->get();
+
+        $itemsToBuy = $orderItems->reduce(function ($carry, $order) {
+            return $carry + $order->orderProducts->count();
+        }, 0);
+
+        $lateOrders = Order::query()
+            ->whereDate('delivery_date', Carbon::tomorrow()->format('Y-m-d'))->count();
+
+        $lateProducts = Order::query()
+            ->with(['orderProducts' => function ($query) {
+                $query->whereIn('in_stock', ['no', 'partial'])
+                    ->where('was_bought', 'Y')
+                    ->whereDate('arrival_date', Carbon::tomorrow()->format('Y-m-d'));
+            }])
+            ->whereHas('orderProducts', function ($query) {
+                $query->whereIn('in_stock', ['no', 'partial'])
+                    ->where('was_bought', 'Y')
+                    ->whereDate('arrival_date', Carbon::tomorrow()->format('Y-m-d'));
+            })
+            ->get()
+            ->reduce(function ($carry, $order) {
+                return $carry + $order->orderProducts->count();
+            }, 0);
+
+        return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt', 'stepInDesign', 'stepInProduction', 'stepFinished', 'stepShipped', 'stepPickup', 'itemsToBuy', 'lateOrders', 'lateProducts'));
     }
 
     public function chartJson(Request $request)
