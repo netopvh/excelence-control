@@ -50,6 +50,8 @@ Route::prefix('order')->group(function () {
     Route::post('/{id}/store', [OrderController::class, 'updateStatusAndStep']);
     Route::post('/{id}/info', [OrderController::class, 'updateInfo']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
+
+    Route::post('/{id}/design', [OrderController::class, 'uploadDesign']);
 });
 
 Route::prefix('purchase')->group(function () {

@@ -7,6 +7,7 @@ import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import 'datatables.net-responsive-bs5'
 import { isValidURL } from '../../codebase/utils'
 import Button from '../../codebase/components/button'
+import Swal from 'sweetalert2'
 
 class pageShowOrder {
   static productsModal = null
@@ -61,40 +62,43 @@ class pageShowOrder {
             btnUpload.setAttribute('disabled', 'disabled')
           }
 
-          const response = await post(`/dashboard/order/${orderId}/upload/design`, new FormData(this), {
+          const response = await post(`/api/order/${orderId}/design`, new FormData(this), {
             'Content-Type': 'multipart/form-data'
           })
 
           loadingDesign.classList.add('d-none')
 
-          document.getElementById('upload-design').classList.add('d-none')
-          const fileContainer = document.getElementById('design-container')
-          fileContainer.innerHTML = ''
-          fileContainer.innerHTML = `
-          <div class="mt-5">
-              <a href="${response.fileUrl}"
-                  target="_blank" class="btn btn-primary">
-                  <i class="fa fa-fw fa-download text-white me-1"></i>
-                  <span class="d-sm-inline">Baixar Arquivo</span>
-              </a>
-              <form
-                  action="/dashboard/order/${orderId}/remove/design"
-                  method="POST" class="mt-3">
-                  <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
-                  <button type="submit" class="btn btn-danger"><i
-                          class="fa fa-fw fa-trash"></i>Excluir Arquivo</button>
-              </form>
-          </div>
-           <div class="preview-images mt-4">
-              ${response.previewFiles.map(file => `<img src="${file}" alt="Pré-visualização" class="img-fluid max-w-25" />`).join('')}
-          </div>
-          `
+          // document.getElementById('upload-design').classList.add('d-none')
+          // const fileContainer = document.getElementById('design-container')
+          // fileContainer.innerHTML = ''
+          // fileContainer.innerHTML = `
+          // <div class="mt-5">
+          //     <a href="${response.fileUrl}"
+          //         target="_blank" class="btn btn-primary">
+          //         <i class="fa fa-fw fa-download text-white me-1"></i>
+          //         <span class="d-sm-inline">Baixar Arquivo</span>
+          //     </a>
+          //     <form
+          //         action="/dashboard/order/${orderId}/remove/design"
+          //         method="POST" class="mt-3">
+          //         <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+          //         <button type="submit" class="btn btn-danger"><i
+          //                 class="fa fa-fw fa-trash"></i>Excluir Arquivo</button>
+          //     </form>
+          // </div>
+          //  <div class="preview-images mt-4">
+          //     ${response.previewFiles.map(file => `<img src="${file}" alt="Pré-visualização" class="img-fluid max-w-25" />`).join('')}
+          // </div>
+          // `
 
-          Helpers.run('jq-alert', {
+          Swal.fire({
             icon: 'success',
-            title: response.message,
-            showConfirmButton: true,
-            timer: 1500
+            title: 'Arquivo enviado com sucesso',
+            showConfirmButton: true
+          }).then((res) => {
+            if (res.isConfirmed) {
+              window.location.reload()
+            }
           })
         } catch (err) {
         // Oculta o indicador de carregamento em caso de erro

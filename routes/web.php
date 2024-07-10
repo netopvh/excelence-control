@@ -63,7 +63,6 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
         Route::post('/{id}/update/arrived', [OrderController::class, 'updateArrived'])->name('update.arrived');
         Route::post('/{id}/update/step', [OrderController::class, 'updateStep'])->name('update.step');
         Route::post('/{id}/upload/preview', [OrderController::class, 'uploadPreview'])->name('upload.preview');
-        Route::post('/{id}/upload/design', [OrderController::class, 'uploadDesign'])->name('upload.design');
         Route::post('/{id}/remove/design', [OrderController::class, 'removeDesign'])->name('remove.design');
     });
 

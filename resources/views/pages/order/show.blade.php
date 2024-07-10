@@ -170,15 +170,26 @@
                                 <div class="row mb-4">
                                     @foreach ($order->orderProducts as $item)
                                         @php
-                                            $colSize = max(12 / $order->orderProducts->count(), 3);
+                                            $colSize =
+                                                $order->orderProducts->count() == 1
+                                                    ? 6
+                                                    : max(12 / $order->orderProducts->count(), 3);
                                         @endphp
                                         <div class="col-12 col-md-{{ $colSize }}">
                                             <div class="card mb-3">
                                                 <div class="card-body text-center">
                                                     <h5 class="card-title">{{ $item->product->name }}</h5>
+                                                    <x-loading />
                                                     @if ($item->preview)
-                                                        <img src="{{ $item->preview }}" alt=""
-                                                            class="img-fluid">
+                                                        @foreach ($item->preview as $file)
+                                                            <div class="preview-image">
+                                                                <img src="{{ asset($file) }}" alt="Pré-visualização"
+                                                                    class="max-w-25 img-fluid">
+                                                            </div>
+                                                        @endforeach
+                                                    @elseif(!is_null($item->design_file) && count($item->preview) == 0)
+                                                        <img src="{{ asset('design/' . $item->design_file) }}"
+                                                            alt="Pré-visualização" class="img-fluid" />
                                                     @else
                                                         <img src="{{ asset('media/photos/noimage.jpg') }}"
                                                             alt="Pré-visualização" class="img-fluid" />
@@ -186,16 +197,22 @@
                                                     @if (is_null($item->design_file))
                                                         <form
                                                             action="{{ route('dashboard.order.upload.design', $order->id) }}"
-                                                            method="POST" enctype="multipart/form-data">
-                                                            @csrf
+                                                            method="POST" enctype="multipart/form-data"
+                                                            id="upload-design">
+                                                            <input type="hidden" name="order_product_id"
+                                                                value="{{ $item->id }}">
                                                             <div class="mb-3">
-                                                                <input type="file" name="design_file"
+                                                                <input type="file" name="design"
                                                                     class="form-control">
                                                             </div>
-                                                            <button type="submit" class="btn btn-primary">Upload</button>
+                                                            <button type="submit" class="btn btn-primary"
+                                                                id="btn-upload">Enviar
+                                                                Arquivo</button>
                                                         </form>
                                                     @else
-                                                        <a href="#" class="btn btn-success">Download Design File</a>
+                                                        <a href="{{ asset('design/' . $item->design_file) }}"
+                                                            class="btn btn-success mt-2" target="_blank">Baixar
+                                                            Arquivo</a>
                                                     @endif
                                                 </div>
                                             </div>

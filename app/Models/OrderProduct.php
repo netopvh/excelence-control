@@ -76,4 +76,9 @@ class OrderProduct extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function getPreviewAttribute($value)
+    {
+        return json_decode($value, true);
+    }
 }

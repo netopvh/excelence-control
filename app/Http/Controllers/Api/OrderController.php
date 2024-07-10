@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DataTables\OrderDataTableEditor;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
+use Imagick;
 
 class OrderController extends Controller
 {
@@ -29,6 +29,33 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
         ]);
+    }
+
+    public function uploadDesign(Request $request, $id)
+    {
+        $this->validateDesign($request);
+
+        [$order, $orderProduct] = $this->getOrderAndOrderProduct($id, $request->get('order_product_id'));
+
+        $fileName = $this->uploadFile($request->file('design'));
+
+        $previewFiles = $this->generatePreviewsIfNeeded($fileName);
+
+        $this->updateOrderProduct($orderProduct, $fileName, $previewFiles);
+
+        return response()->json(['success' => true, 'message' => 'Upload realizado com sucesso.']);
+    }
+
+    public function removeDesign($id)
+    {
+        $order = Order::query()->findOrFail($id);
+
+        $order->update([
+            'design_file' => null,
+            'preview' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Design removido com sucesso!');
     }
 
     public function productsOrder(Request $request, $orderId)
@@ -86,8 +113,77 @@ class OrderController extends Controller
         ]);
     }
 
-    private function checkStringIsLink($string)
+    private function validateDesign(Request $request)
     {
-        return filter_var($string, FILTER_VALIDATE_URL) !== false;
+        $request->validate([
+            'design' => 'required|mimes:pdf,png,jpg,webp|max:10000',
+        ], [
+            'design.required' => 'O campo arquivo é obrigatório.',
+            'design.mimes' => 'O tipo de arquivo enviado deve ser PDF, PNG, JPG ou WEBP.',
+            'design.max' => 'O campo arquivo deve ter no máximo 10MB.',
+        ]);
+    }
+
+    private function getOrderAndOrderProduct($orderId, $orderProductId)
+    {
+        $order = Order::query()->findOrFail($orderId);
+        $orderProduct = $order->orderProducts()->where('id', $orderProductId)->firstOrFail();
+        return [$order, $orderProduct];
+    }
+
+    private function uploadFile($file)
+    {
+        $fileName = time() . '.' . $file->extension();
+        $file->storeAs('', $fileName, ['disk' => 'design']);
+        return $fileName;
+    }
+
+    private function generatePreviewsIfNeeded($fileName)
+    {
+        $storagePath = storage_path('app/design/' . $fileName);
+        $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
+        $outputPath = storage_path('app/preview/' . $outputDir);
+
+        if (!file_exists($outputPath)) {
+            mkdir($outputPath, 0777, true);
+        }
+
+        if (pathinfo($fileName, PATHINFO_EXTENSION) === 'pdf') {
+            return $this->generatePdfPreviews($storagePath, $outputPath, $outputDir);
+        }
+
+        return [];
+    }
+
+    private function generatePdfPreviews($storagePath, $outputPath, $outputDir)
+    {
+        try {
+            $imagick = new Imagick();
+            $imagick->readImage($storagePath);
+
+            $previewFiles = [];
+            foreach ($imagick as $index => $page) {
+                $page->setResolution(300, 300);
+                $page->setImageFormat('jpeg');
+                $outputFile = $outputPath . "/page-" . ($index + 1) . ".jpg";
+                $page->writeImage($outputFile);
+                $previewFiles[] = 'preview/' . $outputDir . '/page-' . ($index + 1) . '.jpg';
+            }
+
+            $imagick->clear();
+            $imagick->destroy();
+
+            return $previewFiles;
+        } catch (\Exception $e) {
+            throw new \Exception('Erro ao converter o PDF: ' . $e->getMessage());
+        }
+    }
+
+    private function updateOrderProduct($orderProduct, $fileName, $previewFiles)
+    {
+        $orderProduct->update([
+            'design_file' => $fileName,
+            'preview' => json_encode($previewFiles)
+        ]);
     }
 }
