@@ -1,5 +1,5 @@
 import { Modal } from 'bootstrap'
-import { post } from '../../codebase/api'
+import { post, delete as del } from '../../codebase/api'
 import Helpers from '../../codebase/modules/helpers'
 
 import DataTable from 'datatables.net-bs5'
@@ -119,6 +119,32 @@ class pageShowOrder {
           </div>
         `
         }
+      })
+    }
+
+    const btnDeleteDesign = document.getElementById('btn-delete-design')
+    if (btnDeleteDesign) {
+      btnDeleteDesign.addEventListener('click', async function () {
+        const productId = this.dataset.id
+
+        Swal.fire({
+          icon: 'question',
+          title: 'Tem certeza que deseja excluir o arquivo de design?',
+          showConfirmButton: true,
+          showCancelButton: true,
+          confirmButtonText: 'Sim, excluir!',
+          cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            console.log(productId)
+            console.log(orderId)
+            const res = await post(`/api/order/${orderId}/design/${productId}`)
+
+            if (res.success) {
+              window.location.reload()
+            }
+          }
+        })
       })
     }
 

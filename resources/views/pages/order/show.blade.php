@@ -208,9 +208,15 @@
                                                                 Arquivo</button>
                                                         </form>
                                                     @else
-                                                        <a href="{{ asset('design/' . $item->design_file) }}"
-                                                            class="btn btn-success mt-2" target="_blank">Baixar
-                                                            Arquivo</a>
+                                                        <div class="btn-group">
+                                                            <a href="{{ asset('design/' . $item->design_file) }}"
+                                                                class="btn btn-success mt-2" target="_blank">Baixar
+                                                                Arquivo</a>
+                                                            <a href="javascript:void(0)" data-id="{{ $item->id }}"
+                                                                class="btn btn-danger btn-delete mt-2"
+                                                                id="btn-delete-design">Excluir
+                                                                Arquivo</a>
+                                                        </div>
                                                     @endif
                                                 </div>
                                             </div>

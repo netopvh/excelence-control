@@ -52,6 +52,7 @@ Route::prefix('order')->group(function () {
     Route::delete('/{id}', [OrderController::class, 'destroy']);
 
     Route::post('/{id}/design', [OrderController::class, 'uploadDesign']);
+    Route::post('/{id}/design/{productId}', [OrderController::class, 'removeDesign']);
 });
 
 Route::prefix('purchase')->group(function () {

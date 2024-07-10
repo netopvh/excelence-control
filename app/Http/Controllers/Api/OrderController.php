@@ -46,16 +46,21 @@ class OrderController extends Controller
         return response()->json(['success' => true, 'message' => 'Upload realizado com sucesso.']);
     }
 
-    public function removeDesign($id)
+    public function removeDesign($id, $productId)
     {
         $order = Order::query()->findOrFail($id);
+        $orderProduct = $order->orderProducts()->where('id', $productId)->firstOrFail();
 
-        $order->update([
+        $this->removeFile($orderProduct->design_file);
+
+        $this->removePreviews($orderProduct->preview);
+
+        $orderProduct->update([
             'design_file' => null,
             'preview' => null
         ]);
 
-        return redirect()->back()->with('success', 'Design removido com sucesso!');
+        return response()->json(['success' => true, 'message' => 'Upload removido com sucesso.']);
     }
 
     public function productsOrder(Request $request, $orderId)
@@ -185,5 +190,23 @@ class OrderController extends Controller
             'design_file' => $fileName,
             'preview' => json_encode($previewFiles)
         ]);
+    }
+
+    private function removeFile($fileName)
+    {
+        if (file_exists(storage_path('app/design/' . $fileName))) {
+            unlink(storage_path('app/design/' . $fileName));
+        }
+    }
+
+    private function removePreviews($previewFiles)
+    {
+        if (count($previewFiles) > 0) {
+            foreach ($previewFiles as $previewFile) {
+                if (file_exists(storage_path('app/preview/' . $previewFile))) {
+                    unlink(storage_path('app/preview/' . $previewFile));
+                }
+            }
+        }
     }
 }
