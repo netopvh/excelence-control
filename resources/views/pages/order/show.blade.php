@@ -195,9 +195,7 @@
                                                             alt="Pré-visualização" class="img-fluid" />
                                                     @endif
                                                     @if (is_null($item->design_file))
-                                                        <form
-                                                            action="{{ route('dashboard.order.upload.design', $order->id) }}"
-                                                            method="POST" enctype="multipart/form-data"
+                                                        <form action="" method="POST" enctype="multipart/form-data"
                                                             id="upload-design">
                                                             <input type="hidden" name="order_product_id"
                                                                 value="{{ $item->id }}">
