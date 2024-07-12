@@ -188,7 +188,7 @@
                                                             </div>
                                                         @endforeach
                                                     @elseif(!is_null($item->design_file) && count($item->preview) == 0)
-                                                        <img src="{{ Storage::disk('s3')->url('design/' . $item->design_file) }}"
+                                                        <img src="{{ Storage::disk('s3')->url($item->design_file) }}"
                                                             alt="Pré-visualização" class="img-fluid" />
                                                     @else
                                                         <img src="{{ asset('media/photos/noimage.jpg') }}"
