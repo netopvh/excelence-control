@@ -178,6 +178,7 @@ class OrderController extends Controller
 
         // Baixar o arquivo do S3 para o caminho temporário local
         Storage::disk('s3')->get($s3FilePath, function ($contents) use ($tempPath) {
+            Log::info($tempPath);
             file_put_contents($tempPath, $contents);
         });
 
