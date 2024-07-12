@@ -176,11 +176,6 @@ class OrderController extends Controller
             mkdir(storage_path('app/temp'), 0777, true);
         }
 
-        // Baixar o arquivo do S3 para o caminho temporário local
-        // Storage::disk('s3')->get($s3FilePath, function ($contents) use ($tempPath) {
-        //     file_put_contents($tempPath, $contents);
-        // });
-
         Storage::disk('temp')->put($s3FilePath, Storage::disk('s3')->get($s3FilePath));
 
         $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
@@ -221,6 +216,9 @@ class OrderController extends Controller
 
                 // Delete o arquivo local temporário
                 unlink($localOutputFile);
+                if (is_dir($outputPath)) {
+                    rmdir($outputPath);
+                }
             }
 
             $imagick->clear();
