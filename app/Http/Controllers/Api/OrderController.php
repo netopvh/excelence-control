@@ -181,7 +181,7 @@ class OrderController extends Controller
         //     file_put_contents($tempPath, $contents);
         // });
 
-        Storage::disk('design')->put($s3FilePath, Storage::disk('s3')->get($s3FilePath));
+        Storage::disk('temp')->put($s3FilePath, Storage::disk('s3')->get($s3FilePath));
 
         $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
         $outputPath = storage_path('app/temp/preview/' . $outputDir);
