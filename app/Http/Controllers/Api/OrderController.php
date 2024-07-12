@@ -176,11 +176,12 @@ class OrderController extends Controller
             mkdir(storage_path('app/temp'), 0777, true);
         }
 
-        Log::info($tempPath);
         // Baixar o arquivo do S3 para o caminho temporário local
-        Storage::disk('s3')->get($s3FilePath, function ($contents) use ($tempPath) {
-            file_put_contents($tempPath, $contents);
-        });
+        // Storage::disk('s3')->get($s3FilePath, function ($contents) use ($tempPath) {
+        //     file_put_contents($tempPath, $contents);
+        // });
+
+        Storage::disk('design')->put($s3FilePath, Storage::disk('s3')->get($s3FilePath));
 
         $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
         $outputPath = storage_path('app/temp/preview/' . $outputDir);
