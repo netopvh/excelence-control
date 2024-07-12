@@ -183,12 +183,12 @@
                                                     @if ($item->preview)
                                                         @foreach ($item->preview as $file)
                                                             <div class="preview-image">
-                                                                <img src="{{ asset($file) }}" alt="Pré-visualização"
-                                                                    class="max-w-25 img-fluid">
+                                                                <img src="{{ Storage::disk('s3')->url($file) }}"
+                                                                    alt="Pré-visualização" class="max-w-25 img-fluid">
                                                             </div>
                                                         @endforeach
                                                     @elseif(!is_null($item->design_file) && count($item->preview) == 0)
-                                                        <img src="{{ asset('design/' . $item->design_file) }}"
+                                                        <img src="{{ Storage::disk('s3')->url('design/' . $item->design_file) }}"
                                                             alt="Pré-visualização" class="img-fluid" />
                                                     @else
                                                         <img src="{{ asset('media/photos/noimage.jpg') }}"
@@ -209,7 +209,7 @@
                                                         </form>
                                                     @else
                                                         <div class="btn-group">
-                                                            <a href="{{ asset('design/' . $item->design_file) }}"
+                                                            <a href="{{ Storage::disk('s3')->url($item->design_file) }}"
                                                                 class="btn btn-success mt-2" target="_blank">Baixar
                                                                 Arquivo</a>
                                                             <a href="javascript:void(0)" data-id="{{ $item->id }}"

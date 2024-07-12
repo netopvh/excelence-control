@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Imagick;
 
@@ -139,47 +140,97 @@ class OrderController extends Controller
     private function uploadFile($file)
     {
         $fileName = time() . '.' . $file->extension();
-        $file->storeAs('', $fileName, ['disk' => 'design']);
-        return $fileName;
+        $filePath = 'design/' . $fileName;
+
+        // $file->storeAs('', $fileName, ['disk' => 'design']);
+        Storage::disk('s3')->put($filePath, file_get_contents($file), 'public');
+        return $filePath;
     }
 
+    // private function generatePreviewsIfNeeded($fileName)
+    // {
+    //     $storagePath = storage_path('app/design/' . $fileName);
+    //     $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
+    //     $outputPath = storage_path('app/preview/' . $outputDir);
+
+    //     if (!file_exists($outputPath)) {
+    //         mkdir($outputPath, 0777, true);
+    //     }
+
+    //     if (pathinfo($fileName, PATHINFO_EXTENSION) === 'pdf') {
+    //         return $this->generatePdfPreviews($storagePath, $outputPath, $outputDir);
+    //     }
+
+    //     return [];
+    // }
     private function generatePreviewsIfNeeded($fileName)
     {
-        $storagePath = storage_path('app/design/' . $fileName);
+        // Caminho do arquivo no S3
+        $s3FilePath = $fileName;
+
+        // Caminho temporário local
+        $tempPath = storage_path('app/temp/' . $fileName);
+
+        // Baixar o arquivo do S3 para o caminho temporário local
+        if (!file_exists(storage_path('app/temp'))) {
+            mkdir(storage_path('app/temp'), 0777, true);
+        }
+
+        // Baixar o arquivo do S3 para o caminho temporário local
+        Storage::disk('s3')->get($s3FilePath, file_put_contents($tempPath, Storage::disk('s3')->get($s3FilePath)));
+
         $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
-        $outputPath = storage_path('app/preview/' . $outputDir);
+        $outputPath = storage_path('app/temp/preview/' . $outputDir);
 
         if (!file_exists($outputPath)) {
             mkdir($outputPath, 0777, true);
         }
 
         if (pathinfo($fileName, PATHINFO_EXTENSION) === 'pdf') {
-            return $this->generatePdfPreviews($storagePath, $outputPath, $outputDir);
+            return $this->generatePdfPreviews($tempPath, $outputPath, $outputDir);
         }
 
         return [];
     }
 
-    private function generatePdfPreviews($storagePath, $outputPath, $outputDir)
+
+    private function generatePdfPreviews($tempPath, $outputPath, $outputDir)
     {
         try {
             $imagick = new Imagick();
-            $imagick->readImage($storagePath);
+            $imagick->readImage($tempPath);
 
             $previewFiles = [];
             foreach ($imagick as $index => $page) {
                 $page->setResolution(300, 300);
                 $page->setImageFormat('jpeg');
-                $outputFile = $outputPath . "/page-" . ($index + 1) . ".jpg";
-                $page->writeImage($outputFile);
-                $previewFiles[] = 'preview/' . $outputDir . '/page-' . ($index + 1) . '.jpg';
+                // $outputFile = $outputPath . "/page-" . ($index + 1) . ".jpg";
+                $localOutputFile = $outputPath . "/page-" . ($index + 1) . ".jpg";
+
+                // Armazene o arquivo no caminho local temporário
+                $page->writeImage($localOutputFile);
+
+                // $previewFiles[] = 'preview/' . $outputDir . '/page-' . ($index + 1) . '.jpg';
+                $s3PreviewFile = 'preview/' . $outputDir . "/page-" . ($index + 1) . ".jpg";
+                Storage::disk('s3')->put($s3PreviewFile, file_get_contents($localOutputFile), 'public');
+                $previewFiles[] = $s3PreviewFile;
+
+                // Delete o arquivo local temporário
+                unlink($localOutputFile);
             }
 
             $imagick->clear();
             $imagick->destroy();
 
+            // Delete o arquivo PDF local temporário
+            unlink($tempPath);
+
             return $previewFiles;
         } catch (\Exception $e) {
+            // Certifique-se de deletar o arquivo PDF local temporário em caso de erro
+            if (file_exists($tempPath)) {
+                unlink($tempPath);
+            }
             throw new \Exception('Erro ao converter o PDF: ' . $e->getMessage());
         }
     }
@@ -194,17 +245,25 @@ class OrderController extends Controller
 
     private function removeFile($fileName)
     {
-        if (file_exists(storage_path('app/design/' . $fileName))) {
-            unlink(storage_path('app/design/' . $fileName));
-        }
+        // if (file_exists(storage_path('app/design/' . $fileName))) {
+        //     unlink(storage_path('app/design/' . $fileName));
+        // }
+        Storage::disk('s3')->delete($fileName);
     }
 
     private function removePreviews($previewFiles)
     {
-        if (count($previewFiles) > 0) {
+        // if (count($previewFiles) > 0) {
+        //     foreach ($previewFiles as $previewFile) {
+        //         if (file_exists(storage_path('app/preview/' . $previewFile))) {
+        //             unlink(storage_path('app/preview/' . $previewFile));
+        //         }
+        //     }
+        // }
+        if (!empty($previewFiles)) {
             foreach ($previewFiles as $previewFile) {
-                if (file_exists(storage_path('app/preview/' . $previewFile))) {
-                    unlink(storage_path('app/preview/' . $previewFile));
+                if (Storage::disk('s3')->exists($previewFile)) {
+                    Storage::disk('s3')->delete($previewFile);
                 }
             }
         }

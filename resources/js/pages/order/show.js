@@ -136,8 +136,6 @@ class pageShowOrder {
           cancelButtonText: 'Cancelar'
         }).then(async (result) => {
           if (result.isConfirmed) {
-            console.log(productId)
-            console.log(orderId)
             const res = await post(`/api/order/${orderId}/design/${productId}`)
 
             if (res.success) {
