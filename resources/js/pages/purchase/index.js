@@ -1,5 +1,5 @@
 import DataTable from 'datatables.net-bs5'
-import { convertDateTimeToISO, convertDateToISO, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
+import { convertDateToISO, convertToDatetimeLocal, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
@@ -463,7 +463,7 @@ class pagePurchase {
                       </div>
                       <div class="mb-3">
                         <label for="purchase_date" class="form-label">Data da Compra:</label>
-                        <input type="datetime-local" class="js-datepicker form-control" name="purchase_date" id="purchase_date" value="${res.data.purchase_date ? convertDateTimeToISO(res.data.purchase_date) : ''}" />
+                        <input type="datetime-local" class="js-datepicker form-control" name="purchase_date" id="purchase_date" value="${res.data.purchase_date ? convertToDatetimeLocal(res.data.purchase_date) : ''}" />
                       </div>
                       <div class="mb-3">
                         <label for="arrival_date" class="form-label">Previsão de Entrega:</label>

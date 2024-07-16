@@ -89,6 +89,19 @@ function convertDateTimeToISO (dateTimeString) {
   return formattedDate
 }
 
+function convertToDatetimeLocal (dateStr) {
+  // Dividir a string de data e hora
+  const [datePart, timePart] = dateStr.split(' ')
+
+  // Dividir a parte da data em dia, mês e ano
+  const [day, month, year] = datePart.split('/')
+
+  // Combinar no formato compatível com datetime-local
+  const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timePart}`
+
+  return formattedDate
+}
+
 function showSuccess (el, data) {
   const alertDiv = document.createElement('div')
   alertDiv.className = 'alert alert-success mx-4 alert-dismissible fade show'
@@ -200,4 +213,4 @@ function getTomorrowDate () {
   return `${year}-${month}-${day}`
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, convertToDatetimeLocal, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }
