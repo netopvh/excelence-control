@@ -70,6 +70,33 @@ function convertDateToISO (dateString) {
   return isoDateString
 }
 
+function convertDateTimeToISO (dateTimeString) {
+  // Create a new Date object from the API date string
+  const date = new Date(dateTimeString)
+
+  // Format components
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Months are 0-based
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  const milliseconds = String(date.getMilliseconds()).padStart(3, '0')
+
+  // Combine them into the required format: yyyy-MM-ddThh:mm:ss.SSS
+  const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`
+
+  return formattedDate
+}
+
+function showSuccess (el, data) {
+  const alertDiv = document.createElement('div')
+  alertDiv.className = 'alert alert-success mx-4 alert-dismissible fade show'
+  alertDiv.setAttribute('role', 'alert')
+  alertDiv.textContent = data.message
+  el.appendChild(alertDiv)
+}
+
 function showErrors (el, data) {
   // Remove qualquer conteúdo anterior do elemento
   el.innerHTML = ''
@@ -173,4 +200,4 @@ function getTomorrowDate () {
   return `${year}-${month}-${day}`
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, showErrors, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }

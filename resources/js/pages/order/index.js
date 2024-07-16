@@ -103,9 +103,9 @@ class pageOrder {
           searchable: false
         }
       ],
-      // language: {
-      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      // }
+      language: {
+        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      },
       drawCallback: function () {
         const api = this.api()
 
@@ -184,7 +184,8 @@ class pageOrder {
 
     table.on('draw', () => {
       detailRows.forEach((id) => {
-        document.querySelector(`#${id} td.dt-control`).click()
+        const escapedId = id.replace(/^(\d)/, '\\3$1 ')
+        document.querySelectorAll(`#${escapedId} td.dt-control`).forEach(element => element.click())
       })
     })
 
@@ -201,9 +202,15 @@ class pageOrder {
           icon: 'info',
           title: 'Detalhes do item',
           html: `
-          <strong>Status</strong>: ${res.data.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '-'} <br><br>
-          <strong>Previsão de Entrega</strong>: ${res.data.arrival_date ? res.data.arrival_date : '-'}
-          `
+    <strong>Status</strong>: ${res.data.in_stock === 'yes' ? '-' : res.data.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '<span class="badge bg-warning">Não Comprado</span>'} <br><br>
+        ${res.data.was_bought === 'Y'
+            ? `
+                  <strong>Data da Compra</strong>: ${res.data.purchase_date ? res.data.purchase_date : '-'} <br><br>
+                  <strong>Previsão de Entrega</strong>: ${res.data.arrival_date ? res.data.arrival_date : '-'} <br><br>
+                  <strong>Produto Chegou?</strong>: ${res.data.arrived === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}
+                `
+            : ''}
+              `
         })
         return
       }
@@ -243,12 +250,6 @@ class pageOrder {
                 </select>
               </div>
               <div class="mb-3">
-                <label for="status" class="form-label">Status:</label>
-                <select name="status" class="form-control">
-                  ${Object.keys(statusOptions).map((key) => `<option value="${key}" ${key === rowData.status ? 'selected' : ''}>${statusOptions[key]}</option>`)}
-                </select>
-              </div>
-              <div class="mb-3">
                 <label for="employee_id" class="form-label">Vendedor:</label>
                 <select name="employee_id" class="form-control" id="employee_id">
                   ${employeeOptions.map((employee) => `<option value="${employee.id}" ${employee.id === rowData.employee_id ? 'selected' : ''}>${employee.name}</option>`)}
@@ -279,7 +280,6 @@ class pageOrder {
 
             const data = {
               step: form.querySelector('select[name="step"]').value,
-              status: form.querySelector('select[name="status"]').value,
               employee_id: form.querySelector('select[name="employee_id"]').value
             }
 

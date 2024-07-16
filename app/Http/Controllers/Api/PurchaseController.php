@@ -138,6 +138,7 @@ class PurchaseController extends Controller
         $order->orderProducts()->where('id', $productId)->update([
             'arrived' => $request->arrived,
             'arrival_date' => $request->arrival_date,
+            'purchase_date' => $request->purchase_date,
             'was_bought' => $request->was_bought,
         ]);
 

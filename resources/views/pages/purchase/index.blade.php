@@ -129,7 +129,7 @@
             <div class="modal-content">
                 <div class="block block-rounded shadow-none mb-0">
                     <div class="block-header block-header-default">
-                        <h3 class="block-title">Alterar Produtos</h3>
+                        <h3 class="block-title">Alterar produtos do pedido</h3>
                     </div>
                     <div class="block-content">
                     </div>

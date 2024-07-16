@@ -179,6 +179,15 @@
                                             <div class="card mb-3">
                                                 <div class="card-body text-center">
                                                     <h5 class="card-title">{{ $item->product->name }}</h5>
+                                                    <div>
+                                                        @if ($item->status == \App\Enums\StatusType::WaitingDesign())
+                                                            <span class="badge bg-info">Aguardando Arte</span>
+                                                        @elseif($item->status == \App\Enums\StatusType::WaitingApproval())
+                                                            <span class="badge bg-warning">Aguardando Aprovação</span>
+                                                        @elseif($item->status == \App\Enums\StatusType::Approved())
+                                                            <span class="badge bg-success">Aprovado</span>
+                                                        @endif
+                                                    </div>
                                                     <x-loading />
                                                     @if ($item->preview)
                                                         @foreach ($item->preview as $file)

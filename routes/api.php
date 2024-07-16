@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\RoleController;
@@ -63,4 +64,8 @@ Route::prefix('purchase')->group(function () {
     Route::get('/{id}/items', [PurchaseController::class, 'orderItems']);
     Route::post('/{id}/product/{productId}', [PurchaseController::class, 'updateProductInfo']);
     Route::get('/{id}/product/{productId}/show', [PurchaseController::class, 'showProductInfo']);
+});
+
+Route::prefix('import')->group(function () {
+    Route::post('/product', [ImportController::class, 'importProducts']);
 });

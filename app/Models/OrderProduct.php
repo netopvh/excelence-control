@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -56,6 +57,7 @@ class OrderProduct extends Model
         'link',
         'obs',
         'arrival_date',
+        'purchase_date',
         'arrived',
         'was_bought',
         'status',
@@ -65,6 +67,7 @@ class OrderProduct extends Model
 
     public $casts = [
         'arrival_date' => 'datetime',
+        'purchase_date' => 'datetime',
     ];
 
     public function order()

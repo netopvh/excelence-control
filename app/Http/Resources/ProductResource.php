@@ -18,6 +18,7 @@ class ProductResource extends JsonResource
             'id' => $this->id,
             'arrived' => $this->arrived,
             'arrival_date' => $this->arrival_date ? $this->arrival_date->format('d/m/Y') : null,
+            'purchase_date' => $this->purchase_date ? $this->purchase_date->format('d/m/Y H:i') : null,
             'in_stock' => $this->in_stock,
             'was_bought' => $this->was_bought,
         ];

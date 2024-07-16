@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\StatusType;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -58,7 +59,8 @@ class OrderController extends Controller
 
         $orderProduct->update([
             'design_file' => null,
-            'preview' => null
+            'preview' => null,
+            'status' => StatusType::WaitingDesign(),
         ]);
 
         return response()->json(['success' => true, 'message' => 'Upload removido com sucesso.']);
@@ -92,7 +94,6 @@ class OrderController extends Controller
     public function updateStatusAndStep(Request $request, $id)
     {
         $order = Order::query()->findOrFail($id);
-        $order->status = $request->status;
         $order->step = $request->step;
         $order->employee_id = $request->employee_id;
         $order->save();
@@ -142,27 +143,10 @@ class OrderController extends Controller
         $fileName = time() . '.' . $file->extension();
         $filePath = 'design/' . $fileName;
 
-        // $file->storeAs('', $fileName, ['disk' => 'design']);
         Storage::disk('s3')->put($filePath, file_get_contents($file), 'public');
         return $filePath;
     }
 
-    // private function generatePreviewsIfNeeded($fileName)
-    // {
-    //     $storagePath = storage_path('app/design/' . $fileName);
-    //     $outputDir = pathinfo($fileName, PATHINFO_FILENAME);
-    //     $outputPath = storage_path('app/preview/' . $outputDir);
-
-    //     if (!file_exists($outputPath)) {
-    //         mkdir($outputPath, 0777, true);
-    //     }
-
-    //     if (pathinfo($fileName, PATHINFO_EXTENSION) === 'pdf') {
-    //         return $this->generatePdfPreviews($storagePath, $outputPath, $outputDir);
-    //     }
-
-    //     return [];
-    // }
     private function generatePreviewsIfNeeded($fileName)
     {
         // Caminho do arquivo no S3
@@ -241,27 +225,18 @@ class OrderController extends Controller
     {
         $orderProduct->update([
             'design_file' => $fileName,
-            'preview' => json_encode($previewFiles)
+            'preview' => json_encode($previewFiles),
+            'status' => StatusType::Approved()
         ]);
     }
 
     private function removeFile($fileName)
     {
-        // if (file_exists(storage_path('app/design/' . $fileName))) {
-        //     unlink(storage_path('app/design/' . $fileName));
-        // }
         Storage::disk('s3')->delete($fileName);
     }
 
     private function removePreviews($previewFiles)
     {
-        // if (count($previewFiles) > 0) {
-        //     foreach ($previewFiles as $previewFile) {
-        //         if (file_exists(storage_path('app/preview/' . $previewFile))) {
-        //             unlink(storage_path('app/preview/' . $previewFile));
-        //         }
-        //     }
-        // }
         if (!empty($previewFiles)) {
             foreach ($previewFiles as $previewFile) {
                 if (Storage::disk('s3')->exists($previewFile)) {

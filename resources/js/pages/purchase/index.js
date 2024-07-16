@@ -1,5 +1,5 @@
 import DataTable from 'datatables.net-bs5'
-import { convertDateToISO, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
+import { convertDateTimeToISO, convertDateToISO, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
@@ -456,20 +456,24 @@ class pagePurchase {
                     <input type="hidden" name="order_id" value="${orderId}" />
                       <input type="hidden" name="order_product_id" value="${productId}" />
                       <div class="mb-3">
-                        <label for="arrived" class="form-label">Chegou:</label>
-                        <select name="arrived" class="form-control" id="arrived">
-                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
-                        </select>
-                      </div>
-                      <div class="mb-3">
                         <label for="was_bought" class="form-label">Status do Item:</label>
                         <select name="was_bought" class="form-control" id="was_bought">
                           ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.was_bought ? 'selected' : ''}>${key === 'Y' ? 'Comprado' : 'Não Comprado'}</option>`)}
                         </select>
                       </div>
                       <div class="mb-3">
+                        <label for="purchase_date" class="form-label">Data da Compra:</label>
+                        <input type="datetime-local" class="js-datepicker form-control" name="purchase_date" id="purchase_date" value="${res.data.purchase_date ? convertDateTimeToISO(res.data.purchase_date) : ''}" />
+                      </div>
+                      <div class="mb-3">
                         <label for="arrival_date" class="form-label">Previsão de Entrega:</label>
                         <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${res.data.arrival_date ? convertDateToISO(res.data.arrival_date) : ''}" />
+                      </div>
+                      <div class="mb-3">
+                        <label for="arrived" class="form-label">Chegou:</label>
+                        <select name="arrived" class="form-control" id="arrived">
+                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
+                        </select>
                       </div>
                       <div class="d-flex gap-2 mb-4">
                         <div class="col-12 col-md-6" id="btn-submit-container">
@@ -498,6 +502,7 @@ class pagePurchase {
             const data = {
               arrived: form.querySelector('select[name="arrived"]').value,
               arrival_date: form.querySelector('input[name="arrival_date"]').value,
+              purchase_date: form.querySelector('input[name="purchase_date"]').value,
               was_bought: form.querySelector('select[name="was_bought"]').value
             }
 

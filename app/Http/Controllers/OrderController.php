@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Imagick;
-use Spatie\PdfToImage\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
