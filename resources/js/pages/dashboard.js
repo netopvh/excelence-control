@@ -4,6 +4,7 @@ import LoadingSpinner from '../codebase/components/loading'
 class pageDashboard {
   static async initCards () {
     const containerCardLate = document.getElementById('container-card-late')
+    const containerCardProductLate = document.getElementById('container-card-product-late')
     const containerApproved = document.getElementById('container-approved')
     const containerWaiting = document.getElementById('container-waiting')
     const containerCancelled = document.getElementById('container-design')
@@ -30,22 +31,27 @@ class pageDashboard {
         containerLate.innerHTML = res.data.lateOrders
         containerLateProducts.innerHTML = res.data.lateProducts
 
-        if (res.data.lateOrders > 0) {
-          let isWarning = false
-          setInterval(() => {
-            if (isWarning) {
-              containerCardLate.classList.remove('bg-warning')
-            } else {
-              containerCardLate.classList.add('bg-warning')
-            }
-            isWarning = !isWarning
-          }, 400)
-        } else {
-          containerCardLate.classList.remove('bg-warning')
-        }
+        this.blinkCard(containerCardLate, res.data.lateOrders)
+        this.blinkCard(containerCardProductLate, res.data.lateProducts)
       }
     } catch (error) {
       console.error('Erro ao obter dados do endpoint:', error)
+    }
+  }
+
+  static blinkCard (element, counter) {
+    if (counter > 0) {
+      let isWarning = false
+      setInterval(() => {
+        if (isWarning) {
+          element.classList.remove('bg-warning')
+        } else {
+          element.classList.add('bg-warning')
+        }
+        isWarning = !isWarning
+      }, 400)
+    } else {
+      element.classList.remove('bg-warning')
     }
   }
 
