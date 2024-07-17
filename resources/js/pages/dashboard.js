@@ -1,6 +1,54 @@
 import { get } from '../codebase/api'
+import LoadingSpinner from '../codebase/components/loading'
 
 class pageDashboard {
+  static async initCards () {
+    const containerCardLate = document.getElementById('container-card-late')
+    const containerApproved = document.getElementById('container-approved')
+    const containerWaiting = document.getElementById('container-waiting')
+    const containerCancelled = document.getElementById('container-design')
+    const containerToBuy = document.getElementById('container-to-buy')
+    const containerLate = document.getElementById('container-late')
+    const containerLateProducts = document.getElementById('container-late-products')
+    const loading = new LoadingSpinner(24, '#000000')
+
+    containerApproved.appendChild(loading.render())
+    containerWaiting.appendChild(loading.render())
+    containerCancelled.appendChild(loading.render())
+    containerToBuy.appendChild(loading.render())
+    containerLate.appendChild(loading.render())
+    containerLateProducts.appendChild(loading.render())
+
+    try {
+      const res = await get('/api/dashboard')
+
+      if (res.success) {
+        containerApproved.innerHTML = res.data.approved
+        containerWaiting.innerHTML = res.data.waitingApproval
+        containerCancelled.innerHTML = res.data.waitingArt
+        containerToBuy.innerHTML = res.data.itemsToBuy
+        containerLate.innerHTML = res.data.lateOrders
+        containerLateProducts.innerHTML = res.data.lateProducts
+
+        if (res.data.lateOrders > 0) {
+          let isWarning = false
+          setInterval(() => {
+            if (isWarning) {
+              containerCardLate.classList.remove('bg-warning')
+            } else {
+              containerCardLate.classList.add('bg-warning')
+            }
+            isWarning = !isWarning
+          }, 400)
+        } else {
+          containerCardLate.classList.remove('bg-warning')
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao obter dados do endpoint:', error)
+    }
+  }
+
   static initCharts () {
     const ctx = document.getElementById('chartContainer')
 
@@ -37,6 +85,7 @@ class pageDashboard {
 
   static init () {
     this.initCharts()
+    this.initCards()
   }
 }
 

@@ -25,7 +25,7 @@
                             <i class="fa fa-thumbs-up fa-2x text-success"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $approved }}</div>
+                            <div class="fs-3 fw-semibold" id="container-approved"></div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Aprovados</div>
                         </div>
                     </div>
@@ -39,7 +39,7 @@
                             <i class="fa fa-hourglass-half fa-2x text-warning"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $waitingApproval }}</div>
+                            <div class="fs-3 fw-semibold" id="container-waiting"></div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Aguard. Aprov.</div>
                         </div>
                     </div>
@@ -53,7 +53,7 @@
                             <i class="fa fa-id-badge fa-2x text-info"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $waitingArt }}</div>
+                            <div class="fs-3 fw-semibold" id="container-design"></div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Aguard. Arte</div>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                             <i class="fa fa-cart-shopping fa-2x text-info"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $itemsToBuy }}</div>
+                            <div class="fs-3 fw-semibold" id="container-to-buy"></div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Itens para Compra</div>
                         </div>
                     </div>
@@ -75,12 +75,13 @@
             <div class="col-12 col-xl-3">
                 <a class="block block-rounded block-link-rotate text-end"
                     href="{{ route('dashboard.order.index', ['type' => 'late']) }}">
-                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center">
+                    <div class="block-content block-content-full d-sm-flex justify-content-between align-items-center"
+                        id="container-card-late">
                         <div class="d-none d-sm-block">
                             <i class="fa fa-file-excel fa-2x text-danger"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $lateOrders }}</div>
+                            <div class="fs-3 fw-semibold" id="container-late"></div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Pedidos Atrasados</div>
                         </div>
                     </div>
@@ -94,7 +95,7 @@
                             <i class="fa fa-cart-arrow-down fa-2x text-danger"></i>
                         </div>
                         <div class="text-end">
-                            <div class="fs-3 fw-semibold">{{ $lateProducts }}</div>
+                            <div class="fs-3 fw-semibold" id="container-late-products"></div>
                             <div class="fs-sm fw-semibold text-uppercase text-muted">Produtos Atrasados</div>
                         </div>
                     </div>

@@ -7,35 +7,11 @@ use App\Enums\StatusType;
 use App\Models\Order;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
 
 class DashboardController extends Controller
 {
     public function index(): \Illuminate\View\View
     {
-        $notInSteps = ['finished', 'shipping', 'canceled', 'pickup'];
-
-        $approved = Order::query()
-            ->whereHas('orderProducts', function ($query) {
-                $query->where('status', StatusType::Approved());
-            })
-            ->whereNotIn('step', $notInSteps)
-            ->count();
-
-        $waitingApproval = Order::query()
-            ->whereHas('orderProducts', function ($query) {
-                $query->where('status', StatusType::WaitingApproval());
-            })
-            ->whereNotIn('step', $notInSteps)
-            ->count();
-
-        $waitingArt = Order::query()
-            ->whereHas('orderProducts', function ($query) {
-                $query->where('status', StatusType::WaitingDesign());
-            })
-            ->whereNotIn('step', $notInSteps)
-            ->count();
 
         $stepInDesign = Order::query()
             ->where('step', MovementType::InDesign())
@@ -57,41 +33,7 @@ class DashboardController extends Controller
             ->where('step', MovementType::Pickup())
             ->count();
 
-        $orderItems = Order::query()
-            ->with(['orderProducts' => function ($query) {
-                $query->whereIn('in_stock', ['no', 'partial'])
-                    ->where('was_bought', 'N');
-            }])
-            ->whereHas('orderProducts', function ($query) {
-                $query->whereIn('in_stock', ['no', 'partial'])
-                    ->where('was_bought', 'N');
-            })
-            ->get();
-
-        $itemsToBuy = $orderItems->reduce(function ($carry, $order) {
-            return $carry + $order->orderProducts->count();
-        }, 0);
-
-        $lateOrders = Order::query()
-            ->whereDate('delivery_date', Carbon::tomorrow()->format('Y-m-d'))->count();
-
-        $lateProducts = Order::query()
-            ->with(['orderProducts' => function ($query) {
-                $query->whereIn('in_stock', ['no', 'partial'])
-                    ->where('was_bought', 'Y')
-                    ->whereDate('arrival_date', Carbon::tomorrow()->format('Y-m-d'));
-            }])
-            ->whereHas('orderProducts', function ($query) {
-                $query->whereIn('in_stock', ['no', 'partial'])
-                    ->where('was_bought', 'Y')
-                    ->whereDate('arrival_date', Carbon::tomorrow()->format('Y-m-d'));
-            })
-            ->get()
-            ->reduce(function ($carry, $order) {
-                return $carry + $order->orderProducts->count();
-            }, 0);
-
-        return view('pages.dashboard', compact('approved', 'waitingApproval', 'waitingArt', 'stepInDesign', 'stepInProduction', 'stepFinished', 'stepShipped', 'stepPickup', 'itemsToBuy', 'lateOrders', 'lateProducts'));
+        return view('pages.dashboard', compact('stepInDesign', 'stepInProduction', 'stepFinished', 'stepShipped', 'stepPickup'));
     }
 
     public function chartJson(Request $request)
