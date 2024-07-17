@@ -42,8 +42,8 @@
                             <fieldset class="border px-2 pb-2 mb-2">
                                 <legend class="float-none w-auto px-4 h5">Filtros</legend>
                                 <div class="row">
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-group">
+                                    <div class="col-12 col-md-12">
+                                        <div class="form-group w-25">
                                             <label for="filterByStep" class="fw-bold mb-1">Filtrar por Etapa</label>
                                             <select class="form-control" id="filterByStep">
                                                 <option value="all">Todos</option>
@@ -53,43 +53,6 @@
                                                 <option value="shipping">Para Entrega</option>
                                                 <option value="pickup">Para Retirada</option>
                                             </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-group">
-                                            <label for="filterByMonth" class="fw-bold mb-1">Filtrar por mês</label>
-                                            <select class="form-control" id="filterByMonth">
-                                                <option value="all">Todos</option>
-                                                <option value="01">Janeiro</option>
-                                                <option value="02">Fevereiro</option>
-                                                <option value="03">Março</option>
-                                                <option value="04">Abril</option>
-                                                <option value="05">Maio</option>
-                                                <option value="06">Junho</option>
-                                                <option value="07">Julho</option>
-                                                <option value="08">Agosto</option>
-                                                <option value="09">Setembro</option>
-                                                <option value="10">Outubro</option>
-                                                <option value="11">Novembro</option>
-                                                <option value="12">Dezembro</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-group">
-                                            <label for="filterType" class="fw-bold mb-1">Tipo de Data</label>
-                                            <select class="form-control" id="filterType">
-                                                <option value="">Todos</option>
-                                                <option value="delivery_date">Data de Entrega</option>
-                                                <option value="date">Data do Pedido</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-group">
-                                            <label for="filterDate" class="fw-bold mb-1">Data</label>
-                                            <input type="date" class="form-control" id="filterDate"
-                                                name="example-daterange1" placeholder="Data">
                                         </div>
                                     </div>
                                     <div class="col-12 col-md-4 align-content-center mt-3">

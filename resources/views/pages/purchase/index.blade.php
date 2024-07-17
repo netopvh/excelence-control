@@ -62,6 +62,15 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-12 col-md-3">
+                                    <div class="form-group">
+                                        <label for="filterByType" class="fw-bold mb-1">Filtrar por Tipo</label>
+                                        <select class="form-control" id="filterByType">
+                                            <option value="all">Todos</option>
+                                            <option value="F">Fornecedor</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-12 col-md-4 align-content-center mt-4">
                                     <button type="button" class="btn btn-primary btn-block text-white"
                                         id="btnCleanFilters">

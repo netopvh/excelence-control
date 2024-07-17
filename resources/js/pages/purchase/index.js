@@ -227,6 +227,7 @@ class pagePurchase {
         data: (d) => {
           d.status = document.querySelector('#filterByStatus').value
           d.month = document.querySelector('#filterByMonth').value
+          d.type = document.querySelector('#filterByType').value
         }
       },
       columns: [
@@ -286,9 +287,14 @@ class pagePurchase {
       table.draw()
     })
 
+    document.querySelector('#filterByType').addEventListener('change', () => {
+      table.draw()
+    })
+
     document.querySelector('#btnCleanFilters').addEventListener('click', () => {
       document.querySelector('#filterByStatus').value = 'N'
       document.querySelector('#filterByMonth').value = 'all'
+      document.querySelector('#filterByType').value = 'all'
       table.draw()
     })
 

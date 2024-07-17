@@ -26,10 +26,6 @@ class PurchaseController extends Controller
         return DataTables::of($ordersQuery)
             ->filter(function ($query) use ($request) {
 
-                if ($searchValue = trim($request->get('search')['value'])) {
-                    $query->filterBySearch($searchValue);
-                }
-
                 $query->when($request->get('status') !== 'all', function ($query) use ($request) {
                     $query->whereHas('orderProducts', function ($query) use ($request) {
                         $query->where('was_bought', $request->get('status'));
@@ -41,6 +37,18 @@ class PurchaseController extends Controller
                         $query->whereMonth('arrival_date', $request->get('month'));
                     });
                 });
+
+                $query->when($request->get('type') !== 'all', function ($query) use ($request) {
+                    if ($request->get('type') == 'F' && $request->get('search')['value']) {
+                        $query->whereHas('orderProducts', function ($query) use ($request) {
+                            $query->where('supplier', 'like', '%' . trim($request->get('search')['value']) . '%');
+                        });
+                    }
+                });
+
+                if ($request->get('type') === 'all' && $searchValue = trim($request->get('search')['value'])) {
+                    $query->filterBySearch($searchValue);
+                }
             })
             ->order(function ($query) use ($request) {
                 if (isset($request['order'])) {

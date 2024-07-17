@@ -136,7 +136,8 @@ class pageShowKanban {
     const newColumn = event.target.closest('.kanban-column')
 
     if (newColumn) {
-      const newStatus = newColumn.id.replace('-cards', '')
+      const newStep = newColumn.id.replace('-cards', '')
+      console.log(newStep)
       newColumn.appendChild(cardElement)
 
       try {
