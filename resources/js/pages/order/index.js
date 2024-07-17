@@ -157,6 +157,7 @@ class pageOrder {
     document.querySelector('#btnCleanFilters').addEventListener('click', () => {
       document.querySelector('#filterByStatus').value = 'all'
       document.querySelector('#filterByMonth').value = 'all'
+      document.querySelector('#filterByStep').value = 'all'
       document.getElementById('filterType').value = ''
       document.getElementById('filterDate').value = ''
       table.draw()

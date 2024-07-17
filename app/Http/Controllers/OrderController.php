@@ -29,16 +29,16 @@ class OrderController extends Controller
                     $query->filterBySearch($searchValue);
                 }
 
-                if ($step = $request->get('step') !== 'all') {
-                    $query->where('step', $step);
-                }
+                $query->when($request->get('step') !== 'all', function ($query) use ($request) {
+                    $query->where('step', $request->get('step'));
+                });
 
-                if ($month = $request->get('month') !== 'all') {
-                    $query->whereMonth('date', $month);
-                }
+                $query->when($request->get('month') !== 'all', function ($query) use ($request) {
+                    $query->whereMonth('date', $request->get('month'));
+                });
 
-                if ($type = trim($request->get('type')) && $date = trim($request->get('date'))) {
-                    $query->whereDate($type, $date);
+                if ($request->get('type') && $request->get('date')) {
+                    $query->whereDate($request->get('type'), $request->get('date'));
                 }
             })
             ->order(function ($query) use ($request) {
