@@ -238,7 +238,6 @@ class pageProduction {
             selectArrived.addEventListener('change', () => {
               if (selectArrived.value === 'Y') {
                 deliveredDateContainer.classList.remove('d-none')
-                deliveredDate.value = convertToDatetimeLocal(new Date())
               } else {
                 deliveredDateContainer.classList.add('d-none')
               }
