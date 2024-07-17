@@ -5,7 +5,6 @@ import { Modal } from 'bootstrap'
 import Button from '../../codebase/components/button'
 import { get, post, put } from '../../codebase/api'
 import Swal from 'sweetalert2'
-import { Responses } from '../../codebase/constants'
 
 class pageUser {
   static userModal = null
@@ -58,9 +57,9 @@ class pageUser {
           }
         }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      },
+      // language: {
+      //   url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
+      // },
       drawCallback: function () {
         const api = this.api()
         api.rows().every(function () {
@@ -78,7 +77,7 @@ class pageUser {
   }
 
   static addUserModal () {
-    document.getElementById('add-user').addEventListener('click', function (event) {
+    document.getElementById('add-user').addEventListener('click', async function (event) {
       event.preventDefault()
 
       const modal = document.getElementById('userModal')
@@ -118,6 +117,8 @@ class pageUser {
                         <label class="form-label" for="password">Senha:</label>
                         <input type="password" class="form-control" id="password" name="password">
                       </div>
+                      <div class="mb-3" id="roles-container">
+                      </div>
                     </form>
                     <div id="error-container" class="d-none">
                       <div class="alert alert-danger" role="alert">
@@ -147,6 +148,7 @@ class pageUser {
 
       document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
       document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+      const rolesContainer = document.getElementById('roles-container')
 
       pageUser.userModal.show()
 
@@ -157,10 +159,35 @@ class pageUser {
         clearErrors(errorContainer)
         clearForm(formUser)
 
+        const roles = await get('/api/role/list')
+
+        const roleLabel = document.createElement('label')
+        roleLabel.className = 'form-label'
+        roleLabel.textContent = 'Perfis:'
+        rolesContainer.appendChild(roleLabel)
+
+        const selectElement = document.createElement('select')
+        selectElement.className = 'form-control'
+        selectElement.id = 'roles'
+        selectElement.multiple = true
+        selectElement.style.minHeight = '150px'
+        rolesContainer.appendChild(selectElement)
+
+        roles.forEach(role => {
+          const option = document.createElement('option')
+          option.value = role.name
+          option.text = getRoleName(role.name)
+          option.style.zIndex = '9999'
+          selectElement.appendChild(option)
+        })
+
         formUser.addEventListener('submit', async function (event) {
           event.preventDefault()
 
           const formData = new FormData(this)
+          const selectedValues = $(selectElement).val()
+          formData.append('roles', JSON.stringify(selectedValues))
+
           const formObject = {}
 
           formData.forEach((value, key) => {
@@ -237,13 +264,7 @@ class pageUser {
                         <label class="form-label" for="email">E-mail:</label>
                         <input type="email" class="form-control" id="email" value="${res.data.email}" name="email">
                       </div>
-                      <div class="mb-3">
-                        <label class="form-label" for="role_id">Perfil:</label>
-                        <select class="form-select js-select2" id="role_id" name="role_id" multiple="multiple">
-                          ${roles.map(role => {
-                            return `<option value="${role.id}" ${userRoleIds.includes(role.id) ? 'selected' : ''}>${role.name}</option>`
-                          })}
-                        </select>
+                      <div class="mb-3" id="roles-container">
                       </div>
                     </form>
                     <div id="error-container" class="d-none">
@@ -264,6 +285,28 @@ class pageUser {
 
         const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit', 'form-user-edit')
         const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
+        const rolesContainer = document.getElementById('roles-container')
+
+        const roleLabel = document.createElement('label')
+        roleLabel.className = 'form-label'
+        roleLabel.textContent = 'Perfis:'
+        rolesContainer.appendChild(roleLabel)
+
+        const selectElement = document.createElement('select')
+        selectElement.className = 'form-control'
+        selectElement.id = 'roles'
+        selectElement.multiple = true
+        selectElement.style.minHeight = '150px'
+        rolesContainer.appendChild(selectElement)
+
+        roles.forEach(role => {
+          const option = document.createElement('option')
+          option.value = role.name
+          option.text = getRoleName(role.name)
+          option.selected = userRoleIds.includes(role.id)
+          option.style.zIndex = '9999'
+          selectElement.appendChild(option)
+        })
 
         document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
         document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
@@ -280,11 +323,16 @@ class pageUser {
             event.preventDefault()
 
             const formData = new FormData(this)
+            const selectedValues = $(selectElement).val()
+            formData.append('roles', JSON.stringify(selectedValues))
+
             const formObject = {}
 
             formData.forEach((value, key) => {
               formObject[key] = value
             })
+
+            console.log(formObject)
 
             btnSubmit.setLoading(true)
 
@@ -294,7 +342,7 @@ class pageUser {
               if (res.success) {
                 btnSubmit.setLoading(false)
                 pageUser.userEditModal.hide()
-                Swal.fire('Sucesso', 'Usuário alterado com sucesso', 'success')
+                Swal.fire('Sucesso', res.message, 'success')
                 pageUser.tableUsers.ajax.reload()
               }
             } catch (error) {

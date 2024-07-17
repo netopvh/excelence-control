@@ -14,4 +14,5 @@ final class OriginType extends Enum
 {
     const Order = 'O';
     const Purchase = 'P';
+    const Production = 'F';
 }

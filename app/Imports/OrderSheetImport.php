@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToCollection;

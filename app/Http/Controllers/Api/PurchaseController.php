@@ -21,30 +21,54 @@ class PurchaseController extends Controller
         })
             ->with(['orderProducts' => function ($query) {
                 $query->whereIn('in_stock', ['no', 'partial']);
-            }, 'orderProducts.product', 'customer', 'employee'])
-            ->orderBy('date', 'desc');
+            }, 'orderProducts.product', 'customer', 'employee']);
 
         return DataTables::of($ordersQuery)
             ->filter(function ($query) use ($request) {
-                if ($request->get('status') !== 'all') {
+
+                if ($searchValue = trim($request->get('search')['value'])) {
+                    $query->filterBySearch($searchValue);
+                }
+
+                $query->when($request->get('status') !== 'all', function ($query) use ($request) {
                     $query->whereHas('orderProducts', function ($query) use ($request) {
                         $query->where('was_bought', $request->get('status'));
                     });
-                }
+                });
 
-                if ($request->get('month') !== 'all') {
+                $query->when($request->get('month') !== 'all', function ($query) use ($request) {
                     $query->whereHas('orderProducts', function ($query) use ($request) {
                         $query->whereMonth('arrival_date', $request->get('month'));
                     });
+                });
+            })
+            ->order(function ($query) use ($request) {
+                if (isset($request['order'])) {
+                    foreach ($request['order'] as $order) {
+                        $columnName = $order['name'] ?? null;
+                        $columnDir = $order['dir'] ?? 'desc';
+
+                        if ($columnName) {
+                            if ($columnName == 'customer.name') {
+                                $query->whereHas('customer', function ($subQuery) use ($columnDir) {
+                                    $subQuery->orderBy('name', $columnDir);
+                                });
+                            } else {
+                                $query->orderBy($columnName, $columnDir);
+                            }
+                        } else {
+                            $query->orderBy('date', 'desc');
+                        }
+                    }
                 }
             })
-            ->editColumn('date', function ($model) {
-                return $model->date->format('d/m/Y');
+            ->editColumn('date', function (Order $model) {
+                return $model->date_formatted;
             })
-            ->editColumn('delivery_date', function ($model) {
-                return $model->delivery_date->format('d/m/Y');
+            ->editColumn('delivery_date', function (Order $model) {
+                return $model->delivery_date_formatted;
             })
-            ->addColumn('action', function ($model) {
+            ->addColumn('action', function (Order $model) {
                 return $model->id;
             })
             ->setRowId('id')

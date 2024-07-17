@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -103,5 +104,26 @@ class Order extends Model
     public function movements()
     {
         return $this->hasMany(OrderMovement::class, 'order_id');
+    }
+
+    public function scopeFilterBySearch(Builder $query, $search)
+    {
+        return $query->whereHas('customer', function ($query) use ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        })
+            ->orWhere('number', 'like', '%' . $search . '%')
+            ->orWhereHas('employee', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            });
+    }
+
+    public function getDateFormattedAttribute()
+    {
+        return $this->date->format('d/m/Y');
+    }
+
+    public function getDeliveryDateFormattedAttribute()
+    {
+        return $this->delivery_date->format('d/m/Y');
     }
 }

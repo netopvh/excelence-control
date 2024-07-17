@@ -13,8 +13,6 @@ use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Imagick;
 use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
@@ -22,53 +20,60 @@ class OrderController extends Controller
     public function json(Request $request)
     {
         $model = Order::query()
-            ->with(['customer', 'orderProducts.product', 'employee'])
-            ->orderBy('date', 'desc');
+            ->with(['customer', 'orderProducts.product', 'employee']);
 
         return DataTables::of($model)
             ->filter(function ($query) use ($request) {
 
-                if (trim($request->get('search')['value']) !== '') {
-                    $query->whereHas('customer', function ($query) use ($request) {
-                        $query->where('name', 'like', '%' . $request->get('search')['value'] . '%');
-                    })
-                        ->orWhere('number', 'like', '%' . $request->get('search')['value'] . '%')
-                        ->orWhere(function ($query) use ($request) {
-                            $query->whereHas('employee', function ($query) use ($request) {
-                                $query->where('name', 'like', '%' . $request->get('search')['value'] . '%');
-                            });
-                        });
+                if ($searchValue = trim($request->get('search')['value'])) {
+                    $query->filterBySearch($searchValue);
                 }
 
-                // if ($request->get('status') !== 'all') {
-                //     $query->where('status', $request->get('status'));
-                // }
-
-                if ($request->get('step') !== 'all') {
-                    $query->where('step', $request->get('step'));
+                if ($step = $request->get('step') !== 'all') {
+                    $query->where('step', $step);
                 }
 
-                if ($request->get('month') !== 'all') {
-                    $query->whereMonth('date', $request->get('month'));
+                if ($month = $request->get('month') !== 'all') {
+                    $query->whereMonth('date', $month);
                 }
 
-                if (trim($request->get('type')) !== '' && trim($request->get('date')) !== '') {
-                    $query->whereDate($request->get('type'), $request->get('date'));
+                if ($type = trim($request->get('type')) && $date = trim($request->get('date'))) {
+                    $query->whereDate($type, $date);
                 }
             })
-            ->editColumn('date', function ($model) {
-                return $model->date->format('d/m/Y');
+            ->order(function ($query) use ($request) {
+                if (isset($request['order'])) {
+                    foreach ($request['order'] as $order) {
+                        $columnName = $order['name'] ?? null;
+                        $columnDir = $order['dir'] ?? 'asc';
+
+                        if ($columnName) {
+                            if ($columnName == 'customer.name') {
+                                $query->whereHas('customer', function ($subQuery) use ($columnDir) {
+                                    $subQuery->orderBy('name', $columnDir);
+                                });
+                            } else {
+                                $query->orderBy($columnName, $columnDir);
+                            }
+                        } else {
+                            $query->orderBy('date', 'desc');
+                        }
+                    }
+                }
             })
-            ->editColumn('delivery_date', function ($model) {
-                return $model->delivery_date->format('d/m/Y');
+            ->editColumn('date', function (Order $model) {
+                return $model->date_formatted;
             })
-            ->editColumn('customer.name', function ($model) {
+            ->editColumn('delivery_date', function (Order $model) {
+                return $model->delivery_date_formatted;
+            })
+            ->editColumn('customer.name', function (Order $model) {
                 return ucwords($model->customer->name);
             })
-            ->editColumn('arrived', function ($model) {
+            ->editColumn('arrived', function (Order  $model) {
                 return $model->arrived ? '<span class="badge bg-success">Chegou</span>' : '';
             })
-            ->addColumn('action', function ($model) {
+            ->addColumn('action', function (Order $model) {
 
                 $buttons = '<div class="btn-group">';
 
@@ -86,7 +91,7 @@ class OrderController extends Controller
 
                 return $buttons;
             })
-            ->setRowId(function ($model) {
+            ->setRowId(function (Order $model) {
                 return $model->id;
             })
             ->rawColumns(['step', 'arrived', 'action'])

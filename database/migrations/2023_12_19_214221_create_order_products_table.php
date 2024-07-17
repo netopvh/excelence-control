@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('obs')->nullable();
             $table->date('arrival_date')->nullable();
             $table->dateTime('purchase_date')->nullable();
+            $table->dateTime('delivered_date')->nullable();
             $table->enum('arrived', ['Y', 'N', 'P'])->nullable()->default(null);
             $table->enum('status', StatusType::getValues())->default(StatusType::WaitingApproval);
             $table->string('preview')->nullable();

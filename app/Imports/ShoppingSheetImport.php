@@ -25,7 +25,6 @@ class ShoppingSheetImport implements ToCollection, WithBatchInserts
 
     private function processRow(array $row): void
     {
-        Log::info($row);
     }
 
     public function batchSize(): int

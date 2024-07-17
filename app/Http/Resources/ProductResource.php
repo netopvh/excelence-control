@@ -21,6 +21,7 @@ class ProductResource extends JsonResource
             'purchase_date' => $this->purchase_date ? $this->purchase_date->format('d/m/Y H:i') : null,
             'in_stock' => $this->in_stock,
             'was_bought' => $this->was_bought,
+            'delivered_date' => $this->delivered_date ? $this->delivered_date->format('d/m/Y H:i') : null,
         ];
     }
 }

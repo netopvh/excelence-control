@@ -8,6 +8,7 @@ import 'datatables.net-responsive-bs5'
 import { isValidURL } from '../../codebase/utils'
 import Button from '../../codebase/components/button'
 import Swal from 'sweetalert2'
+import { tableIntl } from '../../codebase/constants'
 
 class pageShowOrder {
   static productsModal = null
@@ -329,9 +330,7 @@ class pageShowOrder {
         },
         { data: 'obs', name: 'obs', width: '23%', render: function (data) { return data || '-' } }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      }
+      language: tableIntl
     })
 
     tableElement.addEventListener('dblclick', (event) => {

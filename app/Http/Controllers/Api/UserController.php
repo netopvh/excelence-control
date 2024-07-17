@@ -53,6 +53,7 @@ class UserController extends Controller
             'email' => 'required|email',
             'username' => 'required',
             'password' => 'required',
+            'roles' => 'required',
         ]);
 
         $user = User::create([
@@ -61,6 +62,8 @@ class UserController extends Controller
             'username' => $request->username,
             'password' => bcrypt($request->password),
         ]);
+
+        $user->assignRole(json_decode($request->roles, true));
 
         return response()->json([
             'success' => true,
@@ -75,6 +78,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'username' => 'required',
+            'roles' => 'required',
         ]);
 
         $user = User::findOrFail($id);
@@ -83,9 +87,11 @@ class UserController extends Controller
         $user->username = $request->username;
         $user->save();
 
+        $user->syncRoles(json_decode($request->roles, true));
+
         return response()->json([
             'success' => true,
-            'message' => 'User updated',
+            'message' => 'Usuário atualizado com sucesso',
             'data' => $user
         ]);
     }

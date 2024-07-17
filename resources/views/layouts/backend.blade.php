@@ -191,7 +191,7 @@
                                     <span class="nav-main-link-name">Indicadores</span>
                                 </a>
                             </li>
-                            <li class="nav-main-heading">Comercial</li>
+                            <li class="nav-main-heading">Geral</li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link{{ active(['dashboard.order.*'], ' active') }}"
                                     href="{{ route('dashboard.order.index') }}">
@@ -215,6 +215,15 @@
                                     <span class="nav-main-link-name">Compras</span>
                                 </a>
                             </li>
+                            @role('producao')
+                                <li class="nav-main-item">
+                                    <a class="nav-main-link{{ active(['dashboard.production.*'], ' active') }}"
+                                        href="{{ route('dashboard.production.index') }}">
+                                        <i class="nav-main-link-icon fa fa-industry"></i>
+                                        <span class="nav-main-link-name">Produção</span>
+                                    </a>
+                                </li>
+                            @endrole
                             <li class="nav-main-heading">Financeiro</li>
                             <li class="nav-main-item">
                                 <a class="nav-main-link{{ active(['dashboard.entry.*'], ' active') }}"

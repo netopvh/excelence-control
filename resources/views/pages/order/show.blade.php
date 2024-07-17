@@ -23,9 +23,9 @@
 
         <div class="d-flex flex-row mb-3">
             <div class="me-2">
-                <a href="{{ route('dashboard.order.index') }}" class="btn bg-flat">
-                    <i class="fa fa-fw fa-chevron-left text-white me-1"></i>
-                    <span class="d-none d-sm-inline text-white">Voltar</span>
+                <a href="{{ route('dashboard.order.index') }}" class="btn bg-primary">
+                    <i class="fa fa-fw fa-chevron-left me-1"></i>
+                    <span class="d-none d-sm-inline">Voltar</span>
                 </a>
             </div>
             <div class="me-2">

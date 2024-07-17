@@ -9,6 +9,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +85,10 @@ Route::middleware('auth')->prefix('/dashboard')->name('dashboard.')->group(funct
 
     Route::prefix('purchase')->name('purchase.')->group(function () {
         Route::get('/', [PurchaseController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('production')->name('production.')->group(function () {
+        Route::get('/', [ProductionController::class, 'index'])->name('index');
     });
 
     Route::prefix('user')->name('user.')->group(function () {

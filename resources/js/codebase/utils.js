@@ -89,17 +89,44 @@ function convertDateTimeToISO (dateTimeString) {
   return formattedDate
 }
 
-function convertToDatetimeLocal (dateStr) {
-  // Dividir a string de data e hora
-  const [datePart, timePart] = dateStr.split(' ')
+function convertToDatetimeLocal (dateStr, withTime = true) {
+  // Criar um objeto Date a partir da string de data ISO
+  const date = new Date(dateStr)
 
-  // Dividir a parte da data em dia, mês e ano
-  const [day, month, year] = datePart.split('/')
+  // Obter os componentes da data
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  // Obter os componentes da hora
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
 
   // Combinar no formato compatível com datetime-local
-  const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timePart}`
+  if (withTime) {
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+  }
 
-  return formattedDate
+  return `${year}-${month}-${day}`
+}
+
+function formatDate (isoDateStr, withTime = true) {
+  const date = new Date(isoDateStr)
+
+  // Extrair as partes da data
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0') // Os meses são baseados em zero
+  const year = date.getFullYear()
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+
+  // Combinar no formato desejado
+  if (withTime) {
+    return `${day}/${month}/${year} ${hours}:${minutes}`
+  }
+
+  return `${day}/${month}/${year}`
 }
 
 function showSuccess (el, data) {
@@ -213,4 +240,4 @@ function getTomorrowDate () {
   return `${year}-${month}-${day}`
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, convertToDatetimeLocal, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }
+export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, convertToDatetimeLocal, formatDate, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }

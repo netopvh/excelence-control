@@ -1,21 +1,9 @@
 @extends('layouts.backend')
 
 @section('css')
-    <!-- Page JS Plugins CSS -->
-    <link rel="stylesheet" href="{{ asset('js/plugins/datatables-bs5/css/dataTables.bootstrap5.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/datatables-responsive-bs5/css/responsive.bootstrap5.min.css') }}">
 @endsection
 
 @section('js')
-    <!-- jQuery (required for DataTables plugin) -->
-    <script src="{{ asset('js/lib/jquery.min.js') }}"></script>
-
-    <!-- Page JS Plugins -->
-    <script src="{{ asset('js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/datatables-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/datatables-responsive-bs5/js/responsive.bootstrap5.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
     @vite(['resources/js/pages/purchase/index.js'])
 @endsection
 

@@ -33,6 +33,17 @@ class OrderController extends Controller
         ]);
     }
 
+    public function showProductOrder($id, $productId)
+    {
+        $order = Order::query()->with('customer', 'orderProducts.product', 'employee')->findOrFail($id);
+        $orderProduct = $order->orderProducts()->where('id', $productId)->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => $orderProduct,
+        ]);
+    }
+
     public function uploadDesign(Request $request, $id)
     {
         $this->validateDesign($request);

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ImportController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ProductionController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
@@ -51,6 +52,7 @@ Route::prefix('order')->group(function () {
     Route::post('/{id}/store', [OrderController::class, 'updateStatusAndStep']);
     Route::post('/{id}/info', [OrderController::class, 'updateInfo']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
+    Route::get('/{id}/item/{itemId}', [OrderController::class, 'showProductOrder']);
 
     Route::post('/{id}/design', [OrderController::class, 'uploadDesign']);
     Route::post('/{id}/design/{productId}', [OrderController::class, 'removeDesign']);
@@ -64,6 +66,12 @@ Route::prefix('purchase')->group(function () {
     Route::get('/{id}/items', [PurchaseController::class, 'orderItems']);
     Route::post('/{id}/product/{productId}', [PurchaseController::class, 'updateProductInfo']);
     Route::get('/{id}/product/{productId}/show', [PurchaseController::class, 'showProductInfo']);
+});
+
+Route::prefix('production')->group(function () {
+    Route::get('/', [ProductionController::class, 'index']);
+    Route::get('/{id}/show', [ProductionController::class, 'show']);
+    Route::post('/{id}/item/{itemId}', [ProductionController::class, 'updateOrderItem']);
 });
 
 Route::prefix('import')->group(function () {

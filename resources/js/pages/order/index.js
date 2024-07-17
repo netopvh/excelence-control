@@ -1,11 +1,12 @@
 import DataTable from 'datatables.net-bs5'
-import { getParameterByName, getTomorrowDate, isValidURL } from '../../codebase/utils'
+import { formatDate, getParameterByName, getTomorrowDate, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
 import { get, post, delete as del } from '../../codebase/api'
 import Button from '../../codebase/components/button'
 import Swal from 'sweetalert2'
+import { tableIntl } from '../../codebase/constants'
 // import $ from 'jquery'
 
 class pageOrder {
@@ -14,9 +15,10 @@ class pageOrder {
 
   static initDataTables () {
     const stepOptions = { in_design: 'Design e Artes', in_production: 'Produção', finished: 'Concluído', shipping: 'Entrega', pickup: 'Retirada', cancelled: 'Cancelado' }
-    const statusOptions = { approved: 'Aprovado', waiting_approval: 'Aguard. Aprov.', waiting_design: 'Aguard. Arte' }
 
     const format = (d) => {
+      const hasPurchase = d.order_products.some(item => item.purchase_date !== null)
+
       const subTableHtml = `
       <table class='table table-bordered table-hover sub-table' data-order-id='${d.id}'>
         <tr>
@@ -24,6 +26,7 @@ class pageOrder {
           <td class='text-uppercase fw-bold'>Quantidade</td>
           <td class='text-uppercase fw-bold'>Status</td>
           <td class='text-uppercase fw-bold'>Situação</td>
+          ${hasPurchase ? '<td class="text-uppercase fw-bold">Data da Compra</td>' : ''}
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
         </tr>
@@ -33,6 +36,7 @@ class pageOrder {
             <td>${item.qtd}</td>
             <td>${item.status === 'approved' ? '<span class="badge bg-success">Aprovado</span>' : item.status === 'waiting_approval' ? '<span class="badge bg-warning">Aguard. Aprov.</span>' : '<span class="badge bg-info">Aguard. Arte</span> '}</td>
             <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : (item.was_bought === 'N') && (item.in_stock === 'no' || item.in_stock === 'partial') ? '<span class="badge bg-warning">Não Comprado</span>' : '-'}</td>
+            ${hasPurchase ? `<td>${formatDate(item.purchase_date)}</td>` : ''}
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
           </tr>`).join('')}
@@ -50,7 +54,7 @@ class pageOrder {
       pageLength: 50,
       lengthMenu: [[5, 10, 20, 40, 50, 80, 100], [5, 10, 20, 40, 50, 80, 100]],
       autoWidth: false,
-      dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+      dom: "<'row mb-2'<'col-12 col-md-6'l><'col-12 col-md-6'f>>" +
            "<'row'<'col-sm-12'tr>>" +
            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
       ajax: {
@@ -91,6 +95,7 @@ class pageOrder {
         {
           data: 'employee.name',
           name: 'employee.name',
+          orderable: false,
           render: (data, type, row) => {
             return data || '-'
           }
@@ -103,9 +108,7 @@ class pageOrder {
           searchable: false
         }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      },
+      language: tableIntl,
       drawCallback: function () {
         const api = this.api()
 
@@ -207,7 +210,8 @@ class pageOrder {
             ? `
                   <strong>Data da Compra</strong>: ${res.data.purchase_date ? res.data.purchase_date : '-'} <br><br>
                   <strong>Previsão de Entrega</strong>: ${res.data.arrival_date ? res.data.arrival_date : '-'} <br><br>
-                  <strong>Produto Chegou?</strong>: ${res.data.arrived === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}
+                  <strong>Produto Chegou?</strong>: ${res.data.arrived === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>'}<br><br>
+                  ${res.data.arrived === 'Y' ? `<strong>Data da Chegada</strong>: ${res.data.delivered_date ? res.data.delivered_date : '-'}` : ''}
                 `
             : ''}
               `

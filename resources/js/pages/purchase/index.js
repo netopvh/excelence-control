@@ -1,12 +1,12 @@
 import DataTable from 'datatables.net-bs5'
-import { convertDateToISO, convertToDatetimeLocal, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
+import { convertDateToISO, convertToDatetimeLocal, formatDate, getParameterByName, isValidURL, skeletonLoading } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
 import { get, post } from '../../codebase/api'
 import Swal from 'sweetalert2'
 import Button from '../../codebase/components/button'
-// import $ from 'jquery'
+import { tableIntl } from '../../codebase/constants'
 
 class pagePurchase {
   static purchaseModal = null
@@ -15,6 +15,8 @@ class pagePurchase {
 
   static initDataTables () {
     const format = (d) => {
+      const hasPurchase = d.order_products.some(item => item.purchase_date !== null)
+
       return (
         `<table class='table table-bordered table-hover sub-table' data-order-id='${d.id}'>
         <tr>
@@ -22,6 +24,7 @@ class pagePurchase {
           <td class='text-uppercase fw-bold'>Quantidade</td>
           <td class='text-uppercase fw-bold'>Estoque</td>
           <td class='text-uppercase fw-bold'>Status</td>
+          ${hasPurchase ? '<td class="text-uppercase fw-bold">Data Compra</td>' : ''}
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
         </tr>` +
@@ -32,6 +35,7 @@ class pagePurchase {
             <td>${item.qtd}</td>
             <td>${item.in_stock === 'yes' ? '<span class="badge bg-success">Sim</span>' : item.in_stock === 'no' ? '<span class="badge bg-warning">Não</span>' : item.in_stock === 'partial' ? '<span class="badge bg-info">Parcial</span>' : '-'}</td>
             <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : '<span class="badge bg-warning">Não Comprado</span>'}</td>
+            ${hasPurchase ? `<td>${formatDate(item.purchase_date)}</td>` : ''}
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
           </tr>`
@@ -57,13 +61,15 @@ class pagePurchase {
     }
 
     const showModal = async (id) => {
+      const purchaseModalEl = document.getElementById('purchaseModal')
+
       if (!pagePurchase.purchaseModal) {
-        pagePurchase.purchaseModal = new Modal(document.getElementById('purchaseModal'))
+        pagePurchase.purchaseModal = new Modal(purchaseModalEl)
       }
 
       const purchaseModal = pagePurchase.purchaseModal
 
-      const modalBody = document.getElementById('purchaseModal').querySelector('.block-content')
+      const modalBody = purchaseModalEl.querySelector('.block-content')
 
       purchaseModal.show()
 
@@ -107,8 +113,8 @@ class pagePurchase {
                     Produtos do Pedido
                 </h3>
             </div>
-            <div class="block-content">
-                <div class="row items-push">
+            <div class="block-content py-0">
+                <div class="row">
                     <div class="col-md-12">${response.order_products.some(product => product.in_stock === 'partial') ? '<span class="fw-bold"><span class="text-danger">ATENÇÃO</span>: O Pedido contém produtos em quantidade parcial, favor olhar a <span class="text-uppercase">observação</span>.</span>' : ''}</div>
                     <div class="col-md-12">
                         <table class="table table-bordered table-striped table-vcenter list-purchase">
@@ -130,12 +136,20 @@ class pagePurchase {
                 </div>
             </div>
           </div>
+          <div id="buttons-container" class="mt-2 mb-4"></div>
           `
 
+          const btnContainerEl = modalBody.querySelector('#buttons-container')
           const tablePurchaseEl = document.querySelector('.list-purchase')
+          const btnCloseModal = new Button('Fechar', null, 'btn btn-danger w-25')
+
+          btnContainerEl.appendChild(btnCloseModal.render())
+          btnCloseModal.setOnClick(() => {
+            purchaseModal.hide()
+          })
 
           if (tablePurchaseEl) {
-            const tablePurchase = new DataTable(tablePurchaseEl, {
+            new DataTable(tablePurchaseEl, {
               ajax: {
                 url: `/api/purchase/${id}/items`,
                 type: 'GET'
@@ -144,9 +158,7 @@ class pagePurchase {
               paging: false,
               processing: true,
               serverSide: true,
-              language: {
-                url: '//cdn.datatables.net/plug-ins/1.10.21/i18n/Portuguese-Brasil.json'
-              },
+              language: tableIntl,
               columns: [
                 { data: 'product.name' },
                 { data: 'qtd' },
@@ -156,111 +168,6 @@ class pagePurchase {
                 { data: 'arrived', render: function (data) { return !data ? '-' : data === 'Y' ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-danger">Não</span>' } },
                 { data: 'obs' }
               ]
-            })
-
-            tablePurchaseEl.addEventListener('dblclick', async (event) => {
-              const tr = event.target.closest('tr')
-              if (tr) {
-                const rowData = tablePurchase.row(tr).data()
-
-                if (rowData) {
-                  if (!pagePurchase.purchaseProductModal) {
-                    pagePurchase.purchaseProductModal = new Modal(document.getElementById('purchaseProductModal'))
-                  }
-
-                  const purchaseProductModal = pagePurchase.purchaseProductModal
-                  const modalProductBody = document.getElementById('purchaseProductModal').querySelector('.block-content')
-
-                  purchaseModal.hide()
-                  purchaseProductModal.show()
-
-                  modalProductBody.innerHTML = ''
-                  modalProductBody.appendChild(skeletonLoading(3, 3))
-
-                  const res = await get(`/api/purchase/${id}/product/${rowData.id}/show`)
-
-                  if (res.success) {
-                    modalProductBody.innerHTML = ''
-                    modalProductBody.innerHTML = `
-                    <form id="updatePurchaseProductForm" action="">
-                    <input type="hidden" name="order_id" value="${id}" />
-                      <input type="hidden" name="order_product_id" value="${rowData.id}" />
-                      <div class="mb-3">
-                        <label for="arrived" class="form-label">Chegou:</label>
-                        <select name="arrived" class="form-control" id="arrived">
-                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
-                        </select>
-                      </div>
-                      <div class="mb-3">
-                        <label for="was_bought" class="form-label">Status do Item:</label>
-                        <select name="was_bought" class="form-control" id="was_bought">
-                          ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.was_bought ? 'selected' : ''}>${key === 'Y' ? 'Comprado' : 'Não Comprado'}</option>`)}
-                        </select>
-                      </div>
-                      <div class="mb-3">
-                        <label for="arrival_date" class="form-label">Previsão de Entrega:</label>
-                        <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${res.data.arrival_date ? convertDateToISO(res.data.arrival_date) : ''}" />
-                      </div>
-                      <div class="d-flex gap-2 mb-4">
-                        <div class="col-12 col-md-6" id="btn-submit-container">
-                        </div>
-                        <div class="col-12 col-md-6" id="btn-cancel-container">
-                        </div>
-                      </div>
-                    </form>
-                  `
-                  }
-
-                  const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
-                  const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
-
-                  document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
-                  document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
-
-                  const form = document.getElementById('updatePurchaseProductForm')
-                  form.addEventListener('submit', async function (event) {
-                    event.preventDefault()
-
-                    btnSubmit.setLoading(true)
-
-                    const data = {
-                      arrived: form.querySelector('select[name="arrived"]').value,
-                      arrival_date: form.querySelector('input[name="arrival_date"]').value,
-                      was_bought: form.querySelector('select[name="was_bought"]').value
-                    }
-
-                    const orderId = form.querySelector('input[name="order_id"]').value
-                    const orderProductId = form.querySelector('input[name="order_product_id"]').value
-
-                    try {
-                      const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
-
-                      if (res) {
-                        btnSubmit.setLoading(false)
-                        tablePurchase.draw()
-                        table.draw()
-                      }
-
-                      purchaseProductModal.hide()
-                      purchaseModal.show()
-                    } catch (error) {
-                      btnSubmit.setLoading(false)
-                      console.error(error)
-                    }
-                  })
-
-                  form.querySelector('select[name="was_bought"]').addEventListener('change', function () {
-                    if (form.querySelector('select[name="was_bought"]').value !== 'Y') {
-                      form.querySelector('input[name="arrival_date"]').value = null
-                    }
-                  })
-
-                  btnCancel.setOnClick(function () {
-                    purchaseProductModal.hide()
-                    purchaseModal.show()
-                  })
-                }
-              }
             })
           }
         }
@@ -311,7 +218,7 @@ class pagePurchase {
       pageLength: 50,
       lengthMenu: [[5, 10, 20, 40, 50, 80, 100], [5, 10, 20, 40, 50, 80, 100]],
       autoWidth: false,
-      dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+      dom: "<'row mb-2'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
            "<'row'<'col-sm-12'tr>>" +
            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
       ajax: {
@@ -336,6 +243,7 @@ class pagePurchase {
         {
           data: 'employee.name',
           name: 'employee.name',
+          orderable: false,
           render: (data, type, row) => {
             return data || '-'
           }
@@ -352,9 +260,7 @@ class pagePurchase {
           }
         }
       ],
-      language: {
-        url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/pt-BR.json'
-      },
+      language: tableIntl,
       rowCallback: function (row, data) {
         $(row).addClass('bg-success')
       },
@@ -447,13 +353,13 @@ class pagePurchase {
         modalProductBody.appendChild(skeletonLoading(3, 3))
 
         try {
-          const res = await get(`/api/purchase/${orderId}/product/${productId}/show`)
+          const res = await get(`/api/order/${orderId}/item/${productId}`)
 
           if (res.success) {
             modalProductBody.innerHTML = ''
             modalProductBody.innerHTML = `
                     <form id="updatePurchaseProductForm" action="">
-                    <input type="hidden" name="order_id" value="${orderId}" />
+                      <input type="hidden" name="order_id" value="${orderId}" />
                       <input type="hidden" name="order_product_id" value="${productId}" />
                       <div class="mb-3">
                         <label for="was_bought" class="form-label">Status do Item:</label>
@@ -467,7 +373,7 @@ class pagePurchase {
                       </div>
                       <div class="mb-3">
                         <label for="arrival_date" class="form-label">Previsão de Entrega:</label>
-                        <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${res.data.arrival_date ? convertDateToISO(res.data.arrival_date) : ''}" />
+                        <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${res.data.arrival_date ? convertToDatetimeLocal(res.data.arrival_date, false) : ''}" />
                       </div>
                       <div class="mb-3">
                         <label for="arrived" class="form-label">Chegou:</label>
@@ -482,69 +388,69 @@ class pagePurchase {
                         </div>
                       </div>
                     </form>
-                  `
-          }
+            `
 
-          const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
-          const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
+            const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
+            const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
 
-          document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
-          document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+            document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
+            document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
 
-          const table = this.tablePurchases
+            const table = this.tablePurchases
 
-          const form = document.getElementById('updatePurchaseProductForm')
-          form.addEventListener('submit', async function (event) {
-            event.preventDefault()
+            const form = document.getElementById('updatePurchaseProductForm')
+            form.addEventListener('submit', async function (event) {
+              event.preventDefault()
 
-            btnSubmit.setLoading(true)
+              btnSubmit.setLoading(true)
 
-            const data = {
-              arrived: form.querySelector('select[name="arrived"]').value,
-              arrival_date: form.querySelector('input[name="arrival_date"]').value,
-              purchase_date: form.querySelector('input[name="purchase_date"]').value,
-              was_bought: form.querySelector('select[name="was_bought"]').value
-            }
-
-            const orderId = form.querySelector('input[name="order_id"]').value
-            const orderProductId = form.querySelector('input[name="order_product_id"]').value
-
-            try {
-              const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
-
-              if (res) {
-                btnSubmit.setLoading(false)
-                table.draw()
+              const data = {
+                arrived: form.querySelector('select[name="arrived"]').value,
+                arrival_date: form.querySelector('input[name="arrival_date"]').value,
+                purchase_date: form.querySelector('input[name="purchase_date"]').value,
+                was_bought: form.querySelector('select[name="was_bought"]').value
               }
 
+              const orderId = form.querySelector('input[name="order_id"]').value
+              const orderProductId = form.querySelector('input[name="order_product_id"]').value
+
+              try {
+                const res = await post(`/api/purchase/${orderId}/product/${orderProductId}`, data)
+
+                if (res) {
+                  btnSubmit.setLoading(false)
+                  table.draw()
+                }
+
+                purchaseProductModal.hide()
+              } catch (error) {
+                btnSubmit.setLoading(false)
+                console.error(error)
+              }
+            })
+
+            form.querySelector('select[name="was_bought"]').addEventListener('change', function () {
+              if (form.querySelector('select[name="was_bought"]').value !== 'Y') {
+                form.querySelector('input[name="arrival_date"]').value = null
+              }
+            })
+
+            btnCancel.setOnClick(function () {
               purchaseProductModal.hide()
-            } catch (error) {
-              btnSubmit.setLoading(false)
-              console.error(error)
-            }
-          })
-
-          form.querySelector('select[name="was_bought"]').addEventListener('change', function () {
-            if (form.querySelector('select[name="was_bought"]').value !== 'Y') {
-              form.querySelector('input[name="arrival_date"]').value = null
-            }
-          })
-
-          btnCancel.setOnClick(function () {
-            purchaseProductModal.hide()
-          })
+            })
+          }
         } catch (error) {
           console.error(error)
         }
       }
     })
 
-    // table.on('draw', () => {
-    //   console.log(detailRows)
-    //   detailRows.forEach((id) => {
-    //     document.querySelector(`#${id} td.dt-control`).click()
-    //   })
-    // })
+    table.on('draw', () => {
+      detailRows.forEach((id) => {
+        const escapedId = id.replace(/^(\d)/, '\\3$1 ')
+        document.querySelectorAll(`#${escapedId} td.dt-control`).forEach(element => element.click())
+      })
+    })
   }
 
   static checkStatusOnUrl () {

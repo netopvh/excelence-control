@@ -4,8 +4,7 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-    @vite(['resources/js/pages/order/index.js'])
+    @vite(['resources/js/pages/production/index.js'])
 @endsection
 
 @section('content')
@@ -14,7 +13,7 @@
             <div class="content py-1 text-center">
                 <nav class="breadcrumb bg-body-light py-2 mb-0">
                     <a class="breadcrumb-item" href="{{ route('dashboard.index') }}">Painel</a>
-                    <a class="breadcrumb-item" href="#">Pedidos</a>
+                    <a class="breadcrumb-item" href="#">Produção</a>
                     <span class="breadcrumb-item active">Listagem</span>
                 </nav>
             </div>
@@ -25,7 +24,7 @@
                     <div class="block-header block-header-default d-flex justify-content-between flex-row">
                         <div>
                             <h3 class="block-title">
-                                Listagem de Pedidos
+                                Pedidos na Produção
                             </h3>
                         </div>
                         <div class="d-flex flex-row gap-2">
@@ -39,41 +38,24 @@
                         </div>
                     </div>
                     <div class="block-content block-content-full">
-                        <div class="row mb-3">
-                            <div class="col-md-2">
-                                <a href="{{ route('dashboard.order.create') }}" class="btn btn-primary text-white">Novo
-                                    Pedido</a>
-                            </div>
-                        </div>
                         <div class="row">
                             <fieldset class="border px-2 pb-2 mb-2">
                                 <legend class="float-none w-auto px-4 h5">Filtros</legend>
                                 <div class="row">
                                     <div class="col-12 col-md-3">
                                         <div class="form-group">
-                                            <label for="filterByStatus" class="fw-bold mb-1">Filtrar por status</label>
-                                            <select class="form-control" id="filterByStatus">
-                                                <option value="all">Todos</option>
-                                                <option value="waiting_approval">Aguardando Aprovação</option>
-                                                <option value="waiting_design">Aguardando Arte</option>
-                                                <option value="approved">Aprovado</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-md-3">
-                                        <div class="form-group">
                                             <label for="filterByStep" class="fw-bold mb-1">Filtrar por Etapa</label>
                                             <select class="form-control" id="filterByStep">
                                                 <option value="all">Todos</option>
                                                 <option value="in_design">Design e Arte</option>
-                                                <option value="in_production">Produção</option>
+                                                <option value="in_production" selected>Produção</option>
                                                 <option value="finished">Concluídos</option>
                                                 <option value="shipping">Para Entrega</option>
                                                 <option value="pickup">Para Retirada</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-2">
+                                    <div class="col-12 col-md-3">
                                         <div class="form-group">
                                             <label for="filterByMonth" class="fw-bold mb-1">Filtrar por mês</label>
                                             <select class="form-control" id="filterByMonth">
@@ -93,7 +75,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-2">
+                                    <div class="col-12 col-md-3">
                                         <div class="form-group">
                                             <label for="filterType" class="fw-bold mb-1">Tipo de Data</label>
                                             <select class="form-control" id="filterType">
@@ -103,7 +85,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-2">
+                                    <div class="col-12 col-md-3">
                                         <div class="form-group">
                                             <label for="filterDate" class="fw-bold mb-1">Data</label>
                                             <input type="date" class="form-control" id="filterDate"
@@ -120,22 +102,7 @@
                             </fieldset>
                         </div>
                         <div class="table-responsive">
-                            <table
-                                class="table table-bordered table-striped table-vcenter js-dataTable-responsive list-latest">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 8%;"></th>
-                                        <th style="width: 120px;">Data</th>
-                                        <th style="width: 100px;">Pedido</th>
-                                        <th>Cliente</th>
-                                        <th class="text-center" style="width: 110px">Etapa</th>
-                                        <th class="text-center" style="width: 20%;">Vendedor</th>
-                                        <th style="width: 120px;">Entrega</th>
-                                        <th class="text-center" style="width: 10%;">Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
+                            <table class="table table-bordered table-striped table-vcenter list-production">
                             </table>
                         </div>
                     </div>
@@ -145,13 +112,13 @@
     </div>
 
 
-    <div class="modal" id="detalhesModal" data-bs-backdrop='static' tabindex="-1" role="dialog"
-        aria-labelledby="detalhesModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <div class="modal" id="productionProductModal" data-bs-backdrop='static' tabindex="-1" role="dialog"
+        aria-labelledby="productionProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="block block-rounded shadow-none mb-0">
                     <div class="block-header block-header-default">
-                        <h3 class="block-title">Detalhes do Pedido</h3>
+                        <h3 class="block-title"></h3>
                     </div>
                     <div class="block-content">
                     </div>

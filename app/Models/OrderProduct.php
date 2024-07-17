@@ -62,12 +62,14 @@ class OrderProduct extends Model
         'was_bought',
         'status',
         'preview',
-        'design_file'
+        'design_file',
+        'delivered_date'
     ];
 
     public $casts = [
         'arrival_date' => 'datetime',
         'purchase_date' => 'datetime',
+        'delivered_date' => 'datetime'
     ];
 
     public function order()
