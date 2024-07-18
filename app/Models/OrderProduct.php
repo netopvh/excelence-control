@@ -61,6 +61,8 @@ class OrderProduct extends Model
         'arrived',
         'was_bought',
         'status',
+        'step',
+        'production_date',
         'preview',
         'design_file',
         'delivered_date'
@@ -69,7 +71,8 @@ class OrderProduct extends Model
     public $casts = [
         'arrival_date' => 'datetime',
         'purchase_date' => 'datetime',
-        'delivered_date' => 'datetime'
+        'delivered_date' => 'datetime',
+        'production_date' => 'datetime',
     ];
 
     public function order()

@@ -60,23 +60,6 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-3">
-                            <span class="fw-bold">Etapa:</span>
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-success dropdown-toggle text-white w-100"
-                                    id="step-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-fw fa-chevron-down text-white me-1"></i>
-                                    {{ get_step($order->step) }}
-                                </button>
-                                <div class="dropdown-menu fs-sm" aria-labelledby="dropdown-default-primary">
-                                    @foreach ($step as $key => $value)
-                                        <a class="dropdown-item step" data-value="{{ $key }}"
-                                            href="javascript:void(0)">{{ $value }}</a>
-                                        <div class="dropdown-divider"></div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-3">
                             <span class="fw-bold">Arte Finalista:</span>
                             <div class="dropdown">
                                 <button type="button" class="btn btn-info dropdown-toggle text-white w-100"

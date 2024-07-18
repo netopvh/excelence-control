@@ -54,7 +54,7 @@ Route::prefix('user')->group(function () {
 Route::prefix('order')->group(function () {
     Route::get('/{id}', [OrderController::class, 'show']);
     Route::get('products/{orderId}', [OrderController::class, 'productsOrder']);
-    Route::post('/{id}/store', [OrderController::class, 'updateStatusAndStep']);
+    Route::put('/{id}', [OrderController::class, 'updateStatusAndStep']);
     Route::post('/{id}/info', [OrderController::class, 'updateInfo']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
     Route::get('/{id}/item/{itemId}', [OrderController::class, 'showProductOrder']);
@@ -77,6 +77,8 @@ Route::prefix('production')->group(function () {
     Route::get('/', [ProductionController::class, 'index']);
     Route::get('/{id}/show', [ProductionController::class, 'show']);
     Route::post('/{id}/item/{itemId}', [ProductionController::class, 'updateOrderItem']);
+    Route::get('/{id}/viewed', [ProductionController::class, 'checkUserViewed']);
+    Route::post('/{id}/view', [ProductionController::class, 'userViewed']);
 });
 
 Route::prefix('import')->group(function () {

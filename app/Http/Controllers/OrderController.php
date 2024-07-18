@@ -29,8 +29,16 @@ class OrderController extends Controller
                     $query->filterBySearch($searchValue);
                 }
 
+                $query->when($request->get('status') !== 'all', function ($query) use ($request) {
+                    $query->whereHas('orderProducts', function ($query) use ($request) {
+                        $query->where('status', $request->get('status'));
+                    });
+                });
+
                 $query->when($request->get('step') !== 'all', function ($query) use ($request) {
-                    $query->where('step', $request->get('step'));
+                    $query->whereHas('orderProducts', function ($query) use ($request) {
+                        $query->where('step', $request->get('step'));
+                    });
                 });
 
                 $query->when($request->get('month') !== 'all', function ($query) use ($request) {

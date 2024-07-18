@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\MovementType;
 use App\Enums\StatusType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -27,6 +28,8 @@ return new class extends Migration
             $table->dateTime('delivered_date')->nullable();
             $table->enum('arrived', ['Y', 'N', 'P'])->nullable()->default(null);
             $table->enum('status', StatusType::getValues())->default(StatusType::WaitingApproval);
+            $table->enum('step', MovementType::getValues())->default(MovementType::InDesign());
+            $table->dateTime('production_date')->nullable();
             $table->string('preview')->nullable();
             $table->string('design_file')->nullable();
             $table->timestamps();

@@ -147,7 +147,7 @@
 
     <div class="modal" id="detalhesModal" data-bs-backdrop='static' tabindex="-1" role="dialog"
         aria-labelledby="detalhesModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="block block-rounded shadow-none mb-0">
                     <div class="block-header block-header-default">

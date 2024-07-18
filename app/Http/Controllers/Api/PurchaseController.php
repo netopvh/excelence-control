@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Enums\ActionType;
 use App\Enums\OriginType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderProductResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -30,6 +31,9 @@ class PurchaseController extends Controller
                     $query->whereHas('orderProducts', function ($query) use ($request) {
                         $query->where('was_bought', $request->get('status'));
                     });
+                    $query->with(['orderProducts' => function ($query) use ($request) {
+                        $query->where('was_bought', $request->get('status'));
+                    }]);
                 });
 
                 $query->when($request->get('month') !== 'all', function ($query) use ($request) {
@@ -155,11 +159,11 @@ class PurchaseController extends Controller
     public function showProductInfo($id, $productId)
     {
         $order = Order::query()->findOrFail($id);
-        $product = $order->orderProducts()->where('id', $productId)->first();
+        $orderProduct = $order->orderProducts()->where('id', $productId)->first();
 
         return response()->json([
             'success' => true,
-            'data' => ProductResource::make($product),
+            'data' => OrderProductResource::make($orderProduct),
         ]);
     }
 

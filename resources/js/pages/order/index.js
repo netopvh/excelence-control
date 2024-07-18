@@ -3,7 +3,7 @@ import { formatDate, getParameterByName, getTomorrowDate, isValidURL } from '../
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
-import { get, post, delete as del } from '../../codebase/api'
+import { get, post, delete as del, put } from '../../codebase/api'
 import Button from '../../codebase/components/button'
 import Swal from 'sweetalert2'
 import { tableIntl } from '../../codebase/constants'
@@ -79,17 +79,38 @@ class pageOrder {
         { data: 'number', name: 'number' },
         { data: 'customer.name', name: 'customer.name' },
         {
-          data: 'step',
-          name: 'step',
-          type: 'select',
+          data: 'order_products',
+          name: 'order_products',
+          orderable: false,
           render: function (data, type, row, meta) {
-            if (data == null || !(data in stepOptions)) return '<span class="badge bg-secondary">Não definido</span>'
-            if (data === 'in_production') return '<span class="badge bg-warning">' + stepOptions[data] + '</span>'
-            if (data === 'in_design') return '<span class="badge bg-corporate">' + stepOptions[data] + '</span>'
-            if (data === 'finished') return '<span class="badge bg-success">' + stepOptions[data] + '</span>'
-            if (data === 'shipping') return '<span class="badge bg-earth">' + stepOptions[data] + '</span>'
-            if (data === 'píckup') return '<span class="badge bg-elegance">' + stepOptions[data] + '</span>'
-            return stepOptions[data]
+            const inProduction = []
+            const inDesign = []
+            const finished = []
+            const shipping = []
+            const pickUp = []
+            data.forEach((item, index) => {
+              if (item.step === 'in_production') {
+                inProduction.push(item)
+              } else if (item.step === 'in_design') {
+                inDesign.push(item)
+              } else if (item.step === 'finished') {
+                finished.push(item)
+              } else if (item.step === 'shipping') {
+                shipping.push(item)
+              } else if (item.step === 'píckup') {
+                pickUp.push(item)
+              }
+            })
+
+            const html = `
+              ${inProduction.length > 0 ? `<span class="badge bg-warning">${inProduction.length} - Em Produção</span>` : ''}
+              ${inDesign.length > 0 ? `<span class="badge bg-info">${inDesign.length} - Design e Artes</span>` : ''}
+              ${finished.length > 0 ? `<span class="badge bg-success">${finished.length} - Concluído</span>` : ''}
+              ${shipping.length > 0 ? `<span class="badge bg-secondary">${shipping.length} - Entrega</span>` : ''}
+              ${pickUp.length > 0 ? `<span class="badge bg-primary">${pickUp.length} - Retirada</span>` : ''}
+            `
+
+            return html
           }
         },
         {
@@ -222,13 +243,9 @@ class pageOrder {
 
       // Verifica se a linha clicada não pertence à subtabela
       if (tr) {
-        // Obtém os dados da linha utilizando DataTable
         const rowData = table.row(tr).data()
 
-        // Verifica se os dados foram encontrados
         if (rowData) {
-          // Aqui você pode abrir o modal e preencher com os dados da linha clicada
-          // Supondo que o modal tenha o ID 'detalhesModal'
           if (!pageOrder.statusModal) {
             pageOrder.statusModal = new Modal(document.getElementById('detalhesModal'))
           }
@@ -248,11 +265,28 @@ class pageOrder {
             <form id="updateStatusForm" action="">
               <input type="hidden" name="order_id" value="${rowData.id}" />
               <div class="mb-3">
-                <label for="step" class="form-label">Etapa:</label>
-                <select name="step" class="form-control">
-                  <option value="">Não definido</option>
-                  ${Object.keys(stepOptions).map((key) => `<option value="${key}" ${key === rowData.step ? 'selected' : ''}>${stepOptions[key]}</option>`)}
-                </select>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">Produto</th>
+                      <th scope="col">Etapa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rowData.order_products.map((item, index) => `
+                    <tr>
+                      <td>${item.product.name}</td>
+                      <td>
+                        <input type="hidden" name="order_products[${index}][id]" value="${item.id}">
+                        <select name="order_products[${index}][step]" class="form-control">
+                          <option value="">Não definido</option>
+                          ${Object.keys(stepOptions).map((key) => `
+                          <option value="${key}" ${key === item.step ? 'selected' : ''}>${stepOptions[key]}</option>`).join('')}
+                        </select>
+                      </td>
+                    </tr>`)}
+                  </tbody>
+                </table>
               </div>
               <div class="mb-3">
                 <label for="employee_id" class="form-label">Vendedor:</label>
@@ -283,14 +317,28 @@ class pageOrder {
 
             btnSubmit.setLoading(true)
 
-            const data = {
-              step: form.querySelector('select[name="step"]').value,
-              employee_id: form.querySelector('select[name="employee_id"]').value
-            }
-
+            const form = event.target
+            const formData = new FormData(form)
             const orderId = form.querySelector('input[name="order_id"]').value
 
-            const res = await post(`/api/order/${orderId}/store`, data)
+            const data = {}
+
+            formData.forEach((value, key) => {
+              const keys = key.match(/[^[\]]+/g)
+              if (keys.length > 1) {
+                if (!data[keys[0]]) {
+                  data[keys[0]] = []
+                }
+                if (!data[keys[0]][keys[1]]) {
+                  data[keys[0]][keys[1]] = {}
+                }
+                data[keys[0]][keys[1]][keys[2]] = value
+              } else {
+                data[keys[0]] = value
+              }
+            })
+
+            const res = await put(`/api/order/${orderId}`, data)
 
             if (res.success) {
               btnSubmit.setLoading(false)

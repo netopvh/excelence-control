@@ -178,13 +178,11 @@ class pagePurchase {
 
     const validateModal = async (id) => {
       try {
-        // Fazer a chamada para verificar se o usuário já deu ciência de visualização
         const response = await get(`/api/purchase/${id}/viewed`, {
           user_id: document.querySelector('meta[name="user"]').content
         })
 
         if (!response.exists) {
-        // Se o usuário ainda não deu ciência de visualização, exibir o SweetAlert
           const result = await Swal.fire({
             title: 'Aviso',
             text: 'Você deu ciência de visualização deste pedido.',
@@ -193,7 +191,6 @@ class pagePurchase {
           })
 
           if (result.isConfirmed) {
-            // Fazer a chamada para marcar a visualização
             await post(`/api/purchase/${id}/view`, {
               user_id: document.querySelector('meta[name="user"]').content
             })

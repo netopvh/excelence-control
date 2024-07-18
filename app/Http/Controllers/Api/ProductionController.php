@@ -6,8 +6,10 @@ use App\Enums\ActionType;
 use App\Enums\MovementType;
 use App\Enums\OriginType;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductionController extends Controller
@@ -15,6 +17,7 @@ class ProductionController extends Controller
 
     public function index(Request $request)
     {
+
         $ordersQuery = Order::query()
             ->with('orderProducts.product', 'customer', 'employee');
 
@@ -25,7 +28,12 @@ class ProductionController extends Controller
                 }
 
                 $query->when($request->get('step') !== 'all', function ($query) use ($request) {
-                    $query->where('step', $request->get('step'));
+                    $query->whereHas('orderProducts', function ($query) use ($request) {
+                        $query->where('step', $request->get('step'));
+                    });
+                    $query->with(['orderProducts' => function ($query) use ($request) {
+                        $query->where('step', $request->get('step'));
+                    }]);
                 });
             })
             ->editColumn('date', function (Order $model) {
@@ -50,7 +58,7 @@ class ProductionController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $order,
+            'data' => OrderResource::make($order),
         ]);
     }
 
@@ -81,6 +89,45 @@ class ProductionController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Item atualizado com sucesso',
+        ]);
+    }
+
+    public function checkUserViewed(Request $request, $id)
+    {
+        $orders = Order::whereId($id)
+            ->whereHas('movements', function ($query) use ($request) {
+                $query->where('origin', OriginType::Production())
+                    ->where('action_user_id', $request->user_id)
+                    ->where('action_date', '!=', null);
+            })
+            ->get();
+
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'exists' => false,
+                'message' => 'Nenhum registro encontrado',
+            ]);
+        }
+
+        return response()->json([
+            'exists' => true,
+            'message' => 'Registro encontrado',
+        ]);
+    }
+
+    public function userViewed(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        $order->movements()->create([
+            'origin' => OriginType::Production(),
+            'action_type' => ActionType::Ciencia(),
+            'action_user_id' => $request->user_id,
+            'action_date' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Registro salvo com sucesso',
         ]);
     }
 }

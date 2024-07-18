@@ -104,10 +104,25 @@ class OrderController extends Controller
 
     public function updateStatusAndStep(Request $request, $id)
     {
+        $validated = $request->validate([
+            'order_products' => 'required|array',
+            'order_products.*.id' => 'required|exists:order_products,id',
+            'order_products.*.step' => 'nullable|string',
+            'employee_id' => 'nullable|exists:users,id',
+        ]);
+
         $order = Order::query()->findOrFail($id);
-        $order->step = $request->step;
-        $order->employee_id = $request->employee_id;
-        $order->save();
+
+        if ($request->has('employee_id')) {
+            $order->employee_id = $validated['employee_id'];
+            $order->save();
+        }
+
+        foreach ($validated['order_products'] as $orderProduct) {
+            $order->orderProducts()->find($orderProduct['id'])->update([
+                'step' => $orderProduct['step'],
+            ]);
+        }
 
         return response()->json([
             'success' => true,

@@ -29,7 +29,7 @@ class pageImport {
 
           if (res.success) {
             loading.classList.add('d-none')
-            clearForm(form)
+            form.reset()
             clearErrors(message)
             btnOrder.setLoading(false)
             Swal.fire({
@@ -44,19 +44,27 @@ class pageImport {
           showErrors(message, error.data)
         }
       })
+    }
 
-      btnProduct.setOnClick(async () => {
+    btnProduct.setOnClick(async () => {
+      btnProduct.setLoading(true)
+
+      try {
         const res = await post('/api/import/product')
 
         if (res.success) {
+          btnProduct.setLoading(false)
           Swal.fire({
             icon: 'success',
             title: 'Sucesso',
             text: res.message
           })
         }
-      })
-    }
+      } catch (error) {
+        btnProduct.setLoading(false)
+        showErrors(message, error.data)
+      }
+    })
   }
 
   static init () {

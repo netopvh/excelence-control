@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use DateTime;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -60,7 +61,6 @@ class OrderSheetImport implements ToCollection, WithHeadingRow, WithBatchInserts
             $order->fill([
                 'employee_id' => $this->findUser($row['vendedor']),
                 'date' => $this->parseDate($row['data']),
-                'step' => MovementType::InDesign(),
                 'delivery_date' => $this->parseDate($row['entrega'])
             ])->save();
 
@@ -77,6 +77,8 @@ class OrderSheetImport implements ToCollection, WithHeadingRow, WithBatchInserts
             'product_id' => $product->id,
             'qtd' => $row['qtd'],
             'in_stock' => $this->validateInStock($row['estoque']),
+            'step' => $this->validateStep($row['arte'], $row['producao']),
+            'production_date' => trim($row['producao']) ? $this->parseDate($row['producao']) : null,
             'arrived' => $row['estoque'] === 'S' || $row['estoque'] === 'OK' ? 'Y' : 'N',
             'status' => $this->validateStatus($row['arte']),
         ]);
@@ -128,21 +130,34 @@ class OrderSheetImport implements ToCollection, WithHeadingRow, WithBatchInserts
         return date('Y') . '-' . $dateParts[1] . '-' . $dateParts[0];
     }
 
-    private function validateStep($status)
+    private function validateStep($status, $producao)
     {
         $status = trim($status);
+        $producao = trim($producao);
 
-        if ($status === 'Aprovado(C)' || $status === 'Aprovado(D)' || $status === 'Aprovado(R)') {
-            return MovementType::InDesign;
+        if (
+            $status === 'Aprovado(C)' ||
+            $status === 'Aprovado(D)' ||
+            $status === 'Aprovado(R)' &&
+            !$producao
+        ) {
+            return MovementType::InProduction();
+        } elseif (
+            $status === 'Aprovado(C)' ||
+            $status === 'Aprovado(D)' ||
+            $status === 'Aprovado(R)' &&
+            $producao
+        ) {
+            return MovementType::InDesign();
         } else if ($status === 'Aguard Aprov') {
-            return MovementType::Created;
+            return MovementType::InDesign();
         } else if ($status === 'Cancelado') {
             return MovementType::Cancelled;
         } else if ($status === 'Aguard Arte') {
-            return MovementType::Created;
+            return MovementType::InDesign();
         }
 
-        return MovementType::Created;
+        return MovementType::InDesign();
     }
 
     private function validateStatus($status)
