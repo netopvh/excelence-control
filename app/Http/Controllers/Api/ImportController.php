@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\OrderImport;
+use App\Imports\OrderSheetImport;
 use App\Jobs\ImportProductsJob;
 use Automattic\WooCommerce\Client;
 use Codexshaper\WooCommerce\Facades\Product as WooProduct;
@@ -32,7 +33,7 @@ class ImportController extends Controller
         );
 
         try {
-            Excel::import(new OrderImport(), $request->file('file'));
+            Excel::import(new OrderSheetImport(), $request->file('file'));
 
             return response()->json([
                 'success' => true,

@@ -39,6 +39,7 @@ class OrderSheetImport implements ToCollection, WithHeadingRow, WithBatchInserts
 
     private function processRow(array $row)
     {
+        Log::debug($row);
         if (!isset($row['cliente']) || is_null($row['cliente'])) {
             return;
         }

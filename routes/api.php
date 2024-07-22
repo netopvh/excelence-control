@@ -79,6 +79,7 @@ Route::prefix('production')->group(function () {
     Route::post('/{id}/item/{itemId}', [ProductionController::class, 'updateOrderItem']);
     Route::get('/{id}/viewed', [ProductionController::class, 'checkUserViewed']);
     Route::post('/{id}/view', [ProductionController::class, 'userViewed']);
+    Route::get('/sectors', [ProductionController::class, 'getSectors']);
 });
 
 Route::prefix('import')->group(function () {

@@ -426,7 +426,7 @@ class PageProduction {
 
   static async showSectionModal (id) {
     if (!this.modalProductionSection) {
-      this.modalProductionSection = new Dialog('productionSectionModal', 'Definição Setor da Produção', '', 'modal-lg')
+      this.modalProductionSection = new Dialog('productionSectionModal', 'Definição Setor da Produção', '', 'modal-xl')
     }
     document.body.appendChild(this.modalProductionSection.render())
     this.modalProductionSection.show()
@@ -434,9 +434,11 @@ class PageProduction {
     this.modalProductionSection.appendContent(skeletonLoading(3, 5))
 
     try {
+      const sectors = await get('/api/production/sectors')
       const response = await get(`/api/production/${id}/show`)
+
       if (response.success) {
-        this.modalProductionSection.setContent(this.buildSectionForm(response.data))
+        this.modalProductionSection.setContent(this.buildSectionForm(response.data, sectors.data))
         this.initProductionSectionForm(response.data)
       }
     } catch (error) {
@@ -444,7 +446,7 @@ class PageProduction {
     }
   }
 
-  static buildSectionForm (data) {
+  static buildSectionForm (data, sectors) {
     return `
       <form id="updateProductionSectionForm">
         <div class="row items-push">
@@ -461,6 +463,14 @@ class PageProduction {
               ${data.order_products.map((item) => `
                 <tr>
                   <td>${item.product.name}</td>
+                  <td>
+                    <div>
+                      <select name="sector" class="form-select">
+                        <option value="">Selecione</option>
+                        ${sectors.map((sector) => `<option value="${sector.id}" ${sector.id === item.sector_id ? 'selected' : ''}>${sector.name}</option>`)}
+                      </select>
+                    </div>
+                  </td>
                 </tr>
               `).join('')}
               </tbody>
@@ -468,11 +478,19 @@ class PageProduction {
           </div>  
         </div>
         <div class="d-flex gap-2 mb-4">
-          <div class="col-12 col-md-3" id="btn-submit-container"></div>
-          <div class="col-12 col-md-3" id="btn-cancel-container"></div>
+          <div class="col-12 col-md-2" id="btn-submit-container"></div>
+          <div class="col-12 col-md-2" id="btn-cancel-container"></div>
         </div>
       </form>
     `
+  }
+
+  static async getSectors () {
+    const res = await get('/api/production/sectors')
+
+    if (res.success) {
+      return res.data
+    }
   }
 
   static initProductionSectionForm (data) {

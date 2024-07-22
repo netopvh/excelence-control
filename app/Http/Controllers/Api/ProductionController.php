@@ -8,6 +8,7 @@ use App\Enums\OriginType;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Models\ProductionSector;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -128,6 +129,15 @@ class ProductionController extends Controller
 
         return response()->json([
             'message' => 'Registro salvo com sucesso',
+        ]);
+    }
+
+    public function getSectors()
+    {
+        $sectors = ProductionSector::all();
+        return response()->json([
+            'success' => true,
+            'data' => $sectors,
         ]);
     }
 }
