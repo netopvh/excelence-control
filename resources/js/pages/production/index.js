@@ -434,48 +434,62 @@ class PageProduction {
     this.modalProductionSection.appendContent(skeletonLoading(3, 5))
 
     try {
-      const sectors = await get('/api/production/sectors')
-      const response = await get(`/api/production/${id}/show`)
+      const [sectorsResponse, responsablesResponse, sectionResponse] = await Promise.all([
+        get('/api/production/sectors'),
+        get('/api/production/responsables'),
+        get(`/api/production/${id}/show`)
+      ])
 
-      if (response.success) {
-        this.modalProductionSection.setContent(this.buildSectionForm(response.data, sectors.data))
-        this.initProductionSectionForm(response.data)
+      if (sectionResponse.success) {
+        console.log(sectionResponse.data)
+        this.modalProductionSection.setContent(this.buildSectionForm(sectionResponse.data, sectorsResponse.data, responsablesResponse.data))
+        this.initProductionSectionForm(sectionResponse.data)
       }
     } catch (error) {
       console.error(error)
     }
   }
 
-  static buildSectionForm (data, sectors) {
+  static buildSectionForm (data, sectors, responsables) {
     return `
       <form id="updateProductionSectionForm">
-        <div class="row items-push">
-          <div class="col-md-12">
-            <table class="table table-bordered table-striped list-production-items">
-              <thead>
-                <tr>
-                  <th class="text-center">Produto</th>
-                  <th class="text-center">Setor de Produção</th>
-                  <th class="text-center">Responsável</th
-                </tr>
-              </thead>
-              <tbody>
-              ${data.order_products.map((item) => `
-                <tr>
-                  <td>${item.product.name}</td>
-                  <td>
-                    <div>
-                      <select name="sector" class="form-select">
-                        <option value="">Selecione</option>
-                        ${sectors.map((sector) => `<option value="${sector.id}" ${sector.id === item.sector_id ? 'selected' : ''}>${sector.name}</option>`)}
-                      </select>
-                    </div>
-                  </td>
-                </tr>
-              `).join('')}
-              </tbody>
-            </table>
-          </div>  
+        <input type="hidden" name="order_id" value="${data.id}" />
+        <div class="mb-4">
+          <table class="table table-bordered table-striped list-production-items">
+            <thead>
+              <tr>
+                <th class="text-center">Produto</th>
+                <th class="text-center">Setor de Produção</th>
+                <th class="text-center">Responsável</th
+              </tr>
+            </thead>
+            <tbody>
+            ${data.order_products.map((item, index) => `
+              <tr>
+                <td>
+                  ${item.product.name}
+                </td>
+                <td>
+                  <div>
+                    <input type="hidden" name="order_products[${index}][id]" value="${item.id}">
+                    <select name="order_products[${index}][sector]" class="form-control">
+                      <option value="">Não definido</option>
+                      ${sectors.map((key) => `<option value="${key.id}" ${key.id === item.sector_id ? 'selected' : ''}>${key.name}</option>`).join('')}
+                    </select>
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <select name="order_products[${index}][responsable]" class="form-control">
+                      <option value="">Não definido</option>
+                      ${responsables.map((key) => `<option value="${key.id}" ${key.id === item.responsable_id ? 'selected' : ''}>${key.name}</option>`).join('')}
+                    </select>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+            </tbody>
+          </table>
         </div>
         <div class="d-flex gap-2 mb-4">
           <div class="col-12 col-md-2" id="btn-submit-container"></div>
@@ -485,22 +499,38 @@ class PageProduction {
     `
   }
 
-  static async getSectors () {
-    const res = await get('/api/production/sectors')
-
-    if (res.success) {
-      return res.data
-    }
-  }
-
   static initProductionSectionForm (data) {
-    const form = document.querySelector('#productionSectionModal')
+    const form = document.querySelector('#updateProductionSectionForm')
 
     const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
     const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
 
     form.querySelector('#btn-submit-container').appendChild(btnSubmit.render())
     form.querySelector('#btn-cancel-container').appendChild(btnCancel.render())
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+
+      btnSubmit.setLoading(true)
+      const formData = new FormData(form)
+      const orderId = form.querySelector('input[name="order_id"]').value
+      const data = this.serializeFormData(formData)
+
+      console.log(data)
+
+      try {
+        const response = await post(`/api/production/${orderId}/sector`, data)
+        if (response.success) {
+          btnSubmit.setLoading(false)
+          form.reset()
+        } else {
+          showErrors(response)
+        }
+        btnSubmit.setLoading(false)
+      } catch (error) {
+        console.error(error)
+      }
+    })
 
     btnCancel.setOnClick(() => {
       this.modalProductionSection.hide()

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\ProductionSector;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
@@ -138,6 +139,48 @@ class ProductionController extends Controller
         return response()->json([
             'success' => true,
             'data' => $sectors,
+        ]);
+    }
+
+    public function getResponsables()
+    {
+        $responsables = User::whereHas('roles', function ($query) {
+            $query->where('name', 'producao');
+        })->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $responsables,
+        ]);
+    }
+
+    public function updateSector(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'order_products' => 'required|array',
+            'order_products.*.id' => 'required|exists:order_products,id',
+            'order_products.*.sector' => 'nullable|string',
+            'order_products.*.responsable' => 'nullable|string',
+            // 'employee_id' => 'nullable|exists:users,id',
+        ]);
+
+        $order = Order::query()->findOrFail($id);
+
+        if ($request->has('employee_id')) {
+            $order->employee_id = $validated['employee_id'];
+            $order->save();
+        }
+
+        foreach ($validated['order_products'] as $orderProduct) {
+            $order->orderProducts()->find($orderProduct['id'])->update([
+                'sector_id' => $orderProduct['sector'],
+                'responsable_id' => $orderProduct['responsable'],
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Informações atualizadas com sucesso',
         ]);
     }
 }

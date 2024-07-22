@@ -28,6 +28,8 @@ class OrderProductResource extends JsonResource
             'design_file' => $this->design_file ? Storage::disk('s3')->url($this->design_file) : null,
             'preview' => $this->getPreview($this->preview),
             'noimage' => asset('media/photos/noimage.jpg'),
+            'sector_id' => $this->sector_id,
+            'responsable_id' => $this->responsable_id,
             'product' => new ProductResource($this->product)
         ];
     }

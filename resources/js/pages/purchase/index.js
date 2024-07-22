@@ -370,15 +370,15 @@ class pagePurchase {
                           ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.was_bought ? 'selected' : ''}>${key === 'Y' ? 'Comprado' : 'Não Comprado'}</option>`)}
                         </select>
                       </div>
-                      <div class="mb-3">
+                      <div class="mb-3 d-none" id="purchase-date-container">
                         <label for="purchase_date" class="form-label">Data da Compra:</label>
                         <input type="datetime-local" class="js-datepicker form-control" name="purchase_date" id="purchase_date" value="${res.data.purchase_date ? convertToDatetimeLocal(res.data.purchase_date) : ''}" />
                       </div>
-                      <div class="mb-3">
+                      <div class="mb-3 d-none" id="arrival-date-container">
                         <label for="arrival_date" class="form-label">Previsão de Entrega:</label>
                         <input type="date" class="js-datepicker form-control" name="arrival_date" id="arrival_date" value="${res.data.arrival_date ? convertToDatetimeLocal(res.data.arrival_date, false) : ''}" />
                       </div>
-                      <div class="mb-3">
+                      <div class="mb-3 d-none" id="arrived-container">
                         <label for="arrived" class="form-label">Chegou:</label>
                         <select name="arrived" class="form-control" id="arrived">
                           ${['N', 'Y'].map((key) => `<option value="${key}" ${key === res.data.arrived ? 'selected' : ''}>${key === 'Y' ? 'Sim' : 'Não'}</option>`)}
@@ -432,9 +432,23 @@ class pagePurchase {
               }
             })
 
+            if (res.data.was_bought === 'Y') {
+              form.querySelector('#purchase-date-container').classList.remove('d-none')
+              form.querySelector('#arrival-date-container').classList.remove('d-none')
+              form.querySelector('#arrived-container').classList.remove('d-none')
+            }
+
             form.querySelector('select[name="was_bought"]').addEventListener('change', function () {
               if (form.querySelector('select[name="was_bought"]').value !== 'Y') {
                 form.querySelector('input[name="arrival_date"]').value = null
+                form.querySelector('input[name="purchase_date"]').value = null
+                form.querySelector('#purchase-date-container').classList.add('d-none')
+                form.querySelector('#arrival-date-container').classList.add('d-none')
+                form.querySelector('#arrived-container').classList.add('d-none')
+              } else {
+                form.querySelector('#purchase-date-container').classList.remove('d-none')
+                form.querySelector('#arrival-date-container').classList.remove('d-none')
+                form.querySelector('#arrived-container').classList.remove('d-none')
               }
             })
 
