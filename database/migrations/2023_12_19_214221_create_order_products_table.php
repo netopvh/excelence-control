@@ -2,6 +2,8 @@
 
 use App\Enums\MovementType;
 use App\Enums\StatusType;
+use App\Models\ProductionSector;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,6 +34,8 @@ return new class extends Migration
             $table->dateTime('production_date')->nullable();
             $table->string('preview')->nullable();
             $table->string('design_file')->nullable();
+            $table->foreignIdFor(ProductionSector::class, 'sector_id')->nullable();
+            $table->foreignIdFor(User::class, 'responsable_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

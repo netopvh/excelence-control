@@ -65,7 +65,9 @@ class OrderProduct extends Model
         'production_date',
         'preview',
         'design_file',
-        'delivered_date'
+        'delivered_date',
+        'sector_id',
+        'responsable_id'
     ];
 
     public $casts = [
@@ -83,6 +85,16 @@ class OrderProduct extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function sector()
+    {
+        return $this->belongsTo(ProductionSector::class, 'sector_id');
+    }
+
+    public function responsable()
+    {
+        return $this->belongsTo(User::class, 'responsable_id');
     }
 
     public function getPreviewAttribute($value)

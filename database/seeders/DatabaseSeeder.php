@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\ProductionSector;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
@@ -39,6 +41,42 @@ class DatabaseSeeder extends Seeder
             'name' => 'producao',
         ]);
 
+        $setores = [
+            [
+                'name' => 'Sublimação',
+            ],
+            [
+                'name' => 'Resina',
+            ],
+            [
+                'name' => 'Transfer',
+            ],
+            [
+                'name' => 'Calandra',
+            ],
+            [
+                'name' => 'Terceirizado',
+            ],
+            [
+                'name' => 'Serigrafia',
+            ],
+            [
+                'name' => 'Copos',
+            ],
+            [
+                'name' => 'Laser',
+            ],
+            [
+                'name' => 'Canetas',
+            ],
+            [
+                'name' => 'Recorte',
+            ]
+        ];
+
+        foreach ($setores as $setor) {
+            ProductionSector::create($setor);
+        }
 
         $admins = [
             [

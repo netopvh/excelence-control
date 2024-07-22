@@ -3,7 +3,8 @@ import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { tableIntl } from '../../codebase/constants'
 import { convertToDatetimeLocal, formatDate, showErrors, skeletonLoading } from '../../codebase/utils'
-import { Modal } from 'bootstrap'
+import { Tooltip } from 'bootstrap'
+import Dialog from '../../codebase/components/modal'
 import { get, post, put } from '../../codebase/api'
 import Button from '../../codebase/components/button'
 import Swal from 'sweetalert2'
@@ -12,6 +13,7 @@ class PageProduction {
   static tableProduction = null
   static modalProductionItem = null
   static modalProduction = null
+  static modalProductionSection = null
   static modalStep = null
   static detailRows = []
   static stepOptions = { in_design: 'Design e Artes', in_production: 'Produção', finished: 'Concluído', shipping: 'Entrega', pickup: 'Retirada', cancelled: 'Cancelado' }
@@ -45,6 +47,11 @@ class PageProduction {
       order: [[1, 'desc']],
       drawCallback: function () {
         PageProduction.drawCallback(this)
+      },
+      initComplete: function () {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => {
+          new Tooltip(tooltip)
+        })
       }
     })
 
@@ -112,7 +119,14 @@ class PageProduction {
         name: 'action',
         orderable: false,
         searchable: false,
-        render: (data) => `<button type="button" class="btn btn-sm btn-primary" data-id="${data}" id="show-order-${data}"><i class="fa fa-eye"></i></button>`
+        className: 'text-center',
+        render: (data) => `
+        <div class="btn-group">
+          <button type="button" class="btn btn-md btn-success" data-id="${data}" id="show-order-${data}" title="Visualizar" data-bs-toggle="tooltip"><i class="fa fa-eye"></i></button>
+          <button type="button" class="btn btn-md btn-warning" data-id="${data}" id="show-step-${data}" title="Alterar Etapa" data-bs-toggle="tooltip"><i class="fa fa-right-left"></i></button>
+          <button type="button" class="btn btn-md btn-info" data-id="${data}" id="show-section-${data}" title="Alterar Setor" data-bs-toggle="tooltip"><i class="fa fa-people-carry-box"></i></button>
+        </div>
+        `
       }
     ]
   }
@@ -121,17 +135,35 @@ class PageProduction {
     const api = el.api()
     api.rows().every(function () {
       const data = this.data()
-      document.querySelector(`#show-order-${data.id}`).addEventListener('click', () => {
-        PageProduction.validateModal(data.id)
+
+      document.querySelector(`#show-order-${data.id}`).addEventListener('click', async () => {
+        if (await PageProduction.validateModal(data.id)) {
+          PageProduction.showModal(data.id)
+        }
       })
+
+      document.querySelector(`#show-section-${data.id}`).addEventListener('click', async () => {
+        if (await PageProduction.validateModal(data.id)) {
+          PageProduction.showSectionModal(data.id)
+        }
+      })
+
+      document.querySelector(`#show-step-${data.id}`).addEventListener('click', async () => {
+        if (await PageProduction.validateModal(data.id)) {
+          PageProduction.showStepModal(data)
+        }
+      })
+
       return true
     })
   }
 
-  static handleTableClick (event) {
+  static async handleTableClick (event) {
     const tr = event.target.closest('tr')
     if (event.target.closest('td.dt-control')) {
-      this.toggleChildRow(tr)
+      if (await this.validateModal(tr.getAttribute('id'))) {
+        this.toggleChildRow(tr)
+      }
     }
   }
 
@@ -150,9 +182,6 @@ class PageProduction {
           text: 'Este item não pode ser modificado!'
         })
       }
-    } else if (tr) {
-      const rowData = this.tableProduction.row(tr).data()
-      this.showStepModal(rowData)
     }
   }
 
@@ -185,36 +214,35 @@ class PageProduction {
           icon: 'info',
           confirmButtonText: 'OK'
         })
+
         if (result.isConfirmed) {
           await post(`/api/production/${id}/view`, {
             user_id: document.querySelector('meta[name="user"]').content
           })
-          this.showModal(id)
+          return true
         }
       } else {
-        this.showModal(id)
+        return true
       }
     } catch (error) {
       console.error('Erro ao verificar ou marcar visualização:', error)
+      return false
     }
   }
 
   static async showModal (id) {
-    const productionModalEl = document.getElementById('productionModal')
     if (!this.modalProduction) {
-      this.modalProduction = new Modal(productionModalEl)
+      this.modalProduction = new Dialog('productionModal', 'Detalhes do Pedido em Produção', '', 'modal-xl')
     }
-    const modalTitle = productionModalEl.querySelector('.block-title')
-    const modalBody = productionModalEl.querySelector('.block-content')
-    modalTitle.innerHTML = 'Detalhes do Pedido em Produção'
+    document.body.appendChild(this.modalProduction.render())
     this.modalProduction.show()
-    modalBody.innerHTML = ''
-    modalBody.appendChild(skeletonLoading(3, 5))
+    this.modalProduction.clearContent()
+    this.modalProduction.appendContent(skeletonLoading(3, 5))
     try {
       const response = await get(`/api/production/${id}/show`)
       if (response.success) {
-        modalBody.innerHTML = this.buildModalContent(response.data)
-        this.initTablePurchase(id)
+        this.modalProduction.setContent(this.buildModalContent(response.data))
+        this.initTablePurchase(response.data.id)
         this.buildBtnModal()
       }
     } catch (error) {
@@ -239,6 +267,7 @@ class PageProduction {
   static buildBtnModal () {
     const btnContainer = document.getElementById('buttons-container')
     const btnClose = new Button('Fechar', null, 'btn btn-danger w-25')
+
     btnClose.setOnClick(() => {
       this.modalProduction.hide()
     })
@@ -306,7 +335,7 @@ class PageProduction {
           <div class="row">
             <div class="col-md-12">${data.order_products.some(product => product.in_stock === 'partial') ? '<span class="fw-bold"><span class="text-danger">ATENÇÃO</span>: O Pedido contém produtos em quantidade parcial, favor olhar a <span class="text-uppercase">observação</span>.</span>' : ''}</div>
             <div class="col-md-12">
-              <table class="table table-bordered table-striped table-vcenter list-purchase">
+              <table class="table table-bordered table-striped table-vcenter list-production-items">
                 <thead>
                   <tr>
                     <th class="text-center">Nome</th>
@@ -378,9 +407,9 @@ class PageProduction {
   }
 
   static async initTablePurchase (id) {
-    const tablePurchaseEl = document.querySelector('.list-purchase')
-    if (tablePurchaseEl) {
-      new DataTable(tablePurchaseEl, {
+    const tableProductionItemsEl = document.querySelector('.list-production-items')
+    if (tableProductionItemsEl) {
+      const tableProductionItems = new DataTable(tableProductionItemsEl, {
         ajax: {
           url: `/api/purchase/${id}/items`,
           type: 'GET'
@@ -393,6 +422,71 @@ class PageProduction {
         columns: this.getPurchaseColumns()
       })
     }
+  }
+
+  static async showSectionModal (id) {
+    if (!this.modalProductionSection) {
+      this.modalProductionSection = new Dialog('productionSectionModal', 'Definição Setor da Produção', '', 'modal-lg')
+    }
+    document.body.appendChild(this.modalProductionSection.render())
+    this.modalProductionSection.show()
+    this.modalProductionSection.clearContent()
+    this.modalProductionSection.appendContent(skeletonLoading(3, 5))
+
+    try {
+      const response = await get(`/api/production/${id}/show`)
+      if (response.success) {
+        this.modalProductionSection.setContent(this.buildSectionForm(response.data))
+        this.initProductionSectionForm(response.data)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  static buildSectionForm (data) {
+    return `
+      <form id="updateProductionSectionForm">
+        <div class="row items-push">
+          <div class="col-md-12">
+            <table class="table table-bordered table-striped list-production-items">
+              <thead>
+                <tr>
+                  <th class="text-center">Produto</th>
+                  <th class="text-center">Setor de Produção</th>
+                  <th class="text-center">Responsável</th
+                </tr>
+              </thead>
+              <tbody>
+              ${data.order_products.map((item) => `
+                <tr>
+                  <td>${item.product.name}</td>
+                </tr>
+              `).join('')}
+              </tbody>
+            </table>
+          </div>  
+        </div>
+        <div class="d-flex gap-2 mb-4">
+          <div class="col-12 col-md-3" id="btn-submit-container"></div>
+          <div class="col-12 col-md-3" id="btn-cancel-container"></div>
+        </div>
+      </form>
+    `
+  }
+
+  static initProductionSectionForm (data) {
+    const form = document.querySelector('#productionSectionModal')
+
+    const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
+    const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
+
+    form.querySelector('#btn-submit-container').appendChild(btnSubmit.render())
+    form.querySelector('#btn-cancel-container').appendChild(btnCancel.render())
+
+    btnCancel.setOnClick(() => {
+      this.modalProductionSection.hide()
+    })
   }
 
   static getPurchaseColumns () {
@@ -408,20 +502,19 @@ class PageProduction {
   }
 
   static async showProductionItemModal (orderId, productId) {
-    const modalEl = document.getElementById('productionProductModal')
     if (!this.modalProductionItem) {
-      this.modalProductionItem = new Modal(modalEl)
+      this.modalProductionItem = new Dialog('productionItemModal', 'Status da Compra do Item', '', 'modal-md')
     }
-    const modalTitle = modalEl.querySelector('.block-title')
-    const modalBody = modalEl.querySelector('.block-content')
-    modalTitle.innerHTML = 'Informações da Pedido'
+
+    document.body.appendChild(this.modalProductionItem.render())
     this.modalProductionItem.show()
-    modalBody.innerHTML = ''
-    modalBody.appendChild(skeletonLoading(3, 5))
+    this.modalProductionItem.clearContent()
+    this.modalProductionItem.appendContent(skeletonLoading(3, 5))
+
     try {
       const res = await get(`/api/order/${orderId}/item/${productId}`)
       if (res.success) {
-        modalBody.innerHTML = this.buildProductionItemForm(res.data, productId)
+        this.modalProductionItem.setContent(this.buildProductionItemForm(res.data, productId))
         this.initProductionItemForm(res.data)
       }
     } catch (error) {
@@ -455,15 +548,15 @@ class PageProduction {
   }
 
   static initProductionItemForm (data) {
-    const form = document.getElementById('updateProductionItemForm')
+    const form = document.querySelector('#updateProductionItemForm')
     const errorsContainer = document.getElementById('errors-container')
     const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
     const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
     const deliveredDateContainer = document.getElementById('delivered-date-container')
     const selectArrived = document.getElementById('arrived')
 
-    document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
-    document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+    form.querySelector('#btn-submit-container').appendChild(btnSubmit.render())
+    form.querySelector('#btn-cancel-container').appendChild(btnCancel.render())
 
     form.addEventListener('submit', async function (event) {
       event.preventDefault()
@@ -506,16 +599,14 @@ class PageProduction {
     })
   }
 
-  static async showStepModal (rowData) {
+  static async showStepModal (data) {
     const modal = document.getElementById('productionProductModal')
-    if (rowData) {
+    if (data) {
       if (!this.modalStep) {
-        this.modalStep = new Modal(modal)
+        this.modalStep = new Dialog('productionStepModal', 'Informações da Etapa do Pedido', '', 'modal-lg')
       }
-      const modalTitle = modal.querySelector('.block-title')
-      const modalBody = modal.querySelector('.block-content')
-      modalTitle.textContent = 'Alterar Etapa do Pedido'
-      modalBody.innerHTML = this.buildStepForm(rowData)
+      document.body.appendChild(this.modalStep.render())
+      this.modalStep.setContent(this.buildStepForm(data))
       this.initStepForm()
       this.modalStep.show()
     }
@@ -549,7 +640,6 @@ class PageProduction {
           </table>
         </div>
         <div class="d-flex gap-2 mb-4">
-          <div class="col-12 col-md-6"></div>
           <div class="col-12 col-md-3" id="btn-submit-container"></div>
           <div class="col-12 col-md-3" id="btn-cancel-container"></div>
         </div>
@@ -558,12 +648,12 @@ class PageProduction {
   }
 
   static initStepForm () {
-    const form = document.getElementById('updateStepForm')
+    const form = document.querySelector('#updateStepForm')
     const btnSubmit = new Button('Salvar', null, 'btn btn-primary w-100', 'submit')
     const btnCancel = new Button('Cancelar', null, 'btn btn-danger w-100')
 
-    document.getElementById('btn-submit-container').appendChild(btnSubmit.render())
-    document.getElementById('btn-cancel-container').appendChild(btnCancel.render())
+    form.querySelector('#btn-submit-container').appendChild(btnSubmit.render())
+    form.querySelector('#btn-cancel-container').appendChild(btnCancel.render())
 
     form.addEventListener('submit', async function (event) {
       event.preventDefault()

@@ -26,6 +26,7 @@ class pageOrder {
           <td class='text-uppercase fw-bold'>Quantidade</td>
           <td class='text-uppercase fw-bold'>Status</td>
           <td class='text-uppercase fw-bold'>Situação</td>
+          <td class='text-uppercase fw-bold'>Etapa</td>
           ${hasPurchase ? '<td class="text-uppercase fw-bold">Data da Compra</td>' : ''}
           <td class='text-uppercase fw-bold'>Fornecedor</td>
           <td class='text-uppercase fw-bold'>Observação</td>
@@ -36,6 +37,7 @@ class pageOrder {
             <td>${item.qtd}</td>
             <td>${item.status === 'approved' ? '<span class="badge bg-success">Aprovado</span>' : item.status === 'waiting_approval' ? '<span class="badge bg-warning">Aguard. Aprov.</span>' : '<span class="badge bg-info">Aguard. Arte</span> '}</td>
             <td>${item.was_bought === 'Y' ? '<span class="badge bg-success">Comprado</span>' : (item.was_bought === 'N') && (item.in_stock === 'no' || item.in_stock === 'partial') ? '<span class="badge bg-warning">Não Comprado</span>' : '-'}</td>
+            <td>${stepOptions[item.step] ? `<span class="badge bg-info">${stepOptions[item.step]}</span>` : '-'}</td>
             ${hasPurchase ? `<td>${formatDate(item.purchase_date)}</td>` : ''}
             <td>${!item.supplier ? '-' : isValidURL(item.supplier) ? `<a href="${item.supplier}" class="btn btn-sm btn-primary" target="_blank">Abrir Link</a>` : item.supplier}</td>
             <td>${item.obs ? item.obs : '-'}</td>
