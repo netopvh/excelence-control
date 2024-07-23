@@ -36,6 +36,7 @@ return new class extends Migration
             $table->string('design_file')->nullable();
             $table->foreignIdFor(ProductionSector::class, 'sector_id')->nullable();
             $table->foreignIdFor(User::class, 'responsable_id')->nullable();
+            $table->dateTime('finished_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

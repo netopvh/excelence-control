@@ -120,13 +120,14 @@ class PageProduction {
         orderable: false,
         searchable: false,
         className: 'text-center',
-        render: (data) => `
-        <div class="btn-group">
+        render: (data) => {
+          return `<div class="btn-group">
           <button type="button" class="btn btn-md btn-success" data-id="${data}" id="show-order-${data}" title="Visualizar" data-bs-toggle="tooltip"><i class="fa fa-eye"></i></button>
           <button type="button" class="btn btn-md btn-warning" data-id="${data}" id="show-step-${data}" title="Alterar Etapa" data-bs-toggle="tooltip"><i class="fa fa-right-left"></i></button>
           <button type="button" class="btn btn-md btn-info" data-id="${data}" id="show-section-${data}" title="Alterar Setor" data-bs-toggle="tooltip"><i class="fa fa-people-carry-box"></i></button>
         </div>
         `
+        }
       }
     ]
   }
@@ -441,7 +442,6 @@ class PageProduction {
       ])
 
       if (sectionResponse.success) {
-        console.log(sectionResponse.data)
         this.modalProductionSection.setContent(this.buildSectionForm(sectionResponse.data, sectorsResponse.data, responsablesResponse.data))
         this.initProductionSectionForm(sectionResponse.data)
       }
@@ -470,21 +470,25 @@ class PageProduction {
                   ${item.product.name}
                 </td>
                 <td>
-                  <div>
-                    <input type="hidden" name="order_products[${index}][id]" value="${item.id}">
-                    <select name="order_products[${index}][sector]" class="form-control">
-                      <option value="">Não definido</option>
-                      ${sectors.map((key) => `<option value="${key.id}" ${key.id === item.sector_id ? 'selected' : ''}>${key.name}</option>`).join('')}
-                    </select>
-                  </div>
+                  ${item.in_stock === 'yes' || (item.was_bought === 'Y' && item.arrived === 'Y')
+                  ? `
+                  <input type="hidden" name="order_products[${index}][id]" value="${item.id}">
+                  <select name="order_products[${index}][sector]" class="form-control">
+                    <option value="">Não definido</option>
+                    ${sectors.map((key) => `<option value="${key.id}" ${key.id === item.sector_id ? 'selected' : ''}>${key.name}</option>`).join('')}
+                  </select>
+                  `
+                  : 'Produto não comprado ou não chegou'}
                 </td>
                 <td>
-                  <div>
-                    <select name="order_products[${index}][responsable]" class="form-control">
-                      <option value="">Não definido</option>
-                      ${responsables.map((key) => `<option value="${key.id}" ${key.id === item.responsable_id ? 'selected' : ''}>${key.name}</option>`).join('')}
-                    </select>
-                  </div>
+                ${item.in_stock === 'yes' || (item.was_bought === 'Y' && item.arrived === 'Y')
+                  ? `
+                  <select name="order_products[${index}][responsable]" class="form-control">
+                    <option value="">Não definido</option>
+                    ${responsables.map((key) => `<option value="${key.id}" ${key.id === item.responsable_id ? 'selected' : ''}>${key.name}</option>`).join('')}
+                  </select>
+                  `
+                  : 'Produto não comprado ou não chegou'}
                 </td>
               </tr>
             `).join('')}
@@ -516,13 +520,15 @@ class PageProduction {
       const orderId = form.querySelector('input[name="order_id"]').value
       const data = this.serializeFormData(formData)
 
-      console.log(data)
-
       try {
         const response = await post(`/api/production/${orderId}/sector`, data)
         if (response.success) {
           btnSubmit.setLoading(false)
-          form.reset()
+          this.modalProductionSection.hide()
+          Swal.fire({
+            icon: 'success',
+            title: 'Setor da produção definido com sucesso'
+          })
         } else {
           showErrors(response)
         }

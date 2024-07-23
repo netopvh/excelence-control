@@ -8,6 +8,14 @@ function getParameterByName (name) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 
+function delParameterByName (name) {
+  const url = window.location.href
+  const urlParams = new URLSearchParams(url.split('?')[1])
+  urlParams.delete(name)
+  const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + urlParams.toString()
+  window.history.pushState({ path: newUrl }, '', newUrl)
+}
+
 function clearForm (form) {
   const inputs = form.querySelectorAll('input, select, textarea')
 
@@ -240,4 +248,4 @@ function getTomorrowDate () {
   return `${year}-${month}-${day}`
 }
 
-export { getParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, convertToDatetimeLocal, formatDate, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }
+export { getParameterByName, delParameterByName, clearForm, focusElement, isValidURL, convertDateToISO, convertDateTimeToISO, convertToDatetimeLocal, formatDate, showErrors, showSuccess, clearErrors, getRoleName, skeletonLoading, getTomorrowDate }

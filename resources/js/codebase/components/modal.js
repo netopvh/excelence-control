@@ -82,8 +82,22 @@ class Modal {
     const modalInstance = BootstrapModal.getInstance(this.modal)
     if (modalInstance) {
       modalInstance.hide()
+      // this.removeBackdrop()
+      // this.enableScrollbar()
       document.body.removeChild(this.modal)
     }
+  }
+
+  removeBackdrop () {
+    const backdrop = document.querySelector('.modal-backdrop')
+    if (backdrop) {
+      backdrop.remove()
+    }
+  }
+
+  enableScrollbar () {
+    document.body.classList.remove('modal-open')
+    document.body.style = ''
   }
 }
 

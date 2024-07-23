@@ -17,12 +17,7 @@ class PurchaseController extends Controller
 {
     public function index(Request $request)
     {
-        $ordersQuery = Order::whereHas('orderProducts', function ($query) use ($request) {
-            $query->whereIn('in_stock', ['no', 'partial']);
-        })
-            ->with(['orderProducts' => function ($query) {
-                $query->whereIn('in_stock', ['no', 'partial']);
-            }, 'orderProducts.product', 'customer', 'employee']);
+        $ordersQuery = Order::with('orderProducts.product', 'customer', 'employee');
 
         return DataTables::of($ordersQuery)
             ->filter(function ($query) use ($request) {
@@ -49,6 +44,25 @@ class PurchaseController extends Controller
                         });
                     }
                 });
+
+                if ($request->get('late')) {
+                    $query->whereHas('orderProducts', function ($query) {
+                        $query->whereIn('in_stock', ['no', 'partial'])
+                            ->where('was_bought', 'Y')
+                            ->whereDate('arrival_date', Carbon::tomorrow()->format('Y-m-d'));
+                    })->with(['orderProducts' => function ($query) {
+                        $query->whereIn('in_stock', ['no', 'partial'])
+                            ->where('was_bought', 'Y')
+                            ->whereDate('arrival_date', Carbon::tomorrow()->format('Y-m-d'));
+                    }]);
+                } else {
+                    $query->whereHas('orderProducts', function ($query) use ($request) {
+                        $query->whereIn('in_stock', ['no', 'partial']);
+                    })
+                        ->with(['orderProducts' => function ($query) {
+                            $query->whereIn('in_stock', ['no', 'partial']);
+                        }]);
+                }
 
                 if ($request->get('type') === 'all' && $searchValue = trim($request->get('search')['value'])) {
                     $query->filterBySearch($searchValue);
@@ -97,7 +111,10 @@ class PurchaseController extends Controller
         }, 'orderProducts.product', 'customer', 'employee'])
             ->findOrFail($id);
 
-        return response()->json($order);
+        return response()->json([
+            'success' => true,
+            'data' => $order,
+        ]);
     }
 
     public function orderItems($id)
@@ -179,6 +196,7 @@ class PurchaseController extends Controller
         ]);
 
         return response()->json([
+            'success' => true,
             'message' => 'Registro salvo com sucesso',
         ]);
     }

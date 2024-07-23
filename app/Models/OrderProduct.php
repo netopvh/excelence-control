@@ -67,7 +67,8 @@ class OrderProduct extends Model
         'design_file',
         'delivered_date',
         'sector_id',
-        'responsable_id'
+        'responsable_id',
+        'finished_date',
     ];
 
     public $casts = [
@@ -75,6 +76,7 @@ class OrderProduct extends Model
         'purchase_date' => 'datetime',
         'delivered_date' => 'datetime',
         'production_date' => 'datetime',
+        'finished_date' => 'datetime',
     ];
 
     public function order()

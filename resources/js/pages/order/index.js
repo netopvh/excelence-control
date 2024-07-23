@@ -1,5 +1,5 @@
 import DataTable from 'datatables.net-bs5'
-import { formatDate, getParameterByName, getTomorrowDate, isValidURL } from '../../codebase/utils'
+import { delParameterByName, formatDate, getParameterByName, getTomorrowDate, isValidURL } from '../../codebase/utils'
 import 'datatables.net-responsive-bs5'
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css'
 import { Modal } from 'bootstrap'
@@ -183,6 +183,7 @@ class pageOrder {
       document.querySelector('#filterByStep').value = 'all'
       document.getElementById('filterType').value = ''
       document.getElementById('filterDate').value = ''
+      delParameterByName('type')
       table.draw()
     })
 
